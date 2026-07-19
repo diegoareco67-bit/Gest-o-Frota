@@ -2,7 +2,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { CalendarioGrade } from "../../components/CalendarioGrade";
 import { ModalConfirm } from "../../components/ModalConfirm";
 import { useEffect, useState } from "react";
-import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, setDoc, deleteDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -63,10 +63,14 @@ export default function Salas() {
     setEnviando(true);
     try {
       const sala = salas.find(s => s.id === form.salaId);
-      await addDoc(collection(db, "reservasSalas"), {
+      const novaReserva = await addDoc(collection(db, "reservasSalas"), {
         salaId: form.salaId, salaNome: sala?.nome || "",
         responsavelId: usuario?.uid, responsavelNome: usuario?.nome, responsavelSetor: usuario?.setor,
         motivo: form.motivo, dataInicio, dataFim, status: "confirmada", criadoEm: serverTimestamp(),
+      });
+      // Mirror não-sensível pra exibição pública na tela de login (LGPD: sem responsavelNome/motivo)
+      await setDoc(doc(db, "calendarioPublicoSalas", novaReserva.id), {
+        salaNome: sala?.nome || "", dataInicio, dataFim, status: "confirmada",
       });
       setModal(false);
       setForm({ salaId:"", data:"", horaInicio:"", horaFim:"", motivo:"" });
@@ -77,6 +81,7 @@ export default function Salas() {
 
   async function cancelar(r: ReservaSala) {
     await updateDoc(doc(db, "reservasSalas", r.id), { status: "cancelada" });
+    try { await deleteDoc(doc(db, "calendarioPublicoSalas", r.id)); } catch { /* pode não existir */ }
     setConfirmCancelar(null);
     await carregar();
   }

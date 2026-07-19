@@ -16,6 +16,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Suíte de testes unitários (Vitest/Testing Library) também corrigida em 2026-07-18** — tinha **80 testes falhando desde a Fase 1** (a mesma dívida que este arquivo já vinha citando). Causas: mesma classe de bug dos mocks e2e (exports faltando: `where`, `onSnapshot`, `setDoc`, `deleteDoc`, `getDoc`, `Timestamp`), mais `pendentes` prop obsoleta no `Sidebar` (componente ignora silenciosamente, já calcula sozinho via `onSnapshot`), mais um teste (`Sidebar.test.tsx`) que **nunca mockou o Firestore e fazia chamada real ao projeto de produção** durante os testes. Resultado: **141/141 passando**. `tsc -b` e `vite build` conferidos sem erro. Ver seção "Suíte Vitest corrigida" abaixo.
 - ✅ **Código publicado no GitHub e CI/CD via GitHub Actions funcionando ponta a ponta desde 2026-07-19** — repositório `diegoareco67-bit/Gest-o-Frota`, workflow roda type-check + Vitest + Playwright + build a cada push, e faz deploy automático (hosting, firestore rules, storage rules, functions) quando `main` passa em tudo. Ver seção "CI/CD via GitHub Actions" abaixo.
 - ✅ **Rebrand FrotaGov → Hub concluído em 2026-07-19** (tela de login + Sidebar): nome/identidade visual do CLAUDE.md ("Nome Hub, subtítulo Central de Recursos Compartilhados") finalmente aplicado nas telas — antes só existia no documento. Ver seção "Rebrand FrotaGov → Hub" abaixo.
+- ✅ **Calendário público de Salas na tela de login, 2026-07-19** — pedido do usuário pra dar mais substância ao "hub" além do rebrand visual: a tela de login agora tem abas Veículos/Salas, ambas com dado real (não só o chip estático). Ver seção "Calendário público de Salas" abaixo.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -96,6 +97,19 @@ Pedido do usuário: "mudanças no layout da tela inicial que faça jus ao hub". 
 - Verificado: `tsc -b` sem erro, **141/141 Vitest**, **160/160 e2e**, e checagem visual manual (`npm run dev` + screenshot da tela de login) confirmando layout sem sobreposição/corte de texto.
 
 **Fora do escopo, não alterado:** o e-mail placeholder do login continua `gestor@frota.ms.gov.br` (domínio do sistema, não é branding visual); nome do projeto Firebase (`gestaofrotacge530101`) e URL de produção (`gestaofrotacge530101.web.app`) continuam com "frota" no nome — trocar isso seria migração de projeto/domínio, não um ajuste de tela.
+
+### ✅ Calendário público de Salas na tela de login — 2026-07-19
+
+Depois do rebrand visual, o usuário pediu pra "aplicar as informações referente aos dois calendários na tela inicial" — ou seja, não só o chip estático de "Salas", mas um calendário público de verdade, igual ao de Veículos já existente.
+
+**Mesma restrição já identificada no rebrand:** `reservasSalas` não é lida sem login (só `gestor`/`usuario`/`consulta`). Resolvido com o mesmo padrão já usado pra veículos — um mirror público novo:
+
+- `firestore.rules`: nova coleção `calendarioPublicoSalas`, `allow read: if true`, escrita por `isGestor() || isUsuario()` (mesmo padrão de `calendarioPublico`). Campos: `salaNome, dataInicio, dataFim, status` — sem `responsavelNome`/`motivo` (LGPD).
+- `Salas.tsx`: `reservar()` agora também escreve o mirror em `calendarioPublicoSalas/{id}` (mesmo id da reserva) logo após criar a reserva; `cancelar()` apaga o mirror (mesmo padrão de `deleteDoc` já usado em `Aprovacoes.tsx`/`MinhasSolicitacoes.tsx` pros veículos).
+- `login.tsx`: painel direito ganhou abas ("🚚 Veículos" / "🚪 Salas") acima do calendário — troca entre as duas instâncias de `CalendarioGrade` (a de Salas usa `colecao="calendarioPublicoSalas"`, `campoTitulo="salaNome"`, e o mesmo `statusMap`/`statusFiltro` já usados na tela interna de Salas). Aba padrão continua Veículos, sem mudar o comportamento anterior.
+- Cobertura nova: 3 testes em `e2e/login.spec.ts` (abas visíveis, calendário de Veículos por padrão, troca pra Salas exibe o título certo).
+- Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e** (160 + 3 novos), checagem visual manual (screenshot das duas abas).
+- **Equipamentos e Indenização continuam só como chip estático** — não pedido agora; seguiria o mesmo padrão (`calendarioPublicoEquipamentos`) se algum dia for necessário. Indenização não tem "calendário" no sentido de disponibilidade (é fluxo de aprovação individual), então não se aplicaria da mesma forma.
 
 ### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
 

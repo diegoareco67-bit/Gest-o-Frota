@@ -27,6 +27,26 @@ test.describe("Login — renderização", () => {
   });
 });
 
+test.describe("Login — calendários públicos", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/login");
+  });
+
+  test("exibe o calendário de Veículos por padrão", async ({ page }) => {
+    await expect(page.getByText("CALENDÁRIO DE DISPONIBILIDADE", { exact: true })).toBeVisible();
+  });
+
+  test("exibe as abas Veículos e Salas", async ({ page }) => {
+    await expect(page.getByRole("tab", { name: /veículos/i })).toBeVisible();
+    await expect(page.getByRole("tab", { name: /salas/i })).toBeVisible();
+  });
+
+  test("clicar na aba Salas troca para o calendário de salas", async ({ page }) => {
+    await page.getByRole("tab", { name: /salas/i }).click();
+    await expect(page.getByText("SALAS DE REUNIÃO", { exact: true })).toBeVisible();
+  });
+});
+
 test.describe("Login — interação de senha", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/login");

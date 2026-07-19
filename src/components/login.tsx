@@ -16,6 +16,11 @@ const MODULOS = [
     icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg> },
 ];
 
+const STATUS_SALAS_PUBLICO = {
+  confirmada: { cor:"#3B82F6", label:"Reservada" },
+  cancelada:  { cor:"#94A3B8", label:"Cancelada" },
+};
+
 export default function Login() {
   const {login}  = useAuth();
   const navigate = useNavigate();
@@ -29,6 +34,7 @@ export default function Login() {
   const [resetLoad,setResetLoad] = useState(false);
   const [resetOk,setResetOk]     = useState(false);
   const [erroReset,setErroReset] = useState("");
+  const [abaCalendario,setAbaCalendario] = useState<"veiculos"|"salas">("veiculos");
 
   async function handleReset(e:React.FormEvent){
     e.preventDefault(); setErroReset(""); setResetLoad(true);
@@ -216,7 +222,36 @@ export default function Login() {
           <text x="110" y="129" textAnchor="middle" fill="white" fontSize="11.5" fontFamily="Arial, sans-serif" fontWeight="400">de Mato Grosso do Sul</text>
         </svg>
         <div style={{flex:1,padding:"40px 48px",overflowY:"auto",position:"relative",zIndex:1}}>
-          <CalendarioGrade tema="escuro"/>
+          <div style={{display:"flex",gap:8,marginBottom:18}} role="tablist" aria-label="Selecionar calendário público">
+            {(["veiculos","salas"] as const).map(aba=>(
+              <button key={aba} type="button" role="tab" aria-selected={abaCalendario===aba}
+                onClick={()=>setAbaCalendario(aba)}
+                style={{
+                  padding:"8px 18px",borderRadius:999,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                  border: abaCalendario===aba ? "1px solid #fff" : "1px solid rgba(255,255,255,0.14)",
+                  background: abaCalendario===aba ? "#fff" : "rgba(255,255,255,0.07)",
+                  color: abaCalendario===aba ? "#0F172A" : "rgba(255,255,255,0.65)",
+                  transition:"background 0.15s, color 0.15s",
+                }}>
+                {aba==="veiculos" ? "🚚 Veículos" : "🚪 Salas"}
+              </button>
+            ))}
+          </div>
+          {abaCalendario==="veiculos" ? (
+            <CalendarioGrade tema="escuro"/>
+          ) : (
+            <CalendarioGrade
+              tema="escuro"
+              colecao="calendarioPublicoSalas"
+              titulo="SALAS DE REUNIÃO"
+              subtitulo="Consulte a disponibilidade pública das salas"
+              campoTitulo="salaNome"
+              campoDataInicio="dataInicio"
+              campoDataFim="dataFim"
+              statusMap={STATUS_SALAS_PUBLICO}
+              statusFiltro={["confirmada"]}
+            />
+          )}
         </div>
       </div>
     </div>

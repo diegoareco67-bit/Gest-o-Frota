@@ -63,6 +63,15 @@ service cloud.firestore {
       allow write: if isGestor() || isUsuario();
     }
 
+    // ─── calendarioPublicoSalas ─────────────────────────────────────────────
+    // Mesmo padrão de 'calendarioPublico', mirror não-sensível de 'reservasSalas'
+    // pra exibir o calendário de salas também na tela de login (pré-autenticação).
+    // Campos: salaNome, dataInicio, dataFim, status (sem responsavelNome, motivo).
+    match /calendarioPublicoSalas/{id} {
+      allow read: if true;
+      allow write: if isGestor() || isUsuario();
+    }
+
     // ─── solicitacoes ──────────────────────────────────────────────────────
     // Leitura restrita a gestor, ou ao próprio dono da solicitação (LGPD: condutorNome,
     // destino, motivo são sensíveis — um usuario não pode mais ler solicitações de outros
