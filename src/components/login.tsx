@@ -176,11 +176,8 @@ export default function Login() {
                   </div>
                 </div>
 
-                {/* Lembrar / Esqueci */}
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-                  <label style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"#64748B",cursor:"pointer"}}>
-                    <input type="checkbox" style={{marginRight:0}}/> Lembrar-me
-                  </label>
+                {/* Esqueci a senha */}
+                <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",marginBottom:14}}>
                   <button type="button" onClick={()=>{setModoReset(true);setEmailReset(email);setErroReset("");setErro("");}}
                     style={{background:"none",border:"none",fontSize:12,color:"#3B82F6",cursor:"pointer",fontFamily:"inherit"}}>Esqueceu sua senha?</button>
                 </div>
@@ -202,6 +199,10 @@ export default function Login() {
         <button onClick={()=>navigate("/solicitar-acesso")}
           style={{background:"none",border:"1px solid #E2E8F0",borderRadius:8,padding:"9px 16px",fontSize:12,color:"#64748B",cursor:"pointer",fontFamily:"inherit",width:"100%"}}>
           Não possuo acesso — Solicitar cadastro
+        </button>
+        <button onClick={()=>navigate("/privacidade")}
+          style={{background:"none",border:"none",fontSize:11,color:"#94A3B8",cursor:"pointer",fontFamily:"inherit",marginTop:12,textDecoration:"underline"}}>
+          Aviso de Privacidade (LGPD)
         </button>
       </div>
 

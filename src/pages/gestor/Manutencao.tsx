@@ -3,6 +3,7 @@ import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, li
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEscClose } from "../../hooks/useEscClose";
 import { Sidebar } from "../../components/layout/Sidebar";
 
 interface Manutencao { id:string; veiculoId:string; veiculoPlaca:string; tipo:string; descricao:string; status:string; previsao:string; custo?:number; oficina?:string; criadoEm?:{toDate:()=>Date}; }
@@ -27,6 +28,8 @@ export default function Manutencao() {
   const [busca,setBusca]       = useState("");
   const [filtroSt,setFiltroSt] = useState("todas");
   const [form,setForm]         = useState({veiculoId:"",veiculoPlaca:"",tipo:"revisao",descricao:"",status:"agendada",previsao:"",custo:0,oficina:""});
+
+  useEscClose(()=>setModal(false), modal);
 
   useEffect(()=>{carregar();},[]);
 
@@ -160,44 +163,44 @@ export default function Manutencao() {
             <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
               {[["Veículo *","select-veiculo"],["Tipo","select-tipo"],["Descrição *","textarea-descricao"]].map(()=>null)}
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Veículo *</label>
-                <select value={form.veiculoId} onChange={e=>{const v=veiculos.find(x=>x.id===e.target.value);setForm(p=>({...p,veiculoId:e.target.value,veiculoPlaca:v?.placa||""}));}}
+                <label htmlFor="man-veiculo" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Veículo *</label>
+                <select id="man-veiculo" value={form.veiculoId} onChange={e=>{const v=veiculos.find(x=>x.id===e.target.value);setForm(p=>({...p,veiculoId:e.target.value,veiculoPlaca:v?.placa||""}));}}
                   style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                   <option value="">Selecione um veículo</option>
                   {veiculos.map(v=><option key={v.id} value={v.id}>{v.placa}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Tipo</label>
-                <select value={form.tipo} onChange={e=>setForm(p=>({...p,tipo:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
+                <label htmlFor="man-tipo" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Tipo</label>
+                <select id="man-tipo" value={form.tipo} onChange={e=>setForm(p=>({...p,tipo:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                   {TIPOS.map(t=><option key={t} value={t}>{TIPO_LABEL[t]||t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Descrição *</label>
-                <textarea value={form.descricao} onChange={e=>setForm(p=>({...p,descricao:e.target.value}))} rows={3}
+                <label htmlFor="man-descricao" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Descrição *</label>
+                <textarea id="man-descricao" value={form.descricao} onChange={e=>setForm(p=>({...p,descricao:e.target.value}))} rows={3}
                   style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,boxSizing:"border-box",fontFamily:"inherit",resize:"vertical",background:"#fff",color:"#0F172A"} as React.CSSProperties}/>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:"1rem"}}>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Status</label>
-                  <select value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
+                  <label htmlFor="man-status" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Status</label>
+                  <select id="man-status" value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                     {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Previsão de Conclusão</label>
-                  <input type="date" value={form.previsao} onChange={e=>setForm(p=>({...p,previsao:e.target.value}))}
+                  <label htmlFor="man-previsao" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Previsão de Conclusão</label>
+                  <input id="man-previsao" type="date" value={form.previsao} onChange={e=>setForm(p=>({...p,previsao:e.target.value}))}
                     style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,boxSizing:"border-box",fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}/>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Oficina / Responsável</label>
-                  <input value={form.oficina} onChange={e=>setForm(p=>({...p,oficina:e.target.value}))} placeholder="Ex: Oficina Alfa"
+                  <label htmlFor="man-oficina" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Oficina / Responsável</label>
+                  <input id="man-oficina" value={form.oficina} onChange={e=>setForm(p=>({...p,oficina:e.target.value}))} placeholder="Ex: Oficina Alfa"
                     style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,boxSizing:"border-box",fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}/>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Custo Estimado (R$)</label>
-                  <input type="number" value={form.custo} onChange={e=>setForm(p=>({...p,custo:Number(e.target.value)}))}
+                  <label htmlFor="man-custo" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Custo Estimado (R$)</label>
+                  <input id="man-custo" type="number" value={form.custo} onChange={e=>setForm(p=>({...p,custo:Number(e.target.value)}))}
                     style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,boxSizing:"border-box",fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}/>
                 </div>
               </div>

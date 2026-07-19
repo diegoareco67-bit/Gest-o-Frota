@@ -5,6 +5,7 @@ import { collection, getDocs, setDoc, updateDoc, doc, serverTimestamp, query, wh
 import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../../firebase/config";
 import { useSetores } from "../../hooks/useSetores";
+import { useEscClose } from "../../hooks/useEscClose";
 import type { Perfil } from "../../types";
 
 interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; }
@@ -43,6 +44,9 @@ export default function Usuarios() {
   const [sucessoMsg, setSucessoMsg] = useState("");
   const [confirmRecusar, setConfirmRecusar] = useState(false);
   const setores = useSetores();
+
+  useEscClose(() => setModal(false), modal);
+  useEscClose(() => setSolSelecionada(null), !!solSelecionada);
 
   useEffect(() => { carregarTudo(); }, []);
 
@@ -331,14 +335,14 @@ export default function Usuarios() {
                 { label:"Vencimento da CNH", key:"vencimentoCnh", type:"date" },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={s.label}>{f.label}</label>
-                  <input type={f.type||"text"} value={(editForm as Record<string,string>)[f.key]}
+                  <label htmlFor={`analise-${f.key}`} style={s.label}>{f.label}</label>
+                  <input id={`analise-${f.key}`} type={f.type||"text"} value={(editForm as Record<string,string>)[f.key]}
                     onChange={e => setEditForm(p => ({ ...p, [f.key]:e.target.value }))} style={s.input} />
                 </div>
               ))}
               <div>
-                <label style={s.label}>Setor</label>
-                <select value={editForm.setor} onChange={e => setEditForm(p => ({ ...p, setor:e.target.value }))} style={s.input}>
+                <label htmlFor="analise-setor" style={s.label}>Setor</label>
+                <select id="analise-setor" value={editForm.setor} onChange={e => setEditForm(p => ({ ...p, setor:e.target.value }))} style={s.input}>
                   <option value="">Selecione...</option>
                   {setores.map(st => <option key={st.id} value={st.nome}>{st.nome}</option>)}
                 </select>

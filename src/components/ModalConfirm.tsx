@@ -1,3 +1,5 @@
+import { useEscClose } from "../hooks/useEscClose";
+
 interface Props {
   titulo: string;
   mensagem: string;
@@ -15,6 +17,7 @@ export function ModalConfirm({
   corConfirmar   = "#EF4444",
   onConfirmar, onCancelar,
 }: Props) {
+  useEscClose(onCancelar);
   return (
     <div
       role="dialog"

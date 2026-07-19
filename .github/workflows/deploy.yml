@@ -26,6 +26,9 @@ jobs:
       - name: Type-check
         run: npx tsc -b
 
+      - name: Lint
+        run: npm run lint
+
       - name: Testes unitarios (Vitest)
         run: npm run test:run
 

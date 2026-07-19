@@ -1,6 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import * as AuthContextModule from "../contexts/AuthContext";
 import { makeAuthContext, mockUsuarioUsuario } from "../test/mocks/authContext";

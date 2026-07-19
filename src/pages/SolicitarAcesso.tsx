@@ -73,8 +73,14 @@ export default function SolicitarAcesso() {
           </p>
         </div>
 
-        <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#854d0e", marginBottom:"1.5rem" }}>
+        <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#854d0e", marginBottom:"0.85rem" }}>
           ⚠️ Para solicitar acesso, você deve possuir publicação no Diário Oficial do Estado de MS habilitando-o como condutor de veículo oficial. Informe os dados da publicação abaixo.
+        </div>
+
+        <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#1e40af", marginBottom:"1.5rem", lineHeight:1.5 }}>
+          🔒 Os dados informados serão tratados pela Controladoria-Geral do Estado de MS (CGE-MS) apenas para
+          análise do seu cadastro no sistema, com base no art. 7º, III e art. 23 da LGPD.{" "}
+          <button type="button" onClick={() => navigate("/privacidade")} style={{ background:"none", border:"none", padding:0, color:"#1e40af", fontWeight:700, textDecoration:"underline", cursor:"pointer", fontSize:12, fontFamily:"inherit" }}>Ver Aviso de Privacidade</button>.
         </div>
 
         <form onSubmit={enviar} noValidate style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>

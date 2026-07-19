@@ -47,6 +47,33 @@ test.describe("Login — calendários públicos", () => {
   });
 });
 
+test.describe("Login — páginas públicas (LGPD e acesso)", () => {
+  test("link Solicitar cadastro abre o formulário público", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("button", { name: /solicitar cadastro/i }).click();
+    await expect(page).toHaveURL(/\/solicitar-acesso/);
+    await expect(page.getByText("Solicitação de Acesso", { exact: true })).toBeVisible();
+  });
+
+  test("formulário público exibe aviso de privacidade LGPD", async ({ page }) => {
+    await page.goto("/solicitar-acesso");
+    await expect(page.getByRole("button", { name: /ver aviso de privacidade/i })).toBeVisible();
+  });
+
+  test("link Aviso de Privacidade abre a página de privacidade", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("button", { name: /aviso de privacidade/i }).click();
+    await expect(page).toHaveURL(/\/privacidade/);
+    await expect(page.getByText("Aviso de Privacidade", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Controladoria-Geral do Estado/i).first()).toBeVisible();
+  });
+
+  test("não exibe mais o checkbox Lembrar-me", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByText("Lembrar-me")).toBeHidden();
+  });
+});
+
 test.describe("Login — interação de senha", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/login");

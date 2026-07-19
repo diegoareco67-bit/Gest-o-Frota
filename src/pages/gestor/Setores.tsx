@@ -55,7 +55,7 @@ export default function Setores() {
         <div style={{ padding: "20px 24px", flex: 1, overflowY: "auto", maxWidth: 640 }}>
           <div style={s.card}>
             <form onSubmit={cadastrar} style={{ display: "flex", gap: 8, marginBottom: erro ? 8 : 16 }}>
-              <input type="text" placeholder="Nome do setor" value={nomeNovo} onChange={e => setNomeNovo(e.target.value)} style={{ ...s.input, flex: 1 }} />
+              <input type="text" aria-label="Nome do setor" placeholder="Nome do setor" value={nomeNovo} onChange={e => setNomeNovo(e.target.value)} style={{ ...s.input, flex: 1 }} />
               <button type="submit" disabled={salvando} style={s.btnPrimario}>{salvando ? "Salvando..." : "+ Adicionar"}</button>
             </form>
             {erro && <div role="alert" style={{ ...s.erro, marginBottom: 16 }}>{erro}</div>}

@@ -25,6 +25,21 @@ Após a auditoria de homologação (artifact publicado), correções por onda se
 - **Relatórios honestos**: removido o filtro "Tipo" inerte e a afford­ância falsa "Ver relatório →" dos cards (agora informativos); removido o card "Consumo de Combustível" (sem dado de custo por trás).
 - **Testes**: 141 Vitest verdes, 176 e2e verdes (7 novos em `e2e/auditoria.spec.ts` cobrindo trilha + perfil auditor + controle de acesso); mocks e fixtures ganharam o perfil auditor e seed de `auditoria`.
 
+### ✅ Onda 3 — LGPD e acessibilidade
+- **Aviso de Privacidade** (LGPD, antes ausente): página `src/pages/Privacidade.tsx` (rota pública `/privacidade`) — controlador (CGE-MS), finalidade, base legal (art. 7º III / art. 23), dados tratados, compartilhamento, direitos do titular. Link no rodapé do login + aviso no topo do formulário público de solicitação.
+- **Bug pré-existente corrigido de brinde:** `/solicitar-acesso` **não tinha rota registrada** em `App.tsx` — o botão "Solicitar cadastro" caía no catch-all e voltava pro login (o formulário público era inalcançável). Rota registrada.
+- **Acessibilidade (WCAG 1.3.1/3.3.2)**: par `htmlFor`/`id` adicionado em todos os formulários (Veiculos, Manutencao, Usuarios, Salas, Equipamentos, Indenizacoes, Solicitar, VeiculoProprio; Setores ganhou `aria-label`) — antes o rótulo não era anunciado pelo leitor de tela ao focar o campo.
+- **Modais fecham com Esc**: hook `src/hooks/useEscClose.ts` aplicado ao `ModalConfirm` (cobre todas as confirmações) e aos modais de cadastro de Veiculos/Manutencao/Usuarios/Salas/Equipamentos/Indenizacoes.
+
+### ✅ Onda 4 — manutenibilidade
+- **Util `src/utils/conflitoHorario.ts`** (`intervalosSobrepoem`) — extrai a checagem de sobreposição de horário antes triplicada em Solicitar/Salas/Equipamentos.
+- **"Lembrar-me" removido** do login (era decorativo — o Firebase Auth já persiste sessão; o checkbox enganava o usuário).
+- **Lint no CI**: o script `lint` estava quebrado (sem `eslint.config.js` no repo — ESLint v9 exige flat config). Criado `eslint.config.js` (padrão Vite React-TS, com `_`-ignore e `any` liberado em testes/mocks); ajustados 2 imports mortos; lint passa com 0 erros (3 warnings pré-existentes aceitos). Passo `npm run lint` adicionado ao workflow do CI, agora obrigatório.
+- **Verificação final**: `tsc -b` limpo, **141 Vitest**, **180 e2e** (4 novos de LGPD/privacidade em `login.spec.ts`), `npm run lint` limpo.
+
+### Fora de escopo desta rodada (documentado no plano aprovado)
+Parametrizar R$ 0,80/km (mantido como constante única), code-splitting, paginação com cursor, MFA, ambiente de staging separado — evolução futura (§16 do relatório de auditoria).
+
 ## Status de deploy (2026-07-10) — resumo; os detalhes por fase abaixo foram revisados para bater com este bloco
 
 - ✅ **Deployado em produção**: `firestore.rules` (todas as coleções — Salas, Equipamentos, Indenização, Setores, o fix de `veiculos`) e `hosting` (todas as telas até a Fase 5, incluindo o dashboard consolidado)

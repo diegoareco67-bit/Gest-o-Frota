@@ -3,6 +3,7 @@ import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, li
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEscClose } from "../../hooks/useEscClose";
 import { Sidebar } from "../../components/layout/Sidebar";
 
 interface Veiculo { id:string; placa:string; modelo:string; marca:string; ano:number; tipo:string; cor:string; status:string; kmAtual:number; categoriaUso?:string; atualizadoEm?:{toDate:()=>Date}; }
@@ -27,6 +28,8 @@ export default function Veiculos() {
   const [filtroSt,setFiltroSt] = useState("todos");
   const [erroModal,setErroModal] = useState("");
   const [form,setForm]         = useState({placa:"",modelo:"",marca:"",ano:new Date().getFullYear(),tipo:"carro",cor:"",status:"disponivel",kmAtual:0,categoriaUso:"Administrativo"});
+
+  useEscClose(()=>setModal(false), modal);
 
   useEffect(()=>{carregar();},[]);
 
@@ -160,28 +163,28 @@ export default function Veiculos() {
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:"1rem"}}>
               {([["Placa *","placa","HTO-3017"],["Modelo *","modelo","Corolla"],["Marca *","marca","Toyota"],["Ano","ano","2024"],["Cor","cor","Branco"],["KM Atual","kmAtual","0"]] as [string,string,string][]).map(([l,k,ph])=>(
                 <div key={k}>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>{l}</label>
-                  <input type={k==="ano"||k==="kmAtual"?"number":"text"} placeholder={ph}
+                  <label htmlFor={`veiculo-${k}`} style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>{l}</label>
+                  <input id={`veiculo-${k}`} type={k==="ano"||k==="kmAtual"?"number":"text"} placeholder={ph}
                     value={(form as Record<string,string|number>)[k] as string}
                     onChange={e=>setForm(p=>({...p,[k]:k==="ano"||k==="kmAtual"?Number(e.target.value):e.target.value}))}
                     style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,boxSizing:"border-box",fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}/>
                 </div>
               ))}
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Tipo</label>
-                <select value={form.tipo} onChange={e=>setForm(p=>({...p,tipo:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
+                <label htmlFor="veiculo-tipo" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Tipo</label>
+                <select id="veiculo-tipo" value={form.tipo} onChange={e=>setForm(p=>({...p,tipo:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                   {TIPOS.map(t=><option key={t} value={t}>{cap(t)}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Categoria de Uso</label>
-                <select value={form.categoriaUso} onChange={e=>setForm(p=>({...p,categoriaUso:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
+                <label htmlFor="veiculo-categoria" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Categoria de Uso</label>
+                <select id="veiculo-categoria" value={form.categoriaUso} onChange={e=>setForm(p=>({...p,categoriaUso:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                   {CATEGORIAS.map(c=><option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Status</label>
-                <select value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
+                <label htmlFor="veiculo-status" style={{display:"block",fontSize:12,fontWeight:600,color:"#5A7A9A",marginBottom:4}}>Status</label>
+                <select id="veiculo-status" value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value}))} style={{width:"100%",padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,fontFamily:"inherit",background:"#fff",color:"#0F172A"} as React.CSSProperties}>
                   {Object.entries(ST_BADGE).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>

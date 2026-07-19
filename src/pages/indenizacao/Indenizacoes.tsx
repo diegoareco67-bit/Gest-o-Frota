@@ -5,6 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEscClose } from "../../hooks/useEscClose";
 import { gerarPdfAnexoII, calcularHashSHA256, calcularValor, type TrajetoLinha } from "../../utils/pdfIndenizacao";
 
 interface VeiculoProprio { id: string; placa: string; status: string; }
@@ -46,6 +47,8 @@ export default function Indenizacoes() {
     odometroFinal: "",
   });
   const [trajetos, setTrajetos] = useState<TrajetoLinha[]>([{ ...TRAJETO_VAZIO }]);
+
+  useEscClose(() => fecharModal(), modal);
 
   useEffect(() => { carregar(); }, []);
 
@@ -214,31 +217,31 @@ export default function Indenizacoes() {
             {!pdfBlob ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
                 <div>
-                  <label style={s.label}>Serviço a realizar</label>
-                  <input type="text" placeholder="Vistoria de obra pública" value={form.servicoARealizar} onChange={e => setForm(p => ({ ...p, servicoARealizar: e.target.value }))} style={s.input} />
+                  <label htmlFor="ind-servico" style={s.label}>Serviço a realizar</label>
+                  <input id="ind-servico" type="text" placeholder="Vistoria de obra pública" value={form.servicoARealizar} onChange={e => setForm(p => ({ ...p, servicoARealizar: e.target.value }))} style={s.input} />
                 </div>
                 <div>
-                  <label style={s.label}>Localidade(s) do serviço</label>
-                  <input type="text" placeholder="Dourados/MS" value={form.localidadesServico} onChange={e => setForm(p => ({ ...p, localidadesServico: e.target.value }))} style={s.input} />
+                  <label htmlFor="ind-localidade" style={s.label}>Localidade(s) do serviço</label>
+                  <input id="ind-localidade" type="text" placeholder="Dourados/MS" value={form.localidadesServico} onChange={e => setForm(p => ({ ...p, localidadesServico: e.target.value }))} style={s.input} />
                 </div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <div style={{ flex: 1 }}>
-                    <label style={s.label}>Início autorizado</label>
-                    <input type="datetime-local" value={form.inicioAutorizado} onChange={e => setForm(p => ({ ...p, inicioAutorizado: e.target.value }))} style={s.input} />
+                    <label htmlFor="ind-inicio" style={s.label}>Início autorizado</label>
+                    <input id="ind-inicio" type="datetime-local" value={form.inicioAutorizado} onChange={e => setForm(p => ({ ...p, inicioAutorizado: e.target.value }))} style={s.input} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={s.label}>Retorno previsto</label>
-                    <input type="datetime-local" value={form.retornoPrevisto} onChange={e => setForm(p => ({ ...p, retornoPrevisto: e.target.value }))} style={s.input} />
+                    <label htmlFor="ind-retorno" style={s.label}>Retorno previsto</label>
+                    <input id="ind-retorno" type="datetime-local" value={form.retornoPrevisto} onChange={e => setForm(p => ({ ...p, retornoPrevisto: e.target.value }))} style={s.input} />
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <div style={{ flex: 1 }}>
-                    <label style={s.label}>Odômetro inicial (km)</label>
-                    <input type="number" value={form.odometroInicial} onChange={e => setForm(p => ({ ...p, odometroInicial: e.target.value }))} style={s.input} />
+                    <label htmlFor="ind-odo-inicial" style={s.label}>Odômetro inicial (km)</label>
+                    <input id="ind-odo-inicial" type="number" value={form.odometroInicial} onChange={e => setForm(p => ({ ...p, odometroInicial: e.target.value }))} style={s.input} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={s.label}>Km previamente fixada (opcional)</label>
-                    <input type="number" value={form.kmPreviamenteFixada} onChange={e => setForm(p => ({ ...p, kmPreviamenteFixada: e.target.value }))} style={s.input} />
+                    <label htmlFor="ind-km-fixada" style={s.label}>Km previamente fixada (opcional)</label>
+                    <input id="ind-km-fixada" type="number" value={form.kmPreviamenteFixada} onChange={e => setForm(p => ({ ...p, kmPreviamenteFixada: e.target.value }))} style={s.input} />
                   </div>
                 </div>
 
@@ -260,8 +263,8 @@ export default function Indenizacoes() {
                 </div>
 
                 <div>
-                  <label style={s.label}>Serviços realizados</label>
-                  <input type="text" value={form.servicosRealizados} onChange={e => setForm(p => ({ ...p, servicosRealizados: e.target.value }))} style={s.input} />
+                  <label htmlFor="ind-servicos-realizados" style={s.label}>Serviços realizados</label>
+                  <input id="ind-servicos-realizados" type="text" value={form.servicosRealizados} onChange={e => setForm(p => ({ ...p, servicosRealizados: e.target.value }))} style={s.input} />
                 </div>
                 <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#5A7A9A" }}>
                   <input type="checkbox" checked={form.houveAlteracaoForcaMaior} onChange={e => setForm(p => ({ ...p, houveAlteracaoForcaMaior: e.target.checked }))} />
@@ -269,13 +272,13 @@ export default function Indenizacoes() {
                 </label>
                 {form.houveAlteracaoForcaMaior && (
                   <div>
-                    <label style={s.label}>Justificativa</label>
-                    <input type="text" value={form.justificativaAlteracao} onChange={e => setForm(p => ({ ...p, justificativaAlteracao: e.target.value }))} style={s.input} />
+                    <label htmlFor="ind-justificativa" style={s.label}>Justificativa</label>
+                    <input id="ind-justificativa" type="text" value={form.justificativaAlteracao} onChange={e => setForm(p => ({ ...p, justificativaAlteracao: e.target.value }))} style={s.input} />
                   </div>
                 )}
                 <div>
-                  <label style={s.label}>Odômetro final (km)</label>
-                  <input type="number" value={form.odometroFinal} onChange={e => setForm(p => ({ ...p, odometroFinal: e.target.value }))} style={s.input} />
+                  <label htmlFor="ind-odo-final" style={s.label}>Odômetro final (km)</label>
+                  <input id="ind-odo-final" type="number" value={form.odometroFinal} onChange={e => setForm(p => ({ ...p, odometroFinal: e.target.value }))} style={s.input} />
                 </div>
 
                 {erro && <div role="alert" style={s.erro}>{erro}</div>}

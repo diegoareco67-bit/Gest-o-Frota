@@ -3,6 +3,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { RotaProtegida } from "./components/layout/RotaProtegida";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Login from "./pages/Login";
+import Privacidade from "./pages/Privacidade";
+import SolicitarAcesso from "./pages/SolicitarAcesso";
 import DashboardGestor from "./pages/gestor/Dashboard";
 import Aprovacoes from "./pages/gestor/Aprovacoes";
 import Veiculos from "./pages/gestor/Veiculos";
@@ -32,6 +34,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/solicitar-acesso" element={<SolicitarAcesso />} />
+          <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/gestor" element={<RotaProtegida perfil="gestor"><DashboardGestor /></RotaProtegida>} />
           <Route path="/gestor/aprovacoes" element={<RotaProtegida perfil="gestor"><Aprovacoes /></RotaProtegida>} />
           <Route path="/gestor/manual" element={<RotaProtegida perfil="gestor"><ManualUso /></RotaProtegida>} />

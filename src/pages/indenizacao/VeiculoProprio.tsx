@@ -126,26 +126,26 @@ export default function VeiculoProprio() {
               {!pdfBlob ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
                   <div>
-                    <label style={s.label}>Categoria funcional</label>
-                    <input type="text" placeholder="Ex.: Auditor de Controle Interno" value={form.categoriaFuncional} onChange={e => setForm(p => ({ ...p, categoriaFuncional: e.target.value }))} style={s.input} />
+                    <label htmlFor="vp-categoria" style={s.label}>Categoria funcional</label>
+                    <input id="vp-categoria" type="text" placeholder="Ex.: Auditor de Controle Interno" value={form.categoriaFuncional} onChange={e => setForm(p => ({ ...p, categoriaFuncional: e.target.value }))} style={s.input} />
                   </div>
                   <div style={{ display: "flex", gap: 10 }}>
                     <div style={{ flex: 1 }}>
-                      <label style={s.label}>Marca</label>
-                      <input type="text" placeholder="Fiat" value={form.marca} onChange={e => setForm(p => ({ ...p, marca: e.target.value }))} style={s.input} />
+                      <label htmlFor="vp-marca" style={s.label}>Marca</label>
+                      <input id="vp-marca" type="text" placeholder="Fiat" value={form.marca} onChange={e => setForm(p => ({ ...p, marca: e.target.value }))} style={s.input} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <label style={s.label}>Modelo</label>
-                      <input type="text" placeholder="Strada" value={form.modelo} onChange={e => setForm(p => ({ ...p, modelo: e.target.value }))} style={s.input} />
+                      <label htmlFor="vp-modelo" style={s.label}>Modelo</label>
+                      <input id="vp-modelo" type="text" placeholder="Strada" value={form.modelo} onChange={e => setForm(p => ({ ...p, modelo: e.target.value }))} style={s.input} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <label style={s.label}>Placa</label>
-                      <input type="text" placeholder="ABC-1234" value={form.placa} onChange={e => setForm(p => ({ ...p, placa: e.target.value.toUpperCase() }))} style={s.input} />
+                      <label htmlFor="vp-placa" style={s.label}>Placa</label>
+                      <input id="vp-placa" type="text" placeholder="ABC-1234" value={form.placa} onChange={e => setForm(p => ({ ...p, placa: e.target.value.toUpperCase() }))} style={s.input} />
                     </div>
                   </div>
                   <div>
-                    <label style={s.label}>Localidade</label>
-                    <input type="text" value={form.localidade} onChange={e => setForm(p => ({ ...p, localidade: e.target.value }))} style={s.input} />
+                    <label htmlFor="vp-localidade" style={s.label}>Localidade</label>
+                    <input id="vp-localidade" type="text" value={form.localidade} onChange={e => setForm(p => ({ ...p, localidade: e.target.value }))} style={s.input} />
                   </div>
                   {erro && <div role="alert" style={s.erro}>{erro}</div>}
                   <button onClick={gerarPdf} style={s.btnPrimario}>Gerar Termo de Opção (PDF)</button>

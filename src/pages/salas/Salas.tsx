@@ -6,6 +6,8 @@ import { collection, getDocs, addDoc, updateDoc, setDoc, deleteDoc, doc, serverT
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEscClose } from "../../hooks/useEscClose";
+import { intervalosSobrepoem } from "../../utils/conflitoHorario";
 
 interface Sala { id:string; nome:string; capacidade:number; localizacao:string; equipamentos:string; ativo:boolean; }
 interface ReservaSala { id:string; salaId:string; salaNome:string; responsavelId:string; responsavelNome:string; responsavelSetor:string; motivo:string; dataInicio:string; dataFim:string; status:string; }
@@ -28,6 +30,9 @@ export default function Salas() {
   const [formSala, setFormSala] = useState({ nome:"", capacidade:"", localizacao:"", equipamentos:"" });
   const [confirmCancelar, setConfirmCancelar] = useState<ReservaSala|null>(null);
 
+  useEscClose(() => setModal(false), modal);
+  useEscClose(() => setModalSala(false), modalSala);
+
   useEffect(() => { carregar(); }, []);
 
   async function carregar() {
@@ -42,12 +47,7 @@ export default function Salas() {
   }
 
   function verificarConflito(salaId: string, inicio: string, fim: string): boolean {
-    const novoInicio = new Date(inicio).getTime(), novoFim = new Date(fim).getTime();
-    return reservas.some(r => {
-      if (r.salaId !== salaId) return false;
-      const i = new Date(r.dataInicio).getTime(), f = new Date(r.dataFim).getTime();
-      return novoInicio < f && novoFim > i;
-    });
+    return reservas.some(r => r.salaId === salaId && intervalosSobrepoem(inicio, fim, r.dataInicio, r.dataFim));
   }
 
   async function reservar(e: React.FormEvent) {
@@ -188,8 +188,8 @@ export default function Salas() {
             <h2 id="modal-reserva-titulo" style={s.modalTitulo}>Nova Reserva de Sala</h2>
             <form onSubmit={reservar} style={{ display:"flex", flexDirection:"column", gap:"0.85rem" }}>
               <div>
-                <label style={s.label}>Sala</label>
-                <select value={form.salaId} onChange={e => setForm(p => ({ ...p, salaId:e.target.value }))} style={s.input}>
+                <label htmlFor="reserva-sala" style={s.label}>Sala</label>
+                <select id="reserva-sala" value={form.salaId} onChange={e => setForm(p => ({ ...p, salaId:e.target.value }))} style={s.input}>
                   <option value="">Selecione...</option>
                   {salas.filter(sl => sl.ativo).map(sala => (
                     <option key={sala.id} value={sala.id}>{sala.nome} ({sala.capacidade} lugares)</option>
@@ -202,22 +202,22 @@ export default function Salas() {
                 )}
               </div>
               <div>
-                <label style={s.label}>Data</label>
-                <input type="date" value={form.data} onChange={e => setForm(p => ({ ...p, data:e.target.value }))} style={s.input} />
+                <label htmlFor="reserva-data" style={s.label}>Data</label>
+                <input id="reserva-data" type="date" value={form.data} onChange={e => setForm(p => ({ ...p, data:e.target.value }))} style={s.input} />
               </div>
               <div style={{ display:"flex", gap:10 }}>
                 <div style={{ flex:1 }}>
-                  <label style={s.label}>Início</label>
-                  <input type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio:e.target.value }))} style={s.input} />
+                  <label htmlFor="reserva-inicio" style={s.label}>Início</label>
+                  <input id="reserva-inicio" type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio:e.target.value }))} style={s.input} />
                 </div>
                 <div style={{ flex:1 }}>
-                  <label style={s.label}>Fim</label>
-                  <input type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim:e.target.value }))} style={s.input} />
+                  <label htmlFor="reserva-fim" style={s.label}>Fim</label>
+                  <input id="reserva-fim" type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim:e.target.value }))} style={s.input} />
                 </div>
               </div>
               <div>
-                <label style={s.label}>Motivo</label>
-                <input type="text" placeholder="Reunião de equipe" value={form.motivo} onChange={e => setForm(p => ({ ...p, motivo:e.target.value }))} style={s.input} />
+                <label htmlFor="reserva-motivo" style={s.label}>Motivo</label>
+                <input id="reserva-motivo" type="text" placeholder="Reunião de equipe" value={form.motivo} onChange={e => setForm(p => ({ ...p, motivo:e.target.value }))} style={s.input} />
               </div>
               {erro && <div role="alert" style={s.erro}>{erro}</div>}
               <div style={{ display:"flex", gap:8, justifyContent:"flex-end", marginTop:6 }}>
@@ -235,20 +235,20 @@ export default function Salas() {
             <h2 id="modal-sala-titulo" style={s.modalTitulo}>Nova Sala</h2>
             <form onSubmit={cadastrarSala} style={{ display:"flex", flexDirection:"column", gap:"0.85rem" }}>
               <div>
-                <label style={s.label}>Nome</label>
-                <input type="text" placeholder="Sala de Reuniões 1" value={formSala.nome} onChange={e => setFormSala(p => ({ ...p, nome:e.target.value }))} style={s.input} />
+                <label htmlFor="sala-nome" style={s.label}>Nome</label>
+                <input id="sala-nome" type="text" placeholder="Sala de Reuniões 1" value={formSala.nome} onChange={e => setFormSala(p => ({ ...p, nome:e.target.value }))} style={s.input} />
               </div>
               <div>
-                <label style={s.label}>Capacidade</label>
-                <input type="number" min="1" placeholder="8" value={formSala.capacidade} onChange={e => setFormSala(p => ({ ...p, capacidade:e.target.value }))} style={s.input} />
+                <label htmlFor="sala-capacidade" style={s.label}>Capacidade</label>
+                <input id="sala-capacidade" type="number" min="1" placeholder="8" value={formSala.capacidade} onChange={e => setFormSala(p => ({ ...p, capacidade:e.target.value }))} style={s.input} />
               </div>
               <div>
-                <label style={s.label}>Localização</label>
-                <input type="text" placeholder="2º andar" value={formSala.localizacao} onChange={e => setFormSala(p => ({ ...p, localizacao:e.target.value }))} style={s.input} />
+                <label htmlFor="sala-localizacao" style={s.label}>Localização</label>
+                <input id="sala-localizacao" type="text" placeholder="2º andar" value={formSala.localizacao} onChange={e => setFormSala(p => ({ ...p, localizacao:e.target.value }))} style={s.input} />
               </div>
               <div>
-                <label style={s.label}>Equipamentos</label>
-                <input type="text" placeholder="Projetor, TV Smart..." value={formSala.equipamentos} onChange={e => setFormSala(p => ({ ...p, equipamentos:e.target.value }))} style={s.input} />
+                <label htmlFor="sala-equipamentos" style={s.label}>Equipamentos</label>
+                <input id="sala-equipamentos" type="text" placeholder="Projetor, TV Smart..." value={formSala.equipamentos} onChange={e => setFormSala(p => ({ ...p, equipamentos:e.target.value }))} style={s.input} />
               </div>
               <div style={{ display:"flex", gap:8, justifyContent:"flex-end", marginTop:6 }}>
                 <button type="button" onClick={() => setModalSala(false)} style={s.btnSecundario}>Cancelar</button>

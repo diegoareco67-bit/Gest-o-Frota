@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, setDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
+import { intervalosSobrepoem } from "../../utils/conflitoHorario";
 import { useNavigate } from "react-router-dom";
 
 interface Veiculo { id:string; placa:string; modelo:string; marca:string; tipo:string; categoriaUso?:string; }
@@ -46,12 +47,10 @@ export default function Solicitar() {
     // Lê do mirror público (não-sensível) em vez de 'solicitacoes' — evita que a checagem de
     // conflito precise de leitura ampla da coleção sensível (LGPD, ver PLANO.md Fase 5).
     const snap = await getDocs(query(collection(db, "calendarioPublico"), where("veiculoPlaca","==",veiculoPlaca), limit(200)));
-    const novaSaida = new Date(dataSaida).getTime(), novoRetorno = new Date(dataRetorno).getTime();
     for (const d of snap.docs) {
       const sol = d.data();
       if (!["pendente","aprovada","em_uso"].includes(sol.status)) continue;
-      const saida = new Date(sol.dataSaida).getTime(), retorno = new Date(sol.dataRetorno).getTime();
-      if (novaSaida < retorno && novoRetorno > saida) return true;
+      if (intervalosSobrepoem(dataSaida, dataRetorno, sol.dataSaida, sol.dataRetorno)) return true;
     }
     return false;
   }
@@ -149,8 +148,8 @@ export default function Solicitar() {
             <div style={{ ...card, padding:"22px 24px" }}>
               <div style={{ fontSize:11, fontWeight:700, color:"#7A95B2", marginBottom:16, textTransform:"uppercase", letterSpacing:0.5 }}>Veículo</div>
               <div>
-                <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Veículo Disponível *</label>
-                <select value={form.veiculoId} onChange={e => { const v=veiculos.find(x=>x.id===e.target.value); setForm(p=>({ ...p, veiculoId:e.target.value, veiculoPlaca:v?.placa||"" })); setErroCon(""); }} style={inputStyle} required>
+                <label htmlFor="sol-veiculo" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Veículo Disponível *</label>
+                <select id="sol-veiculo" value={form.veiculoId} onChange={e => { const v=veiculos.find(x=>x.id===e.target.value); setForm(p=>({ ...p, veiculoId:e.target.value, veiculoPlaca:v?.placa||"" })); setErroCon(""); }} style={inputStyle} required>
                   <option value="">Selecione um veículo</option>
                   {veiculos.map(v => <option key={v.id} value={v.id}>{v.placa} — {v.marca} {v.modelo} ({v.tipo})</option>)}
                 </select>
@@ -163,25 +162,25 @@ export default function Solicitar() {
               <div style={{ fontSize:11, fontWeight:700, color:"#7A95B2", marginBottom:16, textTransform:"uppercase", letterSpacing:0.5 }}>Viagem</div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:14, marginBottom:14 }}>
                 <div>
-                  <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Destino *</label>
-                  <input value={form.destino} onChange={e=>setForm(p=>({...p,destino:e.target.value}))} style={inputStyle} placeholder="Ex: Hospital CGE-MS" required />
+                  <label htmlFor="sol-destino" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Destino *</label>
+                  <input id="sol-destino" value={form.destino} onChange={e=>setForm(p=>({...p,destino:e.target.value}))} style={inputStyle} placeholder="Ex: Hospital CGE-MS" required />
                 </div>
                 <div>
-                  <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Motivo *</label>
-                  <input value={form.motivo} onChange={e=>setForm(p=>({...p,motivo:e.target.value}))} style={inputStyle} placeholder="Ex: Transporte de pacientes" required />
+                  <label htmlFor="sol-motivo" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Motivo *</label>
+                  <input id="sol-motivo" value={form.motivo} onChange={e=>setForm(p=>({...p,motivo:e.target.value}))} style={inputStyle} placeholder="Ex: Transporte de pacientes" required />
                 </div>
                 <div>
-                  <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Saída *</label>
-                  <input type="datetime-local" value={form.dataSaida} onChange={e=>{ setForm(p=>({...p,dataSaida:e.target.value})); setErroCon(""); }} style={inputStyle} required />
+                  <label htmlFor="sol-saida" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Saída *</label>
+                  <input id="sol-saida" type="datetime-local" value={form.dataSaida} onChange={e=>{ setForm(p=>({...p,dataSaida:e.target.value})); setErroCon(""); }} style={inputStyle} required />
                 </div>
                 <div>
-                  <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Retorno *</label>
-                  <input type="datetime-local" value={form.dataRetorno} onChange={e=>{ setForm(p=>({...p,dataRetorno:e.target.value})); setErroCon(""); }} style={inputStyle} required />
+                  <label htmlFor="sol-retorno" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Retorno *</label>
+                  <input id="sol-retorno" type="datetime-local" value={form.dataRetorno} onChange={e=>{ setForm(p=>({...p,dataRetorno:e.target.value})); setErroCon(""); }} style={inputStyle} required />
                 </div>
               </div>
               <div>
-                <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Descrição / Observações</label>
-                <textarea value={form.descricao} onChange={e=>setForm(p=>({...p,descricao:e.target.value}))} style={{ ...inputStyle, height:80, resize:"vertical" }} placeholder="Detalhes adicionais sobre a viagem..." />
+                <label htmlFor="sol-descricao" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Descrição / Observações</label>
+                <textarea id="sol-descricao" value={form.descricao} onChange={e=>setForm(p=>({...p,descricao:e.target.value}))} style={{ ...inputStyle, height:80, resize:"vertical" }} placeholder="Detalhes adicionais sobre a viagem..." />
               </div>
             </div>
 

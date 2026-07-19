@@ -6,6 +6,8 @@ import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, wh
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEscClose } from "../../hooks/useEscClose";
+import { intervalosSobrepoem } from "../../utils/conflitoHorario";
 
 interface Equipamento { id: string; nome: string; tipo: string; patrimonio: string; status: string; ativo: boolean; }
 interface Emprestimo {
@@ -41,6 +43,9 @@ export default function Equipamentos() {
   const [formEquip, setFormEquip] = useState({ nome: "", tipo: "", patrimonio: "" });
   const [confirmCancelar, setConfirmCancelar] = useState<Emprestimo | null>(null);
 
+  useEscClose(() => setModal(false), modal);
+  useEscClose(() => setModalEquip(false), modalEquip);
+
   useEffect(() => { carregar(); }, []);
 
   async function carregar() {
@@ -55,12 +60,7 @@ export default function Equipamentos() {
   }
 
   function verificarConflito(equipamentoId: string, inicio: string, fim: string): boolean {
-    const novoInicio = new Date(inicio).getTime(), novoFim = new Date(fim).getTime();
-    return emprestimos.some(e => {
-      if (e.equipamentoId !== equipamentoId) return false;
-      const i = new Date(e.dataInicio).getTime(), f = new Date(e.dataFim).getTime();
-      return novoInicio < f && novoFim > i;
-    });
+    return emprestimos.some(e => e.equipamentoId === equipamentoId && intervalosSobrepoem(inicio, fim, e.dataInicio, e.dataFim));
   }
 
   async function reservar(e: React.FormEvent) {
@@ -227,8 +227,8 @@ export default function Equipamentos() {
             <h2 id="modal-emprestimo-titulo" style={s.modalTitulo}>Reservar Equipamento</h2>
             <form onSubmit={reservar} style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
               <div>
-                <label style={s.label}>Equipamento</label>
-                <select value={form.equipamentoId} onChange={e => setForm(p => ({ ...p, equipamentoId: e.target.value }))} style={s.input}>
+                <label htmlFor="emp-equipamento" style={s.label}>Equipamento</label>
+                <select id="emp-equipamento" value={form.equipamentoId} onChange={e => setForm(p => ({ ...p, equipamentoId: e.target.value }))} style={s.input}>
                   <option value="">Selecione...</option>
                   {equipamentos.filter(eq => eq.ativo && eq.status === "disponivel").map(eq => (
                     <option key={eq.id} value={eq.id}>{eq.nome} — {eq.tipo} (Pat. {eq.patrimonio})</option>
@@ -236,22 +236,22 @@ export default function Equipamentos() {
                 </select>
               </div>
               <div>
-                <label style={s.label}>Data</label>
-                <input type="date" value={form.data} onChange={e => setForm(p => ({ ...p, data: e.target.value }))} style={s.input} />
+                <label htmlFor="emp-data" style={s.label}>Data</label>
+                <input id="emp-data" type="date" value={form.data} onChange={e => setForm(p => ({ ...p, data: e.target.value }))} style={s.input} />
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={s.label}>Início</label>
-                  <input type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio: e.target.value }))} style={s.input} />
+                  <label htmlFor="emp-inicio" style={s.label}>Início</label>
+                  <input id="emp-inicio" type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio: e.target.value }))} style={s.input} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={s.label}>Fim</label>
-                  <input type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim: e.target.value }))} style={s.input} />
+                  <label htmlFor="emp-fim" style={s.label}>Fim</label>
+                  <input id="emp-fim" type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim: e.target.value }))} style={s.input} />
                 </div>
               </div>
               <div>
-                <label style={s.label}>Motivo</label>
-                <input type="text" placeholder="Apresentação externa" value={form.motivo} onChange={e => setForm(p => ({ ...p, motivo: e.target.value }))} style={s.input} />
+                <label htmlFor="emp-motivo" style={s.label}>Motivo</label>
+                <input id="emp-motivo" type="text" placeholder="Apresentação externa" value={form.motivo} onChange={e => setForm(p => ({ ...p, motivo: e.target.value }))} style={s.input} />
               </div>
               {erro && <div role="alert" style={s.erro}>{erro}</div>}
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
@@ -269,16 +269,16 @@ export default function Equipamentos() {
             <h2 id="modal-equip-titulo" style={s.modalTitulo}>Novo Equipamento</h2>
             <form onSubmit={cadastrarEquipamento} style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
               <div>
-                <label style={s.label}>Nome</label>
-                <input type="text" placeholder="Notebook Dell Latitude" value={formEquip.nome} onChange={e => setFormEquip(p => ({ ...p, nome: e.target.value }))} style={s.input} />
+                <label htmlFor="equip-nome" style={s.label}>Nome</label>
+                <input id="equip-nome" type="text" placeholder="Notebook Dell Latitude" value={formEquip.nome} onChange={e => setFormEquip(p => ({ ...p, nome: e.target.value }))} style={s.input} />
               </div>
               <div>
-                <label style={s.label}>Tipo</label>
-                <input type="text" placeholder="Notebook, Projetor, Câmera..." value={formEquip.tipo} onChange={e => setFormEquip(p => ({ ...p, tipo: e.target.value }))} style={s.input} />
+                <label htmlFor="equip-tipo" style={s.label}>Tipo</label>
+                <input id="equip-tipo" type="text" placeholder="Notebook, Projetor, Câmera..." value={formEquip.tipo} onChange={e => setFormEquip(p => ({ ...p, tipo: e.target.value }))} style={s.input} />
               </div>
               <div>
-                <label style={s.label}>Número de patrimônio</label>
-                <input type="text" placeholder="123456" value={formEquip.patrimonio} onChange={e => setFormEquip(p => ({ ...p, patrimonio: e.target.value }))} style={s.input} />
+                <label htmlFor="equip-patrimonio" style={s.label}>Número de patrimônio</label>
+                <input id="equip-patrimonio" type="text" placeholder="123456" value={formEquip.patrimonio} onChange={e => setFormEquip(p => ({ ...p, patrimonio: e.target.value }))} style={s.input} />
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
                 <button type="button" onClick={() => setModalEquip(false)} style={s.btnSecundario}>Cancelar</button>
