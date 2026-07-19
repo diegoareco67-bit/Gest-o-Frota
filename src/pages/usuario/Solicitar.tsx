@@ -86,8 +86,11 @@ export default function Solicitar() {
         setEnviando(false); return;
       }
       const protocolo = gerarProtocolo();
+      const veiculoSelecionado = veiculos.find(v => v.id === form.veiculoId);
+      const veiculoLabel = `${veiculoSelecionado?.marca ?? ""} ${veiculoSelecionado?.modelo ?? ""}`.trim();
       const novaSolicitacao = await addDoc(collection(db, "solicitacoes"), {
         ...form, protocolo,
+        veiculoMarca: veiculoSelecionado?.marca ?? "", veiculoModelo: veiculoSelecionado?.modelo ?? "",
         condutorId: usuario?.uid, condutorNome: usuario?.nome, condutorSetor: usuario?.setor,
         status: "pendente", criadoEm: serverTimestamp(),
       });
@@ -95,6 +98,7 @@ export default function Solicitar() {
       // é o que permite a checagem de conflito acima ler um dado público em vez de 'solicitacoes'.
       await setDoc(doc(db, "calendarioPublico", novaSolicitacao.id), {
         veiculoPlaca: form.veiculoPlaca,
+        veiculoLabel,
         dataSaida: form.dataSaida,
         dataRetorno: form.dataRetorno,
         status: "pendente",

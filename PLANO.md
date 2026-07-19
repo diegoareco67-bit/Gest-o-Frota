@@ -17,6 +17,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Código publicado no GitHub e CI/CD via GitHub Actions funcionando ponta a ponta desde 2026-07-19** — repositório `diegoareco67-bit/Gest-o-Frota`, workflow roda type-check + Vitest + Playwright + build a cada push, e faz deploy automático (hosting, firestore rules, storage rules, functions) quando `main` passa em tudo. Ver seção "CI/CD via GitHub Actions" abaixo.
 - ✅ **Rebrand FrotaGov → Hub concluído em 2026-07-19** (tela de login + Sidebar): nome/identidade visual do CLAUDE.md ("Nome Hub, subtítulo Central de Recursos Compartilhados") finalmente aplicado nas telas — antes só existia no documento. Ver seção "Rebrand FrotaGov → Hub" abaixo.
 - ✅ **Calendário público de Salas na tela de login, 2026-07-19** — pedido do usuário pra dar mais substância ao "hub" além do rebrand visual: a tela de login agora tem abas Veículos/Salas, ambas com dado real (não só o chip estático). Ver seção "Calendário público de Salas" abaixo.
+- ✅ **Etiqueta do veículo no calendário público passa a mostrar marca+modelo, 2026-07-19** — usuário notou que a etiqueta só mostrava a placa, sem dar pra identificar visualmente "a Chevrolet" ou "a Fiat Titano". Corrigido em `calendarioPublico` (campo novo `veiculoLabel`); Salas já mostrava `salaNome` (nome real), não precisou mudar.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -110,6 +111,17 @@ Depois do rebrand visual, o usuário pediu pra "aplicar as informações referen
 - Cobertura nova: 3 testes em `e2e/login.spec.ts` (abas visíveis, calendário de Veículos por padrão, troca pra Salas exibe o título certo).
 - Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e** (160 + 3 novos), checagem visual manual (screenshot das duas abas).
 - **Equipamentos e Indenização continuam só como chip estático** — não pedido agora; seguiria o mesmo padrão (`calendarioPublicoEquipamentos`) se algum dia for necessário. Indenização não tem "calendário" no sentido de disponibilidade (é fluxo de aprovação individual), então não se aplicaria da mesma forma.
+
+### ✅ Etiqueta do veículo no calendário público — marca+modelo em vez de só placa, 2026-07-19
+
+Depois de ver as duas abas funcionando, o usuário perguntou como diferenciar "a camionete Chevrolet" da "Fiat Titano" no calendário — a etiqueta de cada evento (e o balão ao passar o mouse) mostrava só a placa (`campoTitulo="veiculoPlaca"`, o default do `CalendarioGrade`), o que exige já saber de cor qual placa é qual carro. Salas não tinha esse problema (`campoTitulo="salaNome"` já mostra o nome real da sala).
+
+- `Solicitar.tsx`: ao criar a solicitação, passa a gravar `veiculoMarca`/`veiculoModelo` também no doc de `solicitacoes` (lookup no `veiculos` já carregado pelo `veiculoId` selecionado), e escreve um novo campo `veiculoLabel` (`"${marca} ${modelo}"`) no mirror `calendarioPublico` — decisão do usuário: só marca+modelo, sem a placa junto.
+- `Aprovacoes.tsx`: ao aprovar, o mirror escrito por lá também passa a incluir `veiculoLabel`, montado a partir de `sol.veiculoMarca`/`sol.veiculoModelo` (por isso precisou vir do doc de `solicitacoes`, não só do formulário).
+- `login.tsx` e `pages/consulta/Dashboard.tsx`: os dois lugares que mostram o calendário de `calendarioPublico` passam a usar `campoTitulo="veiculoLabel"` em vez do default `"veiculoPlaca"`.
+- `veiculoPlaca` continua gravado no mirror (não removido) — ainda é usado pelo `where("veiculoPlaca","==",...)` da checagem de conflito em `Solicitar.tsx`.
+- Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e**. Não deu pra confirmar visualmente com dado real em produção porque não há reserva ativa agora — calendário fica vazio até a próxima solicitação aprovada, mas a lógica foi conferida por tipo e pelos testes automatizados.
+- **Efeito colateral aceito:** mirrors antigos (criados antes desta mudança) não têm `veiculoLabel` — vão aparecer com etiqueta em branco até vencerem/serem substituídos por novas solicitações, que já nascem com o campo preenchido. Não corrigido retroativamente (são poucos registros transitórios, se auto-resolvem).
 
 ### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
 

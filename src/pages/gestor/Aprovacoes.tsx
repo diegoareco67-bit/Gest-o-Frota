@@ -12,6 +12,8 @@ interface Solicitacao {
   condutorNome: string;
   condutorSetor?: string;
   veiculoPlaca: string;
+  veiculoMarca?: string;
+  veiculoModelo?: string;
   destino: string;
   motivo: string;
   descricao?: string;
@@ -87,6 +89,7 @@ export default function Aprovacoes() {
       // Escreve apenas campos não-sensíveis na coleção pública do calendário
       await setDoc(doc(db, "calendarioPublico", id), {
         veiculoPlaca: sol?.veiculoPlaca ?? "",
+        veiculoLabel: `${sol?.veiculoMarca ?? ""} ${sol?.veiculoModelo ?? ""}`.trim(),
         dataSaida:    sol?.dataSaida   ?? "",
         dataRetorno:  sol?.dataRetorno ?? "",
         status: "aprovada",

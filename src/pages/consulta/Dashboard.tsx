@@ -28,7 +28,7 @@ export default function DashboardConsulta() {
 
         <div style={s.content}>
           <div style={s.card}>
-            <CalendarioGrade colecao="calendarioPublico" titulo="Frota — Veículos" subtitulo="Disponibilidade da frota oficial" tema="claro" />
+            <CalendarioGrade colecao="calendarioPublico" titulo="Frota — Veículos" subtitulo="Disponibilidade da frota oficial" tema="claro" campoTitulo="veiculoLabel" />
           </div>
           <div style={s.card}>
             <CalendarioGrade

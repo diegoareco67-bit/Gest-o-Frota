@@ -238,7 +238,7 @@ export default function Login() {
             ))}
           </div>
           {abaCalendario==="veiculos" ? (
-            <CalendarioGrade tema="escuro"/>
+            <CalendarioGrade tema="escuro" campoTitulo="veiculoLabel"/>
           ) : (
             <CalendarioGrade
               tema="escuro"
