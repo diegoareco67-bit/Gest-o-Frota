@@ -7,6 +7,19 @@ import * as AuthContextModule from "../contexts/AuthContext";
 import { makeAuthContext } from "../test/mocks/authContext";
 
 vi.mock("../contexts/AuthContext");
+// O componente de calendário do login faz getDocs real no calendarioPublico; com o
+// App Check em enforcement isso passa a dar permission-denied fora do navegador.
+// Mockamos o Firestore/config para o teste não tocar a rede.
+vi.mock("firebase/firestore", () => ({
+  collection: vi.fn(() => ({})),
+  getDocs: vi.fn().mockResolvedValue({ docs: [], forEach: () => {}, size: 0, empty: true }),
+  getDoc: vi.fn().mockResolvedValue({ exists: () => false, data: () => ({}) }),
+  doc: vi.fn(() => ({})),
+  query: vi.fn(() => ({})),
+  where: vi.fn(() => ({})),
+  limit: vi.fn(() => ({})),
+}));
+vi.mock("../firebase/config", () => ({ db: {}, auth: { currentUser: { uid: "u1" } } }));
 
 function renderLogin() {
   render(
