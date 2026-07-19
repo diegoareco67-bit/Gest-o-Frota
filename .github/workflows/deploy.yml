@@ -73,4 +73,4 @@ jobs:
       - name: Deploy (hosting, firestore rules, storage rules, functions)
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-service-account.json
-        run: npx firebase-tools deploy --only hosting,firestore:rules,storage:rules,functions --project gestaofrotacge530101 --non-interactive
+        run: npx firebase-tools deploy --only hosting,firestore:rules,storage,functions --project gestaofrotacge530101 --non-interactive
