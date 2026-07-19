@@ -19,7 +19,7 @@ test.describe("Gestor — Relatórios", () => {
   });
 
   test("exibe card de relatório Solicitações", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /solicitações/i })).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("main").getByText("Solicitações", { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
   test("exibe card Total de Veículos", async ({ page }) => {

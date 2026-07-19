@@ -70,7 +70,7 @@ Defesa contra o principal risco real de estourar a cota gratuita: não é volume
 
 Perfis de acesso (visão de longo prazo, do documento original): Administrador, Administrativo, Gestor, Chefia, Servidor, Consulta — permissões específicas por módulo, a detalhar conforme construção.
 
-**Implementação atual (2026-07-10):** só 3 perfis existem no código — `"gestor" | "usuario" | "consulta"` (`src/types.ts`). O antigo perfil `"condutor"` foi renomeado para `"usuario"` porque agora reserva salas além de veículos; `"consulta"` é novo, só leitura, só vê calendários (sem telas internas de gestão). Os perfis Administrador/Administrativo/Chefia/Servidor do documento original ainda não foram implementados — quando chegar a Fase 4 (Administração), decidir se viram variações de `"usuario"`/`"gestor"` ou perfis novos de verdade.
+**Implementação atual:** 4 perfis existem no código — `"gestor" | "usuario" | "consulta" | "auditor"` (`src/types.ts`). O antigo perfil `"condutor"` foi renomeado para `"usuario"` porque agora reserva salas além de veículos; `"consulta"` é só leitura, só vê calendários; `"auditor"` (adicionado em 2026-07-19 na correção da auditoria — segregação de função) é só leitura da trilha de auditoria e dos relatórios, sem nenhuma permissão de escrita nem tela de gestão. Os demais perfis Administrador/Administrativo/Chefia/Servidor do documento original seguem sem implementação — quando chegar a Fase 4 (Administração), decidir se viram variações de `"usuario"`/`"gestor"` ou perfis novos de verdade.
 
 ## Identidade visual
 

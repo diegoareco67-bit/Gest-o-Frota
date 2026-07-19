@@ -2,6 +2,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { doc, getDoc, addDoc, updateDoc, setDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -50,6 +51,9 @@ export default function Checkout() {
       await updateDoc(doc(db, "solicitacoes", id), { status:"em_uso" });
       await updateDoc(doc(db, "veiculos", solicitacao.veiculoId), { status:"em_uso", kmAtual:Number(form.kmSaida) });
       await setDoc(doc(db, "calendarioPublico", id), { status:"em_uso" }, { merge: true });
+      await registrarAuditoria("checkout", usuario?.uid || "", usuario?.nome || "", {
+        solicitacaoId: id, veiculoPlaca: solicitacao.veiculoPlaca, kmSaida: Number(form.kmSaida),
+      });
       navigate("/usuario/solicitacoes");
     } catch(e) { console.error(e); setErro("Erro ao registrar saída. Tente novamente."); }
     finally { setEnviando(false); }

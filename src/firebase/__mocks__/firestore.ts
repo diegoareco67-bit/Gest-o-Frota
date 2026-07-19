@@ -9,6 +9,7 @@ const store: Record<string, MockDoc[]> = {
     { id: "uid-gestor-teste",   data: { nome: "Maria Gestora",   perfil: "gestor",   setor: "Gestão",   matricula: "67890", ativo: true } },
     { id: "uid-consulta-teste", data: { nome: "Carlos Consulta", perfil: "consulta", setor: "Auditoria", matricula: "11223", ativo: true } },
     { id: "uid-outro-servidor", data: { nome: "Pedro Motorista",  perfil: "usuario",  setor: "Transportes", matricula: "22334", ativo: true } },
+    { id: "uid-auditor-teste",  data: { nome: "Ana Auditora",     perfil: "auditor",  setor: "Controle Interno", matricula: "33445", ativo: true } },
   ],
   veiculos: [
     { id: "veiculo-001", data: { placa: "ABC-1234", modelo: "Strada",  marca: "Fiat",    ano: 2022, tipo: "caminhonete", cor: "Branco", status: "disponivel", kmAtual: 45000 } },
@@ -41,6 +42,10 @@ const store: Record<string, MockDoc[]> = {
     { id: "vp-002", data: { servidorId: "uid-outro-servidor", servidorNome: "Pedro Motorista", categoriaFuncional: "Motorista", marca: "Volkswagen", modelo: "Gol", placa: "TST-0002", localidade: "Campo Grande", data: "2025-02-01T00:00:00.000Z", status: "pendente", pdfUrl: "https://example.com/termo2.pdf", pdfHash: "hash-teste-2" } },
   ],
   indenizacoes: [],
+  auditoria: [
+    { id: "aud-001", data: { acao: "aprovar_solicitacao", usuarioId: "uid-gestor-teste", usuarioNome: "Maria Gestora", detalhes: { protocolo: "SOL001", veiculoPlaca: "ABC-1234" }, criadoEm: mockTimestamp(new Date("2025-01-20T10:00:00")) } },
+    { id: "aud-002", data: { acao: "checkout", usuarioId: "uid-usuario-teste", usuarioNome: "João Usuário", detalhes: { veiculoPlaca: "ABC-1234", kmSaida: 45000 }, criadoEm: mockTimestamp(new Date("2025-01-20T11:00:00")) } },
+  ],
 };
 
 function getColName(ref: unknown): string {

@@ -2,6 +2,29 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
+## Correções da auditoria técnica (2026-07-19) — em andamento
+
+Após a auditoria de homologação (artifact publicado), correções por onda seguindo o plano aprovado:
+
+### ✅ Onda 1 — regras críticas de segurança (`firestore.rules`)
+- **Escalonamento de privilégio fechado** (achado crítico): auto-update de `usuarios/{uid}` agora trava `perfil` e `ativo` — só o gestor muda esses campos. Antes, qualquer conta gravava `{perfil:"gestor"}` em si mesma e virava gestor.
+- **`veiculos`/`equipamentos`**: escrita do `usuario` restrita via `diff().affectedKeys().hasOnly([...])` só aos campos de status/km (Checkout/Checkin/empréstimo); gestor mantém escrita total; `delete: false` (antes o `write` amplo permitia deletar).
+- **`auditoria`**: create exige `usuarioId == request.auth.uid` (barra autoria forjada).
+- **`solicitacoesAcesso`**: guarda de forma no create (campos obrigatórios + tamanhos máximos).
+
+### ✅ Onda 1b — App Check no formulário público (reCAPTCHA v3, gratuito)
+- `src/firebase/config.ts` inicializa App Check com `ReCaptchaV3Provider`, **guardado** pela presença de `VITE_RECAPTCHA_SITE_KEY` — em dev/e2e (sem a chave) fica desligado, não quebra nada; em produção ativa quando o secret existir.
+- Env novo `VITE_RECAPTCHA_SITE_KEY` (`.env.example`, secret do GitHub Actions).
+- **Pendente de você (console):** gerar chave reCAPTCHA v3, registrar o app em App Check, habilitar enforcement em "monitorar" antes de forçar. Enquanto o secret não existir, a produção roda sem App Check (só com a guarda de forma da regra).
+
+### ✅ Onda 2 — governança
+- **Perfil `auditor` novo** (`types.ts`, `AuthContext`, `RotaProtegida` aceita lista de perfis, `Sidebar`, `App.tsx`, `firestore.rules`) — só leitura de auditoria + relatórios, nenhuma escrita. Landing em `/auditor`.
+- **Log de auditoria completado**: `registrarAuditoria` agora é chamado em checkout, checkin, cadastro/edição de veículo, registro/conclusão de manutenção, reserva/cancelamento de sala, reserva/retirada/devolução/cancelamento de equipamento, aprovação/recusa de veículo próprio e envio de indenização (antes só 2 de 10 ações). Union `AcaoAuditoria` estendido.
+- **Tela `gestor/Auditoria.tsx`** (nova) — trilha read-only, busca, rótulos amigáveis por ação; visível a gestor e auditor. Item no Sidebar.
+- **Criação de conta unificada** (`Usuarios.tsx`): cadastro manual passou a usar senha aleatória descartável + `sendPasswordResetEmail` (o gestor nunca conhece a senha), removido o campo "Senha inicial"; seletor de perfil ganhou "Auditor".
+- **Relatórios honestos**: removido o filtro "Tipo" inerte e a afford­ância falsa "Ver relatório →" dos cards (agora informativos); removido o card "Consumo de Combustível" (sem dado de custo por trás).
+- **Testes**: 141 Vitest verdes, 176 e2e verdes (7 novos em `e2e/auditoria.spec.ts` cobrindo trilha + perfil auditor + controle de acesso); mocks e fixtures ganharam o perfil auditor e seed de `auditoria`.
+
 ## Status de deploy (2026-07-10) — resumo; os detalhes por fase abaixo foram revisados para bater com este bloco
 
 - ✅ **Deployado em produção**: `firestore.rules` (todas as coleções — Salas, Equipamentos, Indenização, Setores, o fix de `veiculos`) e `hosting` (todas as telas até a Fase 5, incluindo o dashboard consolidado)

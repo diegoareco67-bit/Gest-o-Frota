@@ -10,6 +10,7 @@ import Manutencao from "./pages/gestor/Manutencao";
 import Relatorios from "./pages/gestor/Relatorios";
 import Usuarios from "./pages/gestor/Usuarios";
 import ManualUso from "./pages/gestor/ManualUso";
+import Auditoria from "./pages/gestor/Auditoria";
 import DashboardUsuario from "./pages/usuario/Dashboard";
 import Solicitar from "./pages/usuario/Solicitar";
 import MinhasSolicitacoes from "./pages/usuario/MinhasSolicitacoes";
@@ -37,7 +38,9 @@ export default function App() {
           <Route path="/gestor/veiculos" element={<RotaProtegida perfil="gestor"><Veiculos /></RotaProtegida>} />
           <Route path="/gestor/manutencao" element={<RotaProtegida perfil="gestor"><Manutencao /></RotaProtegida>} />
           <Route path="/gestor/usuarios" element={<RotaProtegida perfil="gestor"><Usuarios /></RotaProtegida>} />
-          <Route path="/gestor/relatorios" element={<RotaProtegida perfil="gestor"><Relatorios /></RotaProtegida>} />
+          <Route path="/gestor/relatorios" element={<RotaProtegida perfil={["gestor","auditor"]}><Relatorios /></RotaProtegida>} />
+          <Route path="/gestor/auditoria" element={<RotaProtegida perfil={["gestor","auditor"]}><Auditoria /></RotaProtegida>} />
+          <Route path="/auditor" element={<RotaProtegida perfil="auditor"><Auditoria /></RotaProtegida>} />
           <Route path="/gestor/setores" element={<RotaProtegida perfil="gestor"><Setores /></RotaProtegida>} />
           <Route path="/usuario" element={<RotaProtegida perfil="usuario"><DashboardUsuario /></RotaProtegida>} />
           <Route path="/usuario/solicitar" element={<RotaProtegida perfil="usuario"><Solicitar /></RotaProtegida>} />

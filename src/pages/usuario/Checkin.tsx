@@ -2,6 +2,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { doc, getDoc, getDocs, updateDoc, setDoc, collection, query, where, limit, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -57,6 +58,9 @@ export default function Checkin() {
       await updateDoc(doc(db, "solicitacoes", id), { status:"concluida" });
       await updateDoc(doc(db, "veiculos", solicitacao.veiculoId), { status:"disponivel", kmAtual:kmChegada });
       await setDoc(doc(db, "calendarioPublico", id), { status:"concluida" }, { merge: true });
+      await registrarAuditoria("checkin", usuario?.uid || "", usuario?.nome || "", {
+        solicitacaoId: id, veiculoPlaca: solicitacao.veiculoPlaca, kmChegada, kmRodado,
+      });
       navigate("/usuario/solicitacoes");
     } catch(e) { console.error(e); setErro("Erro ao registrar devolução. Tente novamente."); }
     finally { setEnviando(false); }

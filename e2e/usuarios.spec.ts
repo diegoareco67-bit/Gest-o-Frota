@@ -67,7 +67,6 @@ test.describe("Gestor — Usuários — Cadastro", () => {
   test("preenche e cadastra novo usuário", async ({ page }) => {
     await page.getByPlaceholder("João da Silva").fill("Pedro Novo");
     await page.getByPlaceholder("joao@cge.ms.gov.br").fill("pedro@cge.ms.gov.br");
-    await page.getByPlaceholder("Mínimo 6 caracteres").fill("senha123");
     await page.locator('[role="dialog"] select').first().selectOption({ index: 1 });
 
     await page.getByRole("button", { name: /^cadastrar$/i }).click();

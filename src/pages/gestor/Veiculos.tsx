@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
+import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
 
 interface Veiculo { id:string; placa:string; modelo:string; marca:string; ano:number; tipo:string; cor:string; status:string; kmAtual:number; categoriaUso?:string; atualizadoEm?:{toDate:()=>Date}; }
@@ -16,6 +18,7 @@ const TIPOS = ["carro","caminhonete","moto","van","caminhão","ônibus"];
 const CATEGORIAS = ["Administrativo","Representação","Operacional","Misto"];
 
 export default function Veiculos() {
+  const { usuario } = useAuth();
   const [lista,setLista]       = useState<Veiculo[]>([]);
   const [carregando,setLoad]   = useState(true);
   const [modal,setModal]       = useState(false);
@@ -40,8 +43,13 @@ export default function Veiculos() {
   async function salvar(){
     setErroModal("");
     if(!form.placa||!form.modelo||!form.marca){setErroModal("Preencha placa, modelo e marca.");return;}
-    if(editando) await updateDoc(doc(db,"veiculos",editando.id),{...form,atualizadoEm:serverTimestamp()});
-    else await addDoc(collection(db,"veiculos"),{...form,criadoEm:serverTimestamp()});
+    if(editando){
+      await updateDoc(doc(db,"veiculos",editando.id),{...form,atualizadoEm:serverTimestamp()});
+      await registrarAuditoria("editar_veiculo",usuario?.uid||"",usuario?.nome||"",{veiculoId:editando.id,placa:form.placa});
+    } else {
+      const ref=await addDoc(collection(db,"veiculos"),{...form,criadoEm:serverTimestamp()});
+      await registrarAuditoria("cadastrar_veiculo",usuario?.uid||"",usuario?.nome||"",{veiculoId:ref.id,placa:form.placa});
+    }
     setModal(false);carregar();
   }
 

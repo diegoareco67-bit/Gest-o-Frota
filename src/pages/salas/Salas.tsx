@@ -4,6 +4,7 @@ import { ModalConfirm } from "../../components/ModalConfirm";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, setDoc, deleteDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface Sala { id:string; nome:string; capacidade:number; localizacao:string; equipamentos:string; ativo:boolean; }
@@ -72,6 +73,9 @@ export default function Salas() {
       await setDoc(doc(db, "calendarioPublicoSalas", novaReserva.id), {
         salaNome: sala?.nome || "", dataInicio, dataFim, status: "confirmada",
       });
+      await registrarAuditoria("reservar_sala", usuario?.uid || "", usuario?.nome || "", {
+        reservaId: novaReserva.id, salaNome: sala?.nome, dataInicio, dataFim,
+      });
       setModal(false);
       setForm({ salaId:"", data:"", horaInicio:"", horaFim:"", motivo:"" });
       await carregar();
@@ -82,6 +86,9 @@ export default function Salas() {
   async function cancelar(r: ReservaSala) {
     await updateDoc(doc(db, "reservasSalas", r.id), { status: "cancelada" });
     try { await deleteDoc(doc(db, "calendarioPublicoSalas", r.id)); } catch { /* pode não existir */ }
+    await registrarAuditoria("cancelar_reserva_sala", usuario?.uid || "", usuario?.nome || "", {
+      reservaId: r.id, salaNome: r.salaNome,
+    });
     setConfirmCancelar(null);
     await carregar();
   }

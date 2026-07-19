@@ -166,7 +166,6 @@ describe("Usuarios — modal Novo Usuário", () => {
 
     await userEvent.type(screen.getByPlaceholderText("João da Silva"), "Pedro Novo");
     await userEvent.type(screen.getByPlaceholderText("joao@cge.ms.gov.br"), "pedro@cge.ms.gov.br");
-    await userEvent.type(screen.getByPlaceholderText("Mínimo 6 caracteres"), "senha123");
     await userEvent.selectOptions(
       within(screen.getByRole("dialog")).getAllByRole("combobox")[0],
       "Secretaria de Obras"
@@ -178,7 +177,7 @@ describe("Usuarios — modal Novo Usuário", () => {
       expect(vi.mocked(createUserWithEmailAndPassword)).toHaveBeenCalledWith(
         expect.anything(),
         "pedro@cge.ms.gov.br",
-        "senha123"
+        expect.any(String)
       );
     });
   });

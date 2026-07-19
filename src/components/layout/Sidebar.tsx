@@ -20,6 +20,7 @@ const IcoMap = {
   laptop:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg>,
   building:  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/><line x1="9" y1="18" x2="15" y2="18"/></svg>,
   manual:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+  shield:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>,
 };
 
 type IcoKey = keyof typeof IcoMap;
@@ -27,7 +28,7 @@ type IcoKey = keyof typeof IcoMap;
 interface NavItem { icon:IcoKey; label:string; path:string; badge?:number; }
 interface Section { label:string; items:NavItem[]; }
 
-function getSections(perfil:"gestor"|"usuario"|"consulta", pendentes=0): Section[] {
+function getSections(perfil:"gestor"|"usuario"|"consulta"|"auditor", pendentes=0): Section[] {
   if(perfil==="gestor") return [
     { label:"PRINCIPAL", items:[
       {icon:"dashboard",label:"Dashboard",  path:"/gestor"},
@@ -44,12 +45,19 @@ function getSections(perfil:"gestor"|"usuario"|"consulta", pendentes=0): Section
       {icon:"cash",   label:"Indenizações",  path:"/gestor/indenizacoes"},
     ]},
     { label:"ANÁLISE", items:[
-      {icon:"chart", label:"Relatórios", path:"/gestor/relatorios"},
+      {icon:"chart",  label:"Relatórios", path:"/gestor/relatorios"},
+      {icon:"shield", label:"Auditoria",  path:"/gestor/auditoria"},
     ]},
   ];
   if(perfil==="consulta") return [
     { label:"MENU", items:[
       {icon:"home", label:"Calendários", path:"/consulta"},
+    ]},
+  ];
+  if(perfil==="auditor") return [
+    { label:"FISCALIZAÇÃO", items:[
+      {icon:"shield", label:"Auditoria",  path:"/auditor"},
+      {icon:"chart",  label:"Relatórios", path:"/gestor/relatorios"},
     ]},
   ];
   return [
@@ -83,9 +91,10 @@ const ICO_COLORS: Record<IcoKey, string> = {
   laptop:    "#67E8F9",
   building:  "#7EB8F7",
   manual:    "#FCD34D",
+  shield:    "#6DCF92",
 };
 
-interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"; pendentes?:number; }
+interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; pendentes?:number; }
 
 export function Sidebar({perfil}: SidebarProps) {
   const {usuario, logout} = useAuth();
@@ -242,7 +251,7 @@ export function Sidebar({perfil}: SidebarProps) {
           <div style={s.avatar}>{initials}</div>
           <div style={{flex:1,minWidth:0}}>
             <div style={s.userName}>{usuario?.nome?.split(" ")[0]??"Usuário"}</div>
-            <div style={s.userRole}>{perfil==="gestor"?"Gestor":perfil==="consulta"?"Consulta":"Usuário"} · CGE-MS</div>
+            <div style={s.userRole}>{perfil==="gestor"?"Gestor":perfil==="consulta"?"Consulta":perfil==="auditor"?"Auditor":"Usuário"} · CGE-MS</div>
           </div>
           <button
             onClick={logout}

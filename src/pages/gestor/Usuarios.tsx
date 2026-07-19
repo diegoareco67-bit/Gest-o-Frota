@@ -9,7 +9,7 @@ import type { Perfil } from "../../types";
 
 interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; }
 
-const PERFIL_LABEL: Record<string, string> = { usuario:"Usuário", consulta:"Consulta" };
+const PERFIL_LABEL: Record<string, string> = { usuario:"Usuário", consulta:"Consulta", auditor:"Auditor" };
 
 function statusCnh(vencimento?: string): { cor: string; bg: string; texto: string } | null {
   if (!vencimento) return null;
@@ -49,7 +49,7 @@ export default function Usuarios() {
   async function carregarTudo() {
     setCarregando(true);
     const [condSnap, solSnap] = await Promise.all([
-      getDocs(query(collection(db, "usuarios"), where("perfil","in",["usuario","consulta"]), limit(500))),
+      getDocs(query(collection(db, "usuarios"), where("perfil","in",["usuario","consulta","auditor"]), limit(500))),
       getDocs(query(collection(db, "solicitacoesAcesso"), where("status","==","pendente"), limit(200))),
     ]);
     setLista(condSnap.docs.map(d => ({ id:d.id, ...d.data() } as UsuarioConta)));
@@ -112,18 +112,23 @@ export default function Usuarios() {
 
   async function salvarNovoUsuario() {
     setErroModal("");
-    if (!form.nome || !form.email || !form.senha || !form.setor) { setErroModal("Preencha todos os campos obrigatórios."); return; }
+    if (!form.nome || !form.email || !form.setor) { setErroModal("Preencha todos os campos obrigatórios."); return; }
     setSalvando(true);
     try {
-      const cred = await createUserWithEmailAndPassword(auth, form.email, form.senha);
+      // Senha aleatória descartável: o gestor nunca conhece a senha do usuário.
+      // A conta é criada e um e-mail de definição de senha é enviado — mesmo padrão
+      // seguro já usado na aprovação de solicitação de acesso (unificado em 2026-07-19).
+      const senhaDescartavel = Math.random().toString(36).slice(-10) + "Aa1!";
+      const cred = await createUserWithEmailAndPassword(auth, form.email, senhaDescartavel);
       await setDoc(doc(db, "usuarios", cred.user.uid), {
         uid: cred.user.uid, nome: form.nome, email: form.email, perfil: form.perfil,
         setor: form.setor, matricula: form.matricula, ativo: true, criadoEm: serverTimestamp(),
       });
+      await sendPasswordResetEmail(auth, form.email);
       setModal(false);
       setForm({ nome:"", email:"", senha:"", setor:"", matricula:"", perfil:"usuario" });
       carregarTudo();
-      setSucessoMsg(`Usuário ${form.nome} cadastrado com sucesso.`);
+      setSucessoMsg(`Usuário ${form.nome} cadastrado! E-mail enviado para ${form.email} definir a senha de acesso.`);
     } catch(e: unknown) {
       const err = e as { code?:string };
       if (err.code === "auth/email-already-in-use") setErroModal("Este e-mail já está cadastrado.");
@@ -268,31 +273,31 @@ export default function Usuarios() {
               {[
                 { label:"Nome completo", key:"nome", placeholder:"João da Silva" },
                 { label:"E-mail", key:"email", placeholder:"joao@cge.ms.gov.br", type:"email" },
-                { label:"Senha inicial", key:"senha", placeholder:"Mínimo 6 caracteres", type:"password" },
                 { label:"Matrícula", key:"matricula", placeholder:"000001 (opcional)" },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={s.label}>{f.label}</label>
-                  <input type={f.type||"text"} placeholder={f.placeholder} value={(form as Record<string,string>)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]:e.target.value }))} style={s.input} />
+                  <label htmlFor={`novo-usuario-${f.key}`} style={s.label}>{f.label}</label>
+                  <input id={`novo-usuario-${f.key}`} type={f.type||"text"} placeholder={f.placeholder} value={(form as Record<string,string>)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]:e.target.value }))} style={s.input} />
                 </div>
               ))}
               <div>
-                <label style={s.label}>Setor</label>
-                <select value={form.setor} onChange={e => setForm(p => ({ ...p, setor:e.target.value }))} style={s.input}>
+                <label htmlFor="novo-usuario-setor" style={s.label}>Setor</label>
+                <select id="novo-usuario-setor" value={form.setor} onChange={e => setForm(p => ({ ...p, setor:e.target.value }))} style={s.input}>
                   <option value="">Selecione...</option>
                   {setores.map(st => <option key={st.id} value={st.nome}>{st.nome}</option>)}
                 </select>
               </div>
               <div>
-                <label style={s.label}>Perfil</label>
-                <select value={form.perfil} onChange={e => setForm(p => ({ ...p, perfil:e.target.value as Perfil }))} style={s.input}>
+                <label htmlFor="novo-usuario-perfil" style={s.label}>Perfil</label>
+                <select id="novo-usuario-perfil" value={form.perfil} onChange={e => setForm(p => ({ ...p, perfil:e.target.value as Perfil }))} style={s.input}>
                   <option value="usuario">Usuário — reserva veículos, salas e equipamentos</option>
                   <option value="consulta">Consulta — só leitura, só calendários</option>
+                  <option value="auditor">Auditor — só leitura da auditoria e relatórios</option>
                 </select>
               </div>
             </div>
-            <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#854d0e", margin:"1rem 0" }}>
-              ⚠️ O usuário receberá acesso ao sistema com o e-mail e senha informados.
+            <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#1e40af", margin:"1rem 0" }}>
+              ✉️ O usuário receberá um e-mail para definir a própria senha de acesso. O gestor não define a senha.
             </div>
             {erroModal && (
               <div role="alert" style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#DC2626", marginBottom:"1rem", fontWeight:500 }}>

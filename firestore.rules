@@ -24,11 +24,36 @@ service cloud.firestore {
       return isAuth() && perfil() == "consulta";
     }
 
+    // Perfil de fiscalização: leitura ampla (auditoria + relatórios), nenhuma escrita.
+    function isAuditor() {
+      return isAuth() && perfil() == "auditor";
+    }
+
     // ─── solicitacoesAcesso ────────────────────────────────────────────────
     // Qualquer pessoa pode submeter o formulário público de pré-cadastro.
     // Somente gestores gerenciam (leem/atualizam).
+    // Guarda de forma (defesa em profundidade, além do App Check): exige os campos
+    // obrigatórios presentes, status inicial "pendente" e tamanhos máximos sãos —
+    // rejeita escrita malformada/gigante mesmo que um token de App Check falhe/falte.
+    function solicitacaoAcessoValida() {
+      let d = request.resource.data;
+      return d.status == "pendente"
+        && d.keys().hasOnly([
+          "nomeCompleto","email","matricula","setor","numeroCnh","vencimentoCnh",
+          "numeroDiario","dataPublicacao","numeroResolucao","status","criadoEm"
+        ])
+        && d.nomeCompleto is string && d.nomeCompleto.size() > 0 && d.nomeCompleto.size() < 200
+        && d.email is string && d.email.size() > 0 && d.email.size() < 200
+        && d.matricula is string && d.matricula.size() < 60
+        && d.setor is string && d.setor.size() < 200
+        && d.numeroCnh is string && d.numeroCnh.size() < 60
+        && d.vencimentoCnh is string && d.vencimentoCnh.size() < 40
+        && d.numeroDiario is string && d.numeroDiario.size() < 60
+        && d.dataPublicacao is string && d.dataPublicacao.size() < 40
+        && d.numeroResolucao is string && d.numeroResolucao.size() < 60;
+    }
     match /solicitacoesAcesso/{id} {
-      allow create: if true;
+      allow create: if solicitacaoAcessoValida();
       allow read, update: if isGestor();
       allow delete: if false;
     }
@@ -43,13 +68,18 @@ service cloud.firestore {
 
     // ─── veiculos ─────────────────────────────────────────────────────────
     // Gestor e usuário consultam; consulta não vê (só os calendários públicos/mirror).
-    // Usuário também escreve: Checkout/Checkin atualizam status/kmAtual do veículo
-    // que está retirando/devolvendo (bug encontrado em 2026-07-10 — antes só
-    // gestor podia escrever, então esse updateDoc falhava com permission-denied
-    // para toda conta usuario; nunca funcionou em produção).
+    // Auditor lê (relatórios/fiscalização), nunca escreve.
+    // Escrita: só o gestor cadastra/edita o veículo inteiro. O usuário escreve apenas
+    // os campos status/kmAtual (Checkout/Checkin ao retirar/devolver) — antes a regra
+    // permitia ao usuario reescrever o documento inteiro (placa, marca, modelo...),
+    // brecha fechada na auditoria de 2026-07-19. Ninguém deleta veículo.
     match /veiculos/{id} {
-      allow read: if isGestor() || isUsuario();
-      allow write: if isGestor() || isUsuario();
+      allow read: if isGestor() || isUsuario() || isAuditor();
+      allow create: if isGestor();
+      allow update: if isGestor()
+        || (isUsuario()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","kmAtual"]));
+      allow delete: if false;
     }
 
     // ─── calendarioPublico ────────────────────────────────────────────────
@@ -79,7 +109,7 @@ service cloud.firestore {
     // 'calendarioPublico' em vez desta coleção, ver PLANO.md Fase 5).
     // Perfil consulta não lê esta coleção — só o mirror público em 'calendarioPublico'.
     match /solicitacoes/{id} {
-      allow read: if isGestor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
+      allow read: if isGestor() || isAuditor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
 
       // Usuário cria apenas as próprias solicitações
       allow create: if isUsuario()
@@ -102,17 +132,24 @@ service cloud.firestore {
 
     // ─── usuarios ─────────────────────────────────────────────────────────
     // Documento ID = Firebase Auth UID (obrigatório após a correção do addDoc).
-    // Cada conta lê apenas o próprio perfil; gestor lê todos.
+    // Cada conta lê apenas o próprio perfil; gestor e auditor leem todos.
+    // Auto-update: o próprio usuário pode atualizar seu doc, MAS NUNCA os campos
+    // 'perfil' e 'ativo' — sem essa trava, qualquer conta gravava { perfil: "gestor" }
+    // em si mesma e se autopromovia (achado crítico da auditoria de 2026-07-19).
+    // Só o gestor muda perfil/ativo de qualquer conta.
     match /usuarios/{uid} {
-      allow read: if isAuth() && (request.auth.uid == uid || isGestor());
+      allow read: if isAuth() && (request.auth.uid == uid || isGestor() || isAuditor());
       allow create: if isGestor();
-      allow update: if isGestor() || request.auth.uid == uid;
+      allow update: if isGestor()
+        || (request.auth.uid == uid
+            && request.resource.data.perfil == resource.data.perfil
+            && request.resource.data.ativo  == resource.data.ativo);
       allow delete: if false;
     }
 
     // ─── manutencoes ──────────────────────────────────────────────────────
     match /manutencoes/{id} {
-      allow read: if isGestor() || isUsuario();
+      allow read: if isGestor() || isUsuario() || isAuditor();
       allow write: if isGestor();
     }
 
@@ -121,7 +158,7 @@ service cloud.firestore {
     // aplicada a 'solicitacoes' acima). Checkin.tsx sempre inclui o filtro condutorId
     // na query, exigido pelo Firestore para queries multi-documento sob esta regra.
     match /usos/{id} {
-      allow read: if isGestor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
+      allow read: if isGestor() || isAuditor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
       allow create: if isUsuario();
       allow update: if isUsuario()
         && resource.data.condutorId == request.auth.uid;
@@ -130,9 +167,13 @@ service cloud.firestore {
 
     // ─── auditoria ────────────────────────────────────────────────────────
     // Append-only: create permitido para quem opera a frota; update/delete proibido.
+    // Autoria travada — quem grava só pode registrar a ação como própria
+    // (usuarioId == uid), senão o log aceitaria atribuir uma ação a outra pessoa
+    // (achado da auditoria de 2026-07-19). Gestor e auditor leem o log.
     match /auditoria/{id} {
-      allow read: if isGestor();
-      allow create: if isGestor() || isUsuario();
+      allow read: if isGestor() || isAuditor();
+      allow create: if (isGestor() || isUsuario())
+        && request.resource.data.usuarioId == request.auth.uid;
       allow update, delete: if false;
     }
 
@@ -183,10 +224,16 @@ service cloud.firestore {
 
     // ─── equipamentos ───────────────────────────────────────────────────────
     // Catálogo com patrimônio individual (notebooks, projetores, etc).
-    // Usuário também escreve: precisa atualizar o status ao retirar/devolver.
+    // Só o gestor cadastra/edita o item inteiro. O usuário escreve apenas o campo
+    // status (ao reservar/retirar/devolver/cancelar) — mesma brecha de 'veiculos'
+    // fechada na auditoria de 2026-07-19.
     match /equipamentos/{id} {
       allow read: if isGestor() || isUsuario() || isConsulta();
-      allow write: if isGestor() || isUsuario();
+      allow create: if isGestor();
+      allow update: if isGestor()
+        || (isUsuario()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"]));
+      allow delete: if false;
     }
 
     // ─── emprestimosEquipamentos ────────────────────────────────────────────

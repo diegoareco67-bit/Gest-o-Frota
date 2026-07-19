@@ -23,8 +23,6 @@ const REPORT_CARDS = [
     ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>},
   {id:"manut",    title:"Manutenções",             sub:"Histórico de manutenções",        cor:"#D97706", bgIco:"#fef9c3",
     ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>},
-  {id:"consumo",  title:"Consumo de Combustível",  sub:"Consumo e custos",               cor:"#7C3AED", bgIco:"#ede9fe",
-    ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>},
   {id:"solic",    title:"Solicitações",            sub:"Solicitações por período",        cor:"#0891B2", bgIco:"#cffafe",
     ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891B2" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>},
   {id:"condut",   title:"Usuários",                sub:"Atividade dos usuários",           cor:"#059669", bgIco:"#d1fae5",
@@ -36,9 +34,7 @@ const REPORT_CARDS = [
 export default function Relatorios() {
   const [resumo,setResumo] = useState<Resumo|null>(null);
   const [load,setLoad]     = useState(true);
-  const [tipo,setTipo]     = useState("Todos");
   const [periodo,setPeriodo] = useState(new Date().toISOString().slice(0,7));
-  const [selected,setSelected] = useState<string|null>(null);
   const [solicitacoesRel,setSolicitacoesRel] = useState<SolicitacaoRel[]>([]);
   const [manutencoesRel,setManutencoesRel]   = useState<ManutencaoRel[]>([]);
   const [usosRel,setUsosRel]                 = useState<UsoRel[]>([]);
@@ -167,12 +163,10 @@ export default function Relatorios() {
         </div>
 
         <div style={{padding:"20px 24px",flex:1,overflowY:"auto"}}>
-          {/* Filtros */}
-          <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
-            <select value={tipo} onChange={e=>setTipo(e.target.value)} style={{padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,background:"#ffffff",color:"#0F172A",fontFamily:"inherit",cursor:"pointer",minWidth:160} as React.CSSProperties}>
-              {["Todos","Veículos","Manutenção","Usuários","Solicitações"].map(o=><option key={o}>{o}</option>)}
-            </select>
-            <input type="month" value={periodo} onChange={e=>setPeriodo(e.target.value)}
+          {/* Filtro de período (usado nas exportações CSV) */}
+          <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap",alignItems:"center"}}>
+            <label htmlFor="rel-periodo" style={{fontSize:12,fontWeight:600,color:"#5A7A9A"}}>Período das exportações</label>
+            <input id="rel-periodo" type="month" value={periodo} onChange={e=>setPeriodo(e.target.value)}
               style={{padding:"9px 12px",border:"1px solid #E1EAF5",borderRadius:8,fontSize:13,background:"#ffffff",color:"#0F172A",fontFamily:"inherit"} as React.CSSProperties}/>
           </div>
 
@@ -183,22 +177,19 @@ export default function Relatorios() {
             </div>
           ):(
             <>
-              {/* Cards de relatório */}
+              {/* Categorias cobertas pelo resumo abaixo (informativo, não interativo) */}
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:12,marginBottom:24}}>
                 {REPORT_CARDS.map(c=>(
-                  <button key={c.id} onClick={()=>setSelected(selected===c.id?null:c.id)}
-                    style={{background:"#ffffff",border:`1.5px solid ${selected===c.id?c.cor:"#E1EAF5"}`,borderRadius:12,padding:"16px",cursor:"pointer",textAlign:"left",transition:"all 0.15s",boxShadow:selected===c.id?`0 0 0 3px ${c.cor}22`:"0 1px 3px rgba(0,0,0,0.05)"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+                  <div key={c.id}
+                    style={{background:"#ffffff",border:"1px solid #E1EAF5",borderRadius:12,padding:"16px",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:c.bgIco,display:"flex",alignItems:"center",justifyContent:"center"}}>{c.ico}</div>
                       <div>
                         <div style={{fontSize:13,fontWeight:700,color:"#0F172A"}}>{c.title}</div>
                         <div style={{fontSize:11,color:"#7A95B2"}}>{c.sub}</div>
                       </div>
                     </div>
-                    <div style={{fontSize:11,color:c.cor,fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
-                      Ver relatório →
-                    </div>
-                  </button>
+                  </div>
                 ))}
               </div>
 

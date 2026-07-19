@@ -26,6 +26,7 @@ export function makeAuthContext(overrides: {
   ehGestor?: boolean;
   ehUsuario?: boolean;
   ehConsulta?: boolean;
+  ehAuditor?: boolean;
 }) {
   return {
     usuario: null,
@@ -33,6 +34,7 @@ export function makeAuthContext(overrides: {
     ehGestor: false,
     ehUsuario: false,
     ehConsulta: false,
+    ehAuditor: false,
     login: vi.fn(),
     logout: vi.fn(),
     ...overrides,

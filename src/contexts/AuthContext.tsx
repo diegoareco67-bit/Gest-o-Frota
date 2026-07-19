@@ -12,6 +12,7 @@ interface AuthContextType {
   ehGestor: boolean;
   ehUsuario: boolean;
   ehConsulta: boolean;
+  ehAuditor: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -52,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ usuario, carregando, login, logout, ehGestor: usuario?.perfil === "gestor", ehUsuario: usuario?.perfil === "usuario", ehConsulta: usuario?.perfil === "consulta" }}>
+    <AuthContext.Provider value={{ usuario, carregando, login, logout, ehGestor: usuario?.perfil === "gestor", ehUsuario: usuario?.perfil === "usuario", ehConsulta: usuario?.perfil === "consulta", ehAuditor: usuario?.perfil === "auditor" }}>
       {children}
     </AuthContext.Provider>
   );

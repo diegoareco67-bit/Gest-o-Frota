@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
+import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
 
 interface Manutencao { id:string; veiculoId:string; veiculoPlaca:string; tipo:string; descricao:string; status:string; previsao:string; custo?:number; oficina?:string; criadoEm?:{toDate:()=>Date}; }
@@ -16,6 +18,7 @@ const TIPOS = ["revisao","troca_pneus","troca_oleo","funilaria","eletrica","inst
 const TIPO_LABEL: Record<string,string> = {revisao:"Revisão preventiva",troca_pneus:"Troca de pneus",troca_oleo:"Troca de óleo",funilaria:"Funilaria/Pintura",eletrica:"Elétrica",instalacao_acessorio:"Instalação de acessório",revisao_corretiva:"Revisão corretiva",outro:"Outro"};
 
 export default function Manutencao() {
+  const { usuario } = useAuth();
   const [lista,setLista]       = useState<Manutencao[]>([]);
   const [veiculos,setVeiculos] = useState<{id:string;placa:string}[]>([]);
   const [carregando,setLoad]   = useState(true);
@@ -38,14 +41,16 @@ export default function Manutencao() {
   async function salvar(){
     setErroModal("");
     if(!form.veiculoId||!form.descricao){setErroModal("Preencha veículo e descrição.");return;}
-    await addDoc(collection(db,"manutencoes"),{...form,criadoEm:serverTimestamp()});
+    const ref=await addDoc(collection(db,"manutencoes"),{...form,criadoEm:serverTimestamp()});
     if(form.status==="em_andamento"||form.status==="agendada") await updateDoc(doc(db,"veiculos",form.veiculoId),{status:"manutencao"});
+    await registrarAuditoria("registrar_manutencao",usuario?.uid||"",usuario?.nome||"",{manutencaoId:ref.id,veiculoPlaca:form.veiculoPlaca,tipo:form.tipo});
     setModal(false);setForm({veiculoId:"",veiculoPlaca:"",tipo:"revisao",descricao:"",status:"agendada",previsao:"",custo:0,oficina:""});carregar();
   }
 
   async function concluir(m:Manutencao){
     await updateDoc(doc(db,"manutencoes",m.id),{status:"concluida",concluidoEm:serverTimestamp()});
     await updateDoc(doc(db,"veiculos",m.veiculoId),{status:"disponivel"});
+    await registrarAuditoria("concluir_manutencao",usuario?.uid||"",usuario?.nome||"",{manutencaoId:m.id,veiculoPlaca:m.veiculoPlaca});
     carregar();
   }
 

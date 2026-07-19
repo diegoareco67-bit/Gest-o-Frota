@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, serverTimestamp, limit } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { gerarPdfAnexoII, calcularHashSHA256, calcularValor, type TrajetoLinha } from "../../utils/pdfIndenizacao";
 
@@ -139,6 +140,10 @@ export default function Indenizacoes() {
       }
       await updateDoc(doc(db, "indenizacoes", docRef.id), {
         status: emailConfirmado ? "enviado_rh" : "enviado",
+      });
+      await registrarAuditoria("enviar_indenizacao", usuario.uid, usuario.nome || "", {
+        indenizacaoId: docRef.id, protocolo: protocoloAtual, totalKmRodados,
+        valorTotal: calcularValor(totalKmRodados), emailConfirmado,
       });
 
       setSucesso(true);

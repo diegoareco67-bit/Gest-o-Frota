@@ -58,7 +58,7 @@ export default function Login() {
       const {auth}      =await import("../firebase/config");
       const snap=await getDoc(doc(_db,"usuarios",auth.currentUser!.uid));
       const perfil=snap.data()?.perfil;
-      const destino=perfil==="gestor"||perfil==="usuario"||perfil==="consulta" ? `/${perfil}` : "/consulta";
+      const destino=perfil==="gestor"||perfil==="usuario"||perfil==="consulta"||perfil==="auditor" ? `/${perfil}` : "/consulta";
       navigate(destino,{replace:true});
     }catch(err:unknown){
       const c=(err as {code?:string}).code??"";

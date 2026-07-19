@@ -4,6 +4,7 @@ import { ModalConfirm } from "../../components/ModalConfirm";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface Equipamento { id: string; nome: string; tipo: string; patrimonio: string; status: string; ativo: boolean; }
@@ -76,13 +77,16 @@ export default function Equipamentos() {
     setEnviando(true);
     try {
       const equip = equipamentos.find(eq => eq.id === form.equipamentoId);
-      await addDoc(collection(db, "emprestimosEquipamentos"), {
+      const novoEmprestimo = await addDoc(collection(db, "emprestimosEquipamentos"), {
         protocolo: gerarProtocolo(),
         equipamentoId: form.equipamentoId, equipamentoNome: equip?.nome || "", equipamentoPatrimonio: equip?.patrimonio || "",
         responsavelId: usuario?.uid, responsavelNome: usuario?.nome, responsavelSetor: usuario?.setor,
         motivo: form.motivo, dataInicio, dataFim, status: "reservado", criadoEm: serverTimestamp(),
       });
       await updateDoc(doc(db, "equipamentos", form.equipamentoId), { status: "reservado" });
+      await registrarAuditoria("reservar_equipamento", usuario?.uid || "", usuario?.nome || "", {
+        emprestimoId: novoEmprestimo.id, equipamentoNome: equip?.nome, dataInicio, dataFim,
+      });
       setModal(false);
       setForm({ equipamentoId: "", data: "", horaInicio: "", horaFim: "", motivo: "" });
       await carregar();
@@ -93,18 +97,21 @@ export default function Equipamentos() {
   async function retirar(e: Emprestimo) {
     await updateDoc(doc(db, "emprestimosEquipamentos", e.id), { status: "retirado", retiradoEm: serverTimestamp() });
     await updateDoc(doc(db, "equipamentos", e.equipamentoId), { status: "retirado" });
+    await registrarAuditoria("retirar_equipamento", usuario?.uid || "", usuario?.nome || "", { emprestimoId: e.id, equipamentoNome: e.equipamentoNome });
     await carregar();
   }
 
   async function devolver(e: Emprestimo) {
     await updateDoc(doc(db, "emprestimosEquipamentos", e.id), { status: "devolvido", devolvidoEm: serverTimestamp() });
     await updateDoc(doc(db, "equipamentos", e.equipamentoId), { status: "disponivel" });
+    await registrarAuditoria("devolver_equipamento", usuario?.uid || "", usuario?.nome || "", { emprestimoId: e.id, equipamentoNome: e.equipamentoNome });
     await carregar();
   }
 
   async function cancelar(e: Emprestimo) {
     await updateDoc(doc(db, "emprestimosEquipamentos", e.id), { status: "cancelado" });
     await updateDoc(doc(db, "equipamentos", e.equipamentoId), { status: "disponivel" });
+    await registrarAuditoria("cancelar_emprestimo_equipamento", usuario?.uid || "", usuario?.nome || "", { emprestimoId: e.id, equipamentoNome: e.equipamentoNome });
     setConfirmCancelar(null);
     await carregar();
   }

@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 
 export interface OpcoesMock {
-  perfil: "usuario" | "gestor" | "consulta";
+  perfil: "usuario" | "gestor" | "consulta" | "auditor";
   nome?: string;
   email?: string;
 }
@@ -9,14 +9,14 @@ export interface OpcoesMock {
 export interface DadosMock {
   email: string;
   nome: string;
-  perfil: "usuario" | "gestor" | "consulta";
+  perfil: "usuario" | "gestor" | "consulta" | "auditor";
 }
 
 export function gerarDados(opcoes: OpcoesMock): DadosMock {
   const { perfil } = opcoes;
   return {
-    email: opcoes.email ?? (perfil === "gestor" ? "gestor@cge.ms.gov.br" : perfil === "consulta" ? "consulta@cge.ms.gov.br" : "usuario@cge.ms.gov.br"),
-    nome:  opcoes.nome  ?? (perfil === "gestor" ? "Maria Gestora" : perfil === "consulta" ? "Carlos Consulta" : "João Usuário"),
+    email: opcoes.email ?? (perfil === "gestor" ? "gestor@cge.ms.gov.br" : perfil === "consulta" ? "consulta@cge.ms.gov.br" : perfil === "auditor" ? "auditor@cge.ms.gov.br" : "usuario@cge.ms.gov.br"),
+    nome:  opcoes.nome  ?? (perfil === "gestor" ? "Maria Gestora" : perfil === "consulta" ? "Carlos Consulta" : perfil === "auditor" ? "Ana Auditora" : "João Usuário"),
     perfil,
   };
 }

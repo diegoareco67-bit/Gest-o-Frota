@@ -11,7 +11,16 @@ export type AcaoAuditoria =
   | "cadastrar_veiculo"
   | "editar_veiculo"
   | "registrar_manutencao"
-  | "concluir_manutencao";
+  | "concluir_manutencao"
+  | "reservar_sala"
+  | "cancelar_reserva_sala"
+  | "reservar_equipamento"
+  | "retirar_equipamento"
+  | "devolver_equipamento"
+  | "cancelar_emprestimo_equipamento"
+  | "aprovar_veiculo_proprio"
+  | "recusar_veiculo_proprio"
+  | "enviar_indenizacao";
 
 /**
  * Grava um registro imutável na coleção `auditoria`.

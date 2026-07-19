@@ -93,7 +93,7 @@ describe("Relatorios — renderização", () => {
 
   it("exibe card de relatório Solicitações", async () => {
     renderRelatorios();
-    expect(await screen.findByRole("button", { name: /solicitações/i })).toBeInTheDocument();
+    expect(await screen.findByText("Solicitações", { exact: true })).toBeInTheDocument();
   });
 
   it("exibe card Total de Veículos", async () => {

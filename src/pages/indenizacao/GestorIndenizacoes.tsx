@@ -2,6 +2,8 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { collection, getDocs, updateDoc, doc, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
+import { useAuth } from "../../contexts/AuthContext";
 import { calcularValor } from "../../utils/pdfIndenizacao";
 
 interface VeiculoProprio {
@@ -21,6 +23,7 @@ const STATUS_LABEL: Record<string, { cor: string; bg: string; label: string }> =
 };
 
 export default function GestorIndenizacoes() {
+  const { usuario } = useAuth();
   const [aba, setAba] = useState<"veiculos" | "indenizacoes">("veiculos");
   const [veiculos, setVeiculos] = useState<VeiculoProprio[]>([]);
   const [indenizacoes, setIndenizacoes] = useState<Indenizacao[]>([]);
@@ -41,6 +44,12 @@ export default function GestorIndenizacoes() {
 
   async function decidir(id: string, status: "aprovado" | "recusado") {
     await updateDoc(doc(db, "veiculosProprios", id), { status });
+    const v = veiculos.find(x => x.id === id);
+    await registrarAuditoria(
+      status === "aprovado" ? "aprovar_veiculo_proprio" : "recusar_veiculo_proprio",
+      usuario?.uid || "", usuario?.nome || "",
+      { veiculoProprioId: id, servidorNome: v?.servidorNome, placa: v?.placa },
+    );
     await carregar();
   }
 
