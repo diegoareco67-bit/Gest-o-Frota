@@ -16,11 +16,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // App Check (reCAPTCHA v3, faixa gratuita) — protege o Firestore contra abuso, em
-// especial o formulário público de solicitação de acesso. Só inicializa quando a chave
-// está definida (build de produção via secret VITE_RECAPTCHA_SITE_KEY); em dev e nos
-// testes e2e (Firebase mockado, sem a chave) fica desligado, sem quebrar nada.
+// especial o formulário público de solicitação de acesso. Só inicializa no build de
+// PRODUÇÃO com a chave definida (secret VITE_RECAPTCHA_SITE_KEY). A checagem de
+// `import.meta.env.PROD` é essencial: o servidor de e2e (Playwright) roda em modo dev
+// e agora enxerga a chave do secret no CI — sem esse guard, o App Check tentaria atestar
+// contra localhost e quebraria a renderização nos testes.
 const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
-if (recaptchaSiteKey) {
+if (import.meta.env.PROD && recaptchaSiteKey) {
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true,
