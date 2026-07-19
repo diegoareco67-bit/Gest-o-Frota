@@ -66,7 +66,9 @@ jobs:
           path: dist/
 
       - name: Autentica no Google Cloud / Firebase
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > /tmp/firebase-service-account.json
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
 
       - name: Deploy (hosting, firestore rules, storage rules, functions)
         env:
