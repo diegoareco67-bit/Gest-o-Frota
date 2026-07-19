@@ -14,6 +14,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Cobertura de teste NOVA escrita para Salas/Equipamentos/Indenização/Setores em 2026-07-18** — `e2e/salas.spec.ts` (9), `e2e/equipamentos.spec.ts` (6), `e2e/indenizacao.spec.ts` (12), `e2e/setores.spec.ts` (6). Ver seção "Cobertura nova" abaixo.
 - ✅ **Mocks de teste (`src/firebase/__mocks__/`) estavam quebrando a suíte e2e inteira — corrigido em 2026-07-17/18.** Suíte e2e completa foi de app-não-renderiza para **160/160 testes passando** (127 pré-existentes corrigidos + 33 novos). Ver seção "Infraestrutura de mock e2e corrigida" abaixo.
 - ✅ **Suíte de testes unitários (Vitest/Testing Library) também corrigida em 2026-07-18** — tinha **80 testes falhando desde a Fase 1** (a mesma dívida que este arquivo já vinha citando). Causas: mesma classe de bug dos mocks e2e (exports faltando: `where`, `onSnapshot`, `setDoc`, `deleteDoc`, `getDoc`, `Timestamp`), mais `pendentes` prop obsoleta no `Sidebar` (componente ignora silenciosamente, já calcula sozinho via `onSnapshot`), mais um teste (`Sidebar.test.tsx`) que **nunca mockou o Firestore e fazia chamada real ao projeto de produção** durante os testes. Resultado: **141/141 passando**. `tsc -b` e `vite build` conferidos sem erro. Ver seção "Suíte Vitest corrigida" abaixo.
+- ✅ **Código publicado no GitHub e CI/CD via GitHub Actions funcionando ponta a ponta desde 2026-07-19** — repositório `diegoareco67-bit/Gest-o-Frota`, workflow roda type-check + Vitest + Playwright + build a cada push, e faz deploy automático (hosting, firestore rules, storage rules, functions) quando `main` passa em tudo. Ver seção "CI/CD via GitHub Actions" abaixo.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -78,6 +79,30 @@ Depois da suíte e2e fechar 100%, o usuário pediu pra investigar `npm run test:
 - **2 bugs reais adicionais**, iguais aos já achados na e2e: `serverTimestamp()`/`Timestamp` sem `.toDate()`, e erro de login mockado sem `.code` (`err.code` é o que `login.tsx` usa pra mapear a mensagem).
 
 **Resultado: 141 de 141 testes passando.** `tsc -b` sem erros. `vite build` conclui com sucesso (avisos pré-existentes não relacionados: bundle >500kB por causa do `jsPDF`/`html2canvas`, já registrado como dívida na Fase 2; e um "ineffective dynamic import" em `login.tsx` que importa `firebase/firestore`/`config` dinamicamente apesar de já serem importados estaticamente em outros arquivos — nenhum dos dois é regressão desta sessão).
+
+### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
+
+Repositório publicado em `https://github.com/diegoareco67-bit/Gest-o-Frota`. Decisão do usuário: enviar o histórico local completo, substituindo o remoto.
+
+**Segredo exposto encontrado no primeiro push:** `src/.claude/settings.local.json` (config local do Claude Code de uma sessão anterior, em outra máquina) tinha um token OAuth `ya29.` real do Google embutido em várias entradas de allowlist de permissão (`Bash(curl ... Authorization: Bearer ya29...)`). O GitHub bloqueou o push por secret scanning. Causa raiz do arquivo ter sido versionado: o `.gitignore` tinha `.claude/settings.local.json` sem prefixo `**/` — esse padrão só ancora na raiz do repo, não bate com `src/.claude/settings.local.json`. Corrigido:
+- `.gitignore` ajustado para `**/.claude/settings.local.json`
+- Arquivo removido do tracking (`git rm --cached`) em `main` e `master`
+- **Decisão do usuário:** em vez de reescrever os 24 commits do histórico local pra remover o segredo de todos eles, criado um branch órfão com **um commit único limpo** e publicado como `main` — mais simples, sem reescrita de histórico. O histórico completo (24 commits, incluindo o do segredo) continua só local no branch `master`, nunca publicado.
+
+**Workflow criado** (`.github/workflows/deploy.yml`): a cada push/PR em `main` roda `tsc -b`, `npm run test:run` (Vitest), `npm run test:e2e` (Playwright) e `npm run build`; se tudo passar e for push em `main`, faz `firebase-tools deploy --only hosting,firestore:rules,storage,functions`.
+
+**Secrets configurados no GitHub** (Settings → Secrets and variables → Actions):
+- `VITE_APPS_SCRIPT_URL` — a mesma URL do Apps Script já usada localmente (Fase 2)
+- `FIREBASE_SERVICE_ACCOUNT` — chave JSON de uma conta de serviço gerada no Firebase Console (Configurações do projeto → Contas de serviço), usada pro `firebase-tools` autenticar sem login interativo
+
+**3 erros de configuração corrigidos até o pipeline fechar verde:**
+1. `echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > arquivo` quebrava o JSON — o GitHub Actions substitui o secret direto no texto do comando, e as aspas duplas embutidas no JSON fechavam a string do `echo` prematuramente, corrompendo o arquivo. Corrigido usando `env:` + `printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > arquivo` (referência de variável de shell de verdade, segura contra caracteres especiais).
+2. `Missing permissions ... iam.serviceAccounts.ActAs` e depois `Permission denied to get service [firebasestorage.googleapis.com]` — a conta de serviço `firebase-adminsdk-fbsvc@...` usada pelo CI não tinha os papéis de IAM necessários pra fazer deploy de Functions/verificar APIs habilitadas. Resolvido concedendo, via Google Cloud Console → IAM, os papéis **"Usuário da conta de serviço"** e **"Administrador do Firebase"** a essa conta (decisão do usuário: resolver via console em vez de tirar Functions do escopo do deploy automático).
+3. `Could not find rules for the following storage targets: rules` — mesmo bug de sintaxe já documentado no deploy manual (ver bloco de status no topo): o comando usava `storage:rules`, mas esse projeto não tem targets nomeados. Corrigido para `--only storage` no workflow.
+
+**Resultado:** pipeline completo (test-and-build + deploy) passou 100% verde na execução #3 (`https://github.com/diegoareco67-bit/Gest-o-Frota/actions`).
+
+**Pendente de segurança, não urgente:** revogar o Personal Access Token do GitHub usado manualmente pra criar o primeiro push (não é mais necessário agora que o CI usa os secrets próprios) — Settings → Developer settings → Personal access tokens, no perfil do usuário.
 
 ### ✅ Bug do `storage.rules` — corrigido em 2026-07-17 (cross-service `firestore.get()` não resolvia em produção)
 
@@ -221,9 +246,9 @@ Módulo mais delicado do sistema.
 - Anexo II é um formulário único (não duas etapas no tempo, antes/depois da viagem, como o papel sugere) — simplificação deliberada.
 - Chamada ao Apps Script usa `Content-Type: text/plain;charset=utf-8` em vez de `application/json` — Apps Script Web Apps não tratam bem o preflight CORS (requisição `OPTIONS`) que `application/json` dispara a partir do navegador; `text/plain` é uma "simple request" e não dispara preflight. O `doPost` do lado do Apps Script já faz `JSON.parse(e.postData.contents)` independentemente do Content-Type declarado, então isso não quebra o parsing. Se a resposta não puder ser lida por causa de CORS mesmo assim, o código trata como "enviado, não confirmado" (`status: "enviado"`) em vez de erro — o e-mail já foi disparado no servidor de qualquer forma.
 
-- [ ] **Pendente:** teste manual em navegador real — `storage:rules` já deployado em 2026-07-17 (ver bloco de status no topo), mas nenhuma tela desse módulo foi clicada ainda, só validada por `tsc`/`build`/testes automatizados
-- [ ] **Pendente:** cobertura de teste (unit/e2e) para o módulo — não escrita ainda
-- [ ] **Pendente:** confirmar com o usuário se o `.env` de produção (variável `VITE_APPS_SCRIPT_URL`) precisa ser configurado também no ambiente de build/CI usado pro deploy, já que hoje só existe localmente
+- [x] **Teste manual em navegador real** — feito em 2026-07-17, ver seção "Bug do storage.rules" acima
+- [x] **Cobertura de teste (e2e)** — `e2e/indenizacao.spec.ts` (12 testes), ver seção "Cobertura nova" acima
+- [x] **`VITE_APPS_SCRIPT_URL` em CI/build** — resolvido em 2026-07-19: configurado como GitHub Actions secret (`secrets.VITE_APPS_SCRIPT_URL`), injetado como `env` no workflow. Ver seção "CI/CD via GitHub Actions" abaixo.
 
 ## Fase 3 — Equipamentos ✅ implementada e deployada em 2026-07-10 (não testada em navegador real)
 
