@@ -19,6 +19,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Calendário público de Salas na tela de login, 2026-07-19** — pedido do usuário pra dar mais substância ao "hub" além do rebrand visual: a tela de login agora tem abas Veículos/Salas, ambas com dado real (não só o chip estático). Ver seção "Calendário público de Salas" abaixo.
 - ✅ **Etiqueta do veículo no calendário público passa a mostrar marca+modelo, 2026-07-19** — usuário notou que a etiqueta só mostrava a placa, sem dar pra identificar visualmente "a Chevrolet" ou "a Fiat Titano". Corrigido em `calendarioPublico` (campo novo `veiculoLabel`); Salas já mostrava `salaNome` (nome real), não precisou mudar.
 - ✅ **Dashboard do gestor ganhou o calendário de Salas também, 2026-07-19** — antes só tinha o de Veículos. Agora mostra os dois, empilhados, mesmo padrão do login/consulta.
+- ✅ **Manual de Uso da Aplicação — 7 PDFs, um por item de Gestão, 2026-07-19** — novo item no Sidebar (abaixo de Aprovações) leva a uma tela com 7 manuais em PDF (Veículos, Salas, Equipamentos, Manutenção, Usuários, Setores, Indenizações), gerados por script a partir do comportamento real de cada tela. Ver seção "Manual de Uso da Aplicação" abaixo.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -131,6 +132,20 @@ Depois de ver os dois calendários funcionando na tela de login, o usuário mand
 - `gestor/Dashboard.tsx`: adicionado um segundo card abaixo do calendário de Veículos, com `CalendarioGrade colecao="reservasSalas"` — mesmo padrão já usado em `Salas.tsx` e `pages/consulta/Dashboard.tsx` (área autenticada lê a coleção real direto, não precisa do mirror público `calendarioPublicoSalas`, que é só pra tela de login sem login).
 - Título da seção existente renomeado pra "Calendário de Agendamentos — Veículos" (deixa explícito que é só frota, já que agora tem um segundo calendário logo abaixo).
 - Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e**, e checagem visual — login mockado como gestor via `PLAYWRIGHT_TEST=1` no `npm run dev` (sem precisar de credencial real de produção) confirmando os dois calendários empilhados, sem sobreposição, painel de Ações Rápidas intacto.
+
+### ✅ Manual de Uso da Aplicação — 7 PDFs, 2026-07-19
+
+Pedido do usuário: um item de menu "Manual de uso da aplicação" abaixo de Aprovações, com um manual em PDF pra cada um dos 7 itens da seção GESTÃO (Veículos, Salas, Equipamentos, Manutenção, Usuários, Setores, Indenizações).
+
+- **`scripts/gerar-manuais.mjs`** (novo, mantido no repo pra poder regenerar se a UI mudar) — script Node que usa `jsPDF` (já era dependência do projeto, usado em `pdfIndenizacao.ts`) pra montar os 7 PDFs a partir de conteúdo estruturado (objetivo do módulo + seções com passo a passo numerado + caixas de "Atenção"). Roda com `node scripts/gerar-manuais.mjs` e escreve em `public/manuais/`.
+- **Conteúdo de cada manual** foi escrito a partir da leitura direta do código de cada tela (`gestor/Veiculos.tsx`, `Salas.tsx`, `equipamentos/Equipamentos.tsx`, `gestor/Manutencao.tsx`, `gestor/Usuarios.tsx`, `gestor/Setores.tsx`, `indenizacao/GestorIndenizacoes.tsx`) — botões, campos obrigatórios e efeitos colaterais reais (ex.: cadastrar manutenção "Agendada" marca o veículo como "Manutenção" automaticamente), não just genérico.
+- **Bug real encontrado e corrigido durante a geração:** caracteres fora da codificação padrão da fonte Helvetica do jsPDF (`→`, `✓`, `✕`, `📄`, `⚠`) corrompiam a linha inteira do PDF — texto veio com espaçamento esticado entre letras e cortado no meio, sem quebra de linha correta. As fontes padrão do jsPDF (as "standard 14" do PDF) só suportam WinAnsiEncoding (Latin-1 estendido), não emoji/setas Unicode. Corrigido substituindo `→` por `>` e removendo os emojis dos textos (mantendo só a palavra entre aspas, ex.: `"Aprovar"` em vez de `"✓ Aprovar"`) — acentuação em português (ã, ç, é...) não teve problema, já está dentro do WinAnsiEncoding.
+- **`src/pages/gestor/ManualUso.tsx`** (novo) — grid de 7 cards (ícone + título + descrição curta + botão "Baixar PDF" apontando pra `/manuais/<arquivo>.pdf` com atributo `download`) — página estática, sem leitura de Firestore.
+- **`App.tsx`**: rota `/gestor/manual`, protegida por `RotaProtegida perfil="gestor"` (mesmo padrão de Aprovações).
+- **`Sidebar.tsx`**: novo item "Manual de Uso da Aplicação" na seção PRINCIPAL, logo abaixo de Aprovações (pedido explícito de posição) — novo ícone `manual` (livro) adicionado ao `IcoMap`.
+- **Cobertura nova:** `e2e/manual-uso.spec.ts` (6 testes) — título, os 7 cards, os 7 links de download com o `href` correto, um teste que de fato baixa o PDF de Veículos via `request.get()` e confere HTTP 200 (não só que o link existe), navegação pelo Sidebar, e controle de acesso (usuario não acessa `/gestor/manual`, redireciona pra `/usuario`).
+- Verificado: `tsc -b` sem erro, **141/141 Vitest**, **169/169 e2e** (163 + 6 novos), checagem visual manual (login mockado como gestor, screenshot da tela).
+- **Escopo, por decisão implícita do pedido:** só a área do gestor — o item de menu e a rota são gestor-only, batendo com a seção GESTÃO (que também é exclusiva do gestor). Perfis usuario/consulta não têm um manual equivalente ainda.
 
 ### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
 

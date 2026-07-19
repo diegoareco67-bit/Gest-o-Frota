@@ -1,0 +1,517 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 6584
+>>
+stream
+0.5670000000000001 w
+0 G
+0.12 0.23 0.54 rg
+0. 841.8899999999999864 595.2755905511811534 -73.7007874015748143 re
+f
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+1. g
+39.6850393700787407 813.5435433070865656 Td
+(CGE-MS — Controladoria-Geral do Estado de Mato Grosso do Sul) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+1. g
+39.6850393700787407 793.7010236220472734 Td
+(Hub — Central de Recursos Compartilhados · Manual de Uso) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+1. g
+39.6850393700787407 778.1104724409448181 Td
+(Módulo: Usuários) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0.059 0.09 0.165 rg
+39.6850393700787407 745.5120472440944468 Td
+(Usuários) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 722.8348818897637784 Td
+(O módulo Usuários gerencia as contas de acesso ao sistema \(perfis Usuário e Consulta\) e as solicitações de) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 707.8112598425196893 Td
+(cadastro enviadas pelo formulário público de acesso.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 678.614409448818833 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 662.4569291338582389 Td
+(Cadastrar um usuário manualmente) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 641.7640157480315111 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 641.7640157480315111 Td
+(Acesse Gestão > Usuários e clique em "+ Novo Usuário".) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 621.6380314960629221 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 621.6380314960629221 Td
+(Preencha Nome completo, E-mail institucional, Senha inicial e, se houver, a Matrícula.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 601.5120472440944468 Td
+(3.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 601.5120472440944468 Td
+(Selecione o Setor e o Perfil: Usuário \(reserva veículos, salas e equipamentos\) ou Consulta \(só leitura, só) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 586.4884251968503577 Td
+(enxerga os calendários\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 566.3624409448818824 Td
+(4.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 566.3624409448818824 Td
+(Clique em Cadastrar. O usuário já pode acessar o sistema com o e-mail e a senha informados.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 540.5671653543307684 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 524.4096850393700606 Td
+(Analisar uma solicitação de acesso) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 503.7167716535433328 Td
+(Quando alguém preenche o formulário público "Solicitar cadastro", o pedido aparece na aba "Solicitações de) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 488.6931496062992437 Td
+(Acesso", com a contagem de pendências destacada em vermelho.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 465.1655905511811397 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 465.1655905511811397 Td
+(Clique no card da solicitação para abrir os detalhes.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 445.0396062992125508 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 445.0396062992125508 Td
+(Revise \(ou edite, se necessário\) nome, e-mail, matrícula, setor, número e vencimento da CNH.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 424.9136220472439618 Td
+(3.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 424.9136220472439618 Td
+(Confira os dados de publicação no Diário Oficial \(número do diário, data de publicação, número da) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 409.8899999999998727 Td
+(resolução\) informados pelo solicitante.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 389.7640157480312837 Td
+(4.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 389.7640157480312837 Td
+(Clique em "Aprovar e Enviar Acesso" para criar a conta — o novo usuário recebe um e-mail para definir a) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 374.7403937007871377 Td
+(própria senha — ou em "Recusar" para negar o pedido.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 348.9451181102359101 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 332.787637795275316 Td
+(Ativar ou desativar uma conta) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 312.0947244094485313 Td
+(Cada card de usuário na aba "Usuários" tem um botão para Desativar \(ou Reativar, se já estiver inativo\).) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 297.0711023622043285 Td
+(Desativar bloqueia o acesso ao sistema sem apagar o histórico do usuário.) Tj
+ET
+1. 0.98 0.92 rg
+0.99 0.9 0.54 RG
+45.354330708661422 273.5435433070862246 m
+549.9212598425197029 273.5435433070862246 l
+553.0523229911667613 273.5435433070862246 555.5905511811024553 271.0053151171505306 555.5905511811024553 267.874251968503529 c
+555.5905511811024553 200.126220472440508 l
+555.5905511811024553 196.9951573237935065 552.4594880324553969 194.456929133857841 549.9212598425197029 194.456929133857841 c
+45.354330708661422 194.456929133857841 l
+42.2232675600144063 194.456929133857841 39.6850393700787407 197.5879922825048425 39.6850393700787407 200.126220472440508 c
+39.6850393700787407 267.874251968503529 l
+39.6850393700787407 271.0053151171505306 42.8161025187257636 273.5435433070862246 45.354330708661422 273.5435433070862246 c
+h
+B
+BT
+/F2 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 253.7010236220468187 Td
+(Atenção) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 236.693149606298789 Td
+(O card de cada usuário com CNH cadastrada mostra um aviso de vencimento quando a habilitação está) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 221.6695275590546999 Td
+(vencida ou vence nos próximos 60 dias — vale acompanhar antes de aprovar solicitações de uso de) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 206.6459055118106107 Td
+(veículo.) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.549 g
+39.6850393700787407 22.6774015748030706 Td
+(Hub CGE-MS · Manual de Uso · Página 1 de 1) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260719071357-04'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000006788 00000 n 
+0000008605 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000006845 00000 n 
+0000006970 00000 n 
+0000007100 00000 n 
+0000007233 00000 n 
+0000007370 00000 n 
+0000007493 00000 n 
+0000007622 00000 n 
+0000007754 00000 n 
+0000007890 00000 n 
+0000008018 00000 n 
+0000008145 00000 n 
+0000008274 00000 n 
+0000008407 00000 n 
+0000008509 00000 n 
+0000008853 00000 n 
+0000008939 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <73733AA5891EA94885FD56C6709982F8> <73733AA5891EA94885FD56C6709982F8> ]
+>>
+startxref
+9043
+%%EOF

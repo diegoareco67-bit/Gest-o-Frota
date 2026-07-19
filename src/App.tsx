@@ -9,6 +9,7 @@ import Veiculos from "./pages/gestor/Veiculos";
 import Manutencao from "./pages/gestor/Manutencao";
 import Relatorios from "./pages/gestor/Relatorios";
 import Usuarios from "./pages/gestor/Usuarios";
+import ManualUso from "./pages/gestor/ManualUso";
 import DashboardUsuario from "./pages/usuario/Dashboard";
 import Solicitar from "./pages/usuario/Solicitar";
 import MinhasSolicitacoes from "./pages/usuario/MinhasSolicitacoes";
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/gestor" element={<RotaProtegida perfil="gestor"><DashboardGestor /></RotaProtegida>} />
           <Route path="/gestor/aprovacoes" element={<RotaProtegida perfil="gestor"><Aprovacoes /></RotaProtegida>} />
+          <Route path="/gestor/manual" element={<RotaProtegida perfil="gestor"><ManualUso /></RotaProtegida>} />
           <Route path="/gestor/veiculos" element={<RotaProtegida perfil="gestor"><Veiculos /></RotaProtegida>} />
           <Route path="/gestor/manutencao" element={<RotaProtegida perfil="gestor"><Manutencao /></RotaProtegida>} />
           <Route path="/gestor/usuarios" element={<RotaProtegida perfil="gestor"><Usuarios /></RotaProtegida>} />

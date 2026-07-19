@@ -1,0 +1,402 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 4010
+>>
+stream
+0.5670000000000001 w
+0 G
+0.12 0.23 0.54 rg
+0. 841.8899999999999864 595.2755905511811534 -73.7007874015748143 re
+f
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+1. g
+39.6850393700787407 813.5435433070865656 Td
+(CGE-MS — Controladoria-Geral do Estado de Mato Grosso do Sul) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+1. g
+39.6850393700787407 793.7010236220472734 Td
+(Hub — Central de Recursos Compartilhados · Manual de Uso) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+1. g
+39.6850393700787407 778.1104724409448181 Td
+(Módulo: Setores) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0.059 0.09 0.165 rg
+39.6850393700787407 745.5120472440944468 Td
+(Setores) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 722.8348818897637784 Td
+(O módulo Setores mantém o catálogo de departamentos da CGE-MS usado como opção de seleção nos) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 707.8112598425196893 Td
+(cadastros de usuário e no formulário público de solicitação de acesso.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 678.614409448818833 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 662.4569291338582389 Td
+(Cadastrar um setor) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 641.7640157480315111 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 641.7640157480315111 Td
+(Acesse Gestão > Setores.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 621.6380314960629221 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 621.6380314960629221 Td
+(Digite o nome do setor no campo de texto no topo da tela.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 601.5120472440944468 Td
+(3.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 601.5120472440944468 Td
+(Clique em "+ Adicionar".) Tj
+ET
+1. 0.98 0.92 rg
+0.99 0.9 0.54 RG
+45.354330708661422 575.7167716535433328 m
+549.9212598425197029 575.7167716535433328 l
+553.0523229911667613 575.7167716535433328 555.5905511811024553 573.1785434636076388 555.5905511811024553 570.0474803149606942 c
+555.5905511811024553 517.3230708661417339 l
+555.5905511811024553 514.1920077174946755 552.4594880324553969 511.6537795275590952 549.9212598425197029 511.6537795275590952 c
+45.354330708661422 511.6537795275590952 l
+42.2232675600144063 511.6537795275590952 39.6850393700787407 514.7848426762061536 39.6850393700787407 517.3230708661417339 c
+39.6850393700787407 570.0474803149606942 l
+39.6850393700787407 573.1785434636076388 42.8161025187257636 575.7167716535433328 45.354330708661422 575.7167716535433328 c
+h
+B
+BT
+/F2 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 555.8742519685040406 Td
+(Atenção) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 538.8663779527558972 Td
+(O sistema não permite cadastrar dois setores com o mesmo nome \(a comparação ignora) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.573 0.251 0.055 rg
+51.0236220472441033 523.8427559055119218 Td
+(maiúsculas/minúsculas\).) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 497.4805511811023848 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 481.3230708661417339 Td
+(Ativar ou desativar um setor) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 460.6301574803150061 Td
+(Cada linha da lista tem um botão Desativar \(ou Reativar\). Um setor desativado aparece riscado na lista e deixa de) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 445.6065354330708601 Td
+(estar disponível como opção nos formulários de cadastro — mas os usuários que já estavam vinculados a ele não) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 430.5829133858267141 Td
+(são alterados, e o histórico é preservado.) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.549 g
+39.6850393700787407 22.6774015748030706 Td
+(Hub CGE-MS · Manual de Uso · Página 1 de 1) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260719071357-04'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000004214 00000 n 
+0000006031 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000004271 00000 n 
+0000004396 00000 n 
+0000004526 00000 n 
+0000004659 00000 n 
+0000004796 00000 n 
+0000004919 00000 n 
+0000005048 00000 n 
+0000005180 00000 n 
+0000005316 00000 n 
+0000005444 00000 n 
+0000005571 00000 n 
+0000005700 00000 n 
+0000005833 00000 n 
+0000005935 00000 n 
+0000006279 00000 n 
+0000006365 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <61BFD478FE46743350F0208E8E8F7EC4> <61BFD478FE46743350F0208E8E8F7EC4> ]
+>>
+startxref
+6469
+%%EOF

@@ -1,0 +1,455 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 4776
+>>
+stream
+0.5670000000000001 w
+0 G
+0.12 0.23 0.54 rg
+0. 841.8899999999999864 595.2755905511811534 -73.7007874015748143 re
+f
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+1. g
+39.6850393700787407 813.5435433070865656 Td
+(CGE-MS — Controladoria-Geral do Estado de Mato Grosso do Sul) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+1. g
+39.6850393700787407 793.7010236220472734 Td
+(Hub — Central de Recursos Compartilhados · Manual de Uso) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+1. g
+39.6850393700787407 778.1104724409448181 Td
+(Módulo: Equipamentos) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0.059 0.09 0.165 rg
+39.6850393700787407 745.5120472440944468 Td
+(Equipamentos) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 722.8348818897637784 Td
+(O módulo Equipamentos controla o empréstimo de itens com número de patrimônio — notebooks, projetores,) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 707.8112598425196893 Td
+(câmeras e afins. Cada equipamento é individual \(não por tipo/quantidade\) e segue um ciclo de reserva, retirada e) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 692.7876377952756002 Td
+(devolução.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 663.5907874015748575 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 647.4333070866141497 Td
+(Cadastrar um novo equipamento) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 626.7403937007874219 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 626.7403937007874219 Td
+(Acesse Gestão > Equipamentos.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 606.614409448818833 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 606.614409448818833 Td
+(No card "Catálogo", clique em "+ Novo equipamento" \(visível apenas para o perfil Gestor\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 586.4884251968503577 Td
+(3.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 586.4884251968503577 Td
+(Preencha Nome \(ex.: "Notebook Dell Latitude"\), Tipo \(ex.: Notebook, Projetor, Câmera\) e o Número de) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 571.4648031496062686 Td
+(patrimônio.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 551.3388188976377933 Td
+(4.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 551.3388188976377933 Td
+(Clique em Cadastrar. O equipamento entra no catálogo com status "Disponível".) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 525.5435433070866793 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 509.3860629921260283 Td
+(Acompanhar o ciclo de empréstimo) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 488.6931496062992437 Td
+(Todo empréstimo passa por até três etapas, visíveis na lista "Todos os empréstimos ativos": Reservado > Retirado) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 473.6695275590551546 Td
+(> Devolvido. Como gestor, você enxerga e pode agir sobre os empréstimos de qualquer servidor, não só os seus.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 450.1419685039369938 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 450.1419685039369938 Td
+(Reservado: o servidor reservou o equipamento para um período futuro. Botão disponível: Retirar.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 430.0159842519684048 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 430.0159842519684048 Td
+(Retirado: o equipamento já foi pego fisicamente. Botão disponível: Devolver.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.227 0.541 rg
+39.6850393700787407 409.8899999999998727 Td
+(3.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+59.5275590551181182 409.8899999999998727 Td
+(Uma reserva ainda não retirada pode ser cancelada a qualquer momento pelo botão Cancelar.) Tj
+ET
+0.95 0.96 0.97 rg
+39.6850393700787407 384.0947244094485882 515.9055118110236435 -22.677165354330711 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.227 0.541 rg
+48.1889763779527627 367.9372440944879941 Td
+(Calendário de disponibilidade) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 347.2443307086612094 Td
+(O card com o calendário mostra as reservas e retiradas de equipamentos ao longo do mês, ajudando a identificar) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+39.6850393700787407 332.2207086614170635 Td
+(períodos de maior concorrência por um mesmo item.) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.549 g
+39.6850393700787407 22.6774015748030706 Td
+(Hub CGE-MS · Manual de Uso · Página 1 de 1) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260719071357-04'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000004980 00000 n 
+0000006797 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000005037 00000 n 
+0000005162 00000 n 
+0000005292 00000 n 
+0000005425 00000 n 
+0000005562 00000 n 
+0000005685 00000 n 
+0000005814 00000 n 
+0000005946 00000 n 
+0000006082 00000 n 
+0000006210 00000 n 
+0000006337 00000 n 
+0000006466 00000 n 
+0000006599 00000 n 
+0000006701 00000 n 
+0000007045 00000 n 
+0000007131 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <77A0520ABE633C8B7E2B4B295C0EB31D> <77A0520ABE633C8B7E2B4B295C0EB31D> ]
+>>
+startxref
+7235
+%%EOF
