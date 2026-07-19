@@ -1,36 +1,51 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RotaProtegida } from "./components/layout/RotaProtegida";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Login from "./pages/Login";
-import Privacidade from "./pages/Privacidade";
-import SolicitarAcesso from "./pages/SolicitarAcesso";
-import DashboardGestor from "./pages/gestor/Dashboard";
-import Aprovacoes from "./pages/gestor/Aprovacoes";
-import Veiculos from "./pages/gestor/Veiculos";
-import Manutencao from "./pages/gestor/Manutencao";
-import Relatorios from "./pages/gestor/Relatorios";
-import Usuarios from "./pages/gestor/Usuarios";
-import ManualUso from "./pages/gestor/ManualUso";
-import Auditoria from "./pages/gestor/Auditoria";
-import DashboardUsuario from "./pages/usuario/Dashboard";
-import Solicitar from "./pages/usuario/Solicitar";
-import MinhasSolicitacoes from "./pages/usuario/MinhasSolicitacoes";
-import Checkout from "./pages/usuario/Checkout";
-import Checkin from "./pages/usuario/Checkin";
-import DashboardConsulta from "./pages/consulta/Dashboard";
-import Salas from "./pages/salas/Salas";
-import VeiculoProprio from "./pages/indenizacao/VeiculoProprio";
-import Indenizacoes from "./pages/indenizacao/Indenizacoes";
-import GestorIndenizacoes from "./pages/indenizacao/GestorIndenizacoes";
-import Equipamentos from "./pages/equipamentos/Equipamentos";
-import Setores from "./pages/gestor/Setores";
+
+// Rotas carregadas sob demanda (code-splitting) — tira as telas internas e o
+// gerador de PDF (jsPDF/html2canvas) do bundle inicial, que antes vinha inteiro
+// já na tela de login. O Login fica eager por ser a landing.
+const Privacidade = lazy(() => import("./pages/Privacidade"));
+const SolicitarAcesso = lazy(() => import("./pages/SolicitarAcesso"));
+const DashboardGestor = lazy(() => import("./pages/gestor/Dashboard"));
+const Aprovacoes = lazy(() => import("./pages/gestor/Aprovacoes"));
+const Veiculos = lazy(() => import("./pages/gestor/Veiculos"));
+const Manutencao = lazy(() => import("./pages/gestor/Manutencao"));
+const Relatorios = lazy(() => import("./pages/gestor/Relatorios"));
+const Usuarios = lazy(() => import("./pages/gestor/Usuarios"));
+const ManualUso = lazy(() => import("./pages/gestor/ManualUso"));
+const Auditoria = lazy(() => import("./pages/gestor/Auditoria"));
+const Setores = lazy(() => import("./pages/gestor/Setores"));
+const DashboardUsuario = lazy(() => import("./pages/usuario/Dashboard"));
+const Solicitar = lazy(() => import("./pages/usuario/Solicitar"));
+const MinhasSolicitacoes = lazy(() => import("./pages/usuario/MinhasSolicitacoes"));
+const Checkout = lazy(() => import("./pages/usuario/Checkout"));
+const Checkin = lazy(() => import("./pages/usuario/Checkin"));
+const DashboardConsulta = lazy(() => import("./pages/consulta/Dashboard"));
+const Salas = lazy(() => import("./pages/salas/Salas"));
+const VeiculoProprio = lazy(() => import("./pages/indenizacao/VeiculoProprio"));
+const Indenizacoes = lazy(() => import("./pages/indenizacao/Indenizacoes"));
+const GestorIndenizacoes = lazy(() => import("./pages/indenizacao/GestorIndenizacoes"));
+const Equipamentos = lazy(() => import("./pages/equipamentos/Equipamentos"));
+
+function Carregando() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#F1F5F9", fontFamily: "'Sora', system-ui, sans-serif", color: "#7A95B2", gap: 12 }}>
+      <div style={{ width: 28, height: 28, border: "3px solid #E1EAF5", borderTop: "3px solid #3B82F6", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <span style={{ fontSize: 13 }}>Carregando...</span>
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
+        <Suspense fallback={<Carregando />}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
@@ -59,6 +74,7 @@ export default function App() {
           <Route path="/equipamentos" element={<RotaProtegida><Equipamentos /></RotaProtegida>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
     </ErrorBoundary>
