@@ -1,0 +1,352 @@
+<title>Configurar o Apps Script — Indenização de Transporte</title>
+<style>
+  :root {
+    --paper: #F3F5F8;
+    --ink: #17233A;
+    --muted: #5B6B85;
+    --line: #D8DEE8;
+    --accent: #0E7C7B;
+    --accent-ink: #04302F;
+    --accent-soft: #E3F2F1;
+    --warn: #9A5B12;
+    --warn-soft: #FBEEDC;
+    --card: #FFFFFF;
+    --code-bg: #101826;
+    --code-ink: #D9E4F5;
+    --code-accent: #6FE3DC;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0D1420;
+      --ink: #E6EAF2;
+      --muted: #8B98B0;
+      --line: #232C3D;
+      --accent: #2DD4CF;
+      --accent-ink: #04302F;
+      --accent-soft: #12302E;
+      --warn: #F0A857;
+      --warn-soft: #2E2312;
+      --card: #121A28;
+      --code-bg: #070C14;
+      --code-ink: #D9E4F5;
+      --code-accent: #6FE3DC;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0D1420; --ink: #E6EAF2; --muted: #8B98B0; --line: #232C3D;
+    --accent: #2DD4CF; --accent-ink: #04302F; --accent-soft: #12302E;
+    --warn: #F0A857; --warn-soft: #2E2312; --card: #121A28;
+    --code-bg: #070C14; --code-ink: #D9E4F5; --code-accent: #6FE3DC;
+  }
+  :root[data-theme="light"] {
+    --paper: #F3F5F8; --ink: #17233A; --muted: #5B6B85; --line: #D8DEE8;
+    --accent: #0E7C7B; --accent-ink: #04302F; --accent-soft: #E3F2F1;
+    --warn: #9A5B12; --warn-soft: #FBEEDC; --card: #FFFFFF;
+    --code-bg: #101826; --code-ink: #D9E4F5; --code-accent: #6FE3DC;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  h1, h2 {
+    font-family: ui-serif, "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-weight: 600;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  }
+
+  /* ── Header ───────────────────────────────────────────── */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+  h1 {
+    font-size: clamp(26px, 4vw, 34px);
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+  .lede {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0 0 8px;
+  }
+  .context {
+    margin-top: 22px;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    background: var(--card);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .context strong { color: var(--ink); }
+
+  /* ── Steps ────────────────────────────────────────────── */
+  .steps {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 20px;
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+  }
+  .step:last-child { border-bottom: 1px solid var(--line); }
+  .step-num {
+    font-family: ui-serif, Georgia, serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.4;
+  }
+  .step h2 {
+    font-size: 18px;
+    margin: 0 0 8px;
+  }
+  .step p {
+    margin: 0 0 12px;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .step p.sub {
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+  .ui-path {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .ui-path .mono {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  :root[data-theme="dark"] .ui-path .mono { color: var(--code-accent); }
+  @media (prefers-color-scheme: dark) {
+    .ui-path .mono { color: var(--code-accent); }
+  }
+
+  .warn {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--warn-soft);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--warn);
+  }
+  .warn::before { content: "⚠"; flex-shrink: 0; }
+
+  pre {
+    margin: 14px 0 0;
+    padding: 16px 18px;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+  pre .cm { color: #7C8AA5; }
+  pre .kw { color: var(--code-accent); }
+  pre .str { color: #F0C987; }
+  pre .fn { color: #9FC6F5; }
+
+  /* ── Recap card ───────────────────────────────────────── */
+  .recap {
+    margin-top: 44px;
+    padding: 24px 26px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .recap h2 { font-size: 17px; margin: 0 0 6px; }
+  .recap p.sub { color: var(--muted); font-size: 13.5px; margin: 0 0 16px; }
+  .recap ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .recap li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .recap li::before {
+    content: "→";
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .foot {
+    margin-top: 40px;
+    font-size: 12.5px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  @media (max-width: 520px) {
+    .step { grid-template-columns: 32px 1fr; gap: 14px; }
+    .step-num { font-size: 16px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Hub CGE-MS · Fase 2 · Indenização de Transporte</div>
+  <h1>Configurar o Google Apps Script Web App</h1>
+  <p class="lede">
+    O plano Firebase Spark não permite Cloud Functions. Esse Apps Script substitui o backend:
+    recebe a URL de um PDF já salvo no Storage e a metadados da viagem, busca o arquivo e envia
+    por e-mail com o PDF anexado para o RH/Contabilidade.
+  </p>
+  <div class="context">
+    <strong>Antes de começar:</strong> faça login em <span class="mono">script.google.com</span>
+    com a <strong>conta institucional</strong> da CGE-MS — nunca um Gmail pessoal. É essa conta que
+    vai aparecer como remetente dos e-mails de indenização.
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h2>Criar o projeto</h2>
+        <p>Abra <span class="mono">script.google.com</span>, já logado na conta institucional, e clique em <span class="ui-path"><span class="mono">Novo projeto</span></span>.</p>
+        <p class="sub">Renomeie para algo reconhecível, ex.: "Hub CGE-MS — Envio de Indenização".</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h2>Colar o código</h2>
+        <p>Apague o conteúdo padrão de <span class="mono">Code.gs</span> e cole isto — o e-mail do destinatário já está preenchido (<span class="mono">suad@cge.ms.gov.br</span>):</p>
+        <pre><span class="kw">function</span> <span class="fn">doPost</span>(e) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> dados = JSON.<span class="fn">parse</span>(e.postData.contents);
+    <span class="kw">const</span> { urlArquivo, nomeServidor, matricula, destino, protocolo } = dados;
+
+    <span class="cm">// Busca o PDF que o cliente já salvou no Firebase Storage</span>
+    <span class="kw">const</span> resposta = UrlFetchApp.<span class="fn">fetch</span>(urlArquivo);
+    <span class="kw">const</span> pdfBlob = resposta.<span class="fn">getBlob</span>().<span class="fn">setName</span>(
+      <span class="str">`Indenizacao_${protocolo || matricula}.pdf`</span>
+    );
+
+    MailApp.<span class="fn">sendEmail</span>({
+      to: <span class="str">"suad@cge.ms.gov.br"</span>,
+      subject: <span class="str">`Indenização de Transporte — ${nomeServidor} (${protocolo || matricula})`</span>,
+      body: <span class="str">`Segue em anexo o Boletim Demonstrativo de Viagem homologado.
+
+Servidor: ${nomeServidor}
+Matrícula: ${matricula}
+Destino: ${destino}`</span>,
+      attachments: [pdfBlob],
+    });
+
+    <span class="kw">return</span> ContentService
+      .<span class="fn">createTextOutput</span>(JSON.<span class="fn">stringify</span>({ ok: <span class="kw">true</span> }))
+      .<span class="fn">setMimeType</span>(ContentService.MimeType.JSON);
+
+  } <span class="kw">catch</span> (err) {
+    <span class="kw">return</span> ContentService
+      .<span class="fn">createTextOutput</span>(JSON.<span class="fn">stringify</span>({ ok: <span class="kw">false</span>, erro: err.message }))
+      .<span class="fn">setMimeType</span>(ContentService.MimeType.JSON);
+  }
+}</pre>
+        <p class="sub" style="margin-top:12px;">Salve com <span class="mono">Ctrl+S</span> (ou <span class="mono">Cmd+S</span>).</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h2>Implantar como Web App</h2>
+        <p>Clique em <span class="ui-path"><span class="mono">Implantar</span> → <span class="mono">Nova implantação</span></span>. No tipo, escolha <span class="mono">Aplicativo da Web</span>.</p>
+        <p>Configure exatamente assim:</p>
+        <p class="ui-path"><span class="mono">Executar como</span>: Eu (a conta institucional logada)</p>
+        <p class="ui-path"><span class="mono">Quem tem acesso</span>: Qualquer pessoa</p>
+        <div class="warn">"Qualquer pessoa" é necessário pro app web chamar o script sem exigir login Google do servidor — mas ninguém descobre a URL por acaso, e o script só faz uma coisa (enviar e-mail), então o risco é baixo. Ainda assim, não divulgue a URL fora do código do projeto.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>
+        <h2>Autorizar</h2>
+        <p>Clique em <span class="mono">Implantar</span>. O Google vai pedir autorização — escolha a conta institucional, clique em <span class="mono">Avançado</span> se aparecer aviso de app não verificado, e aceite o escopo de enviar e-mail em seu nome.</p>
+        <p class="sub">Esse aviso aparece porque é um script seu, não publicado na Play Store — é esperado, não é um problema de segurança.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div>
+        <h2>Copiar a URL</h2>
+        <p>Depois de implantado, copie a <span class="mono">URL do app da Web</span> (termina em <span class="mono">/exec</span>). Essa é a URL que o Hub vai chamar para disparar o e-mail.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div>
+        <h2>Testar</h2>
+        <p>Cole isto no terminal, trocando a URL pela sua e usando qualquer PDF público de teste como <span class="mono">urlArquivo</span>:</p>
+        <pre>curl -X POST "SUA_URL_AQUI/exec" \
+  -H "Content-Type: application/json" \
+  -d <span class="str">'{"urlArquivo":"https://exemplo.com/teste.pdf","nomeServidor":"Teste","matricula":"000","destino":"Teste","protocolo":"TESTE001"}'</span></pre>
+        <p class="sub" style="margin-top:12px;">Se a resposta for <span class="mono">{"ok":true}</span> e o e-mail chegar com o anexo, está funcionando.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="recap">
+    <h2>O que me mandar de volta</h2>
+    <p class="sub">Assim que terminar, é só colar aqui na conversa:</p>
+    <ul>
+      <li>A URL do Web App (a que termina em <span class="mono">/exec</span>)</li>
+      <li>Confirmação de que o teste do passo 6 funcionou (ou o erro, se não funcionou)</li>
+    </ul>
+  </div>
+
+  <div class="foot">Hub — Central de Recursos Compartilhados · CGE-MS</div>
+
+</div>

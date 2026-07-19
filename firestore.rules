@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── helpers ───────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Funciona porque corrigimos os documentos de usuário para usar UID como ID
+    function perfil() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.perfil;
+    }
+
+    function isGestor() {
+      return isAuth() && perfil() == "gestor";
+    }
+
+    function isUsuario() {
+      return isAuth() && perfil() == "usuario";
+    }
+
+    function isConsulta() {
+      return isAuth() && perfil() == "consulta";
+    }
+
+    // ─── solicitacoesAcesso ────────────────────────────────────────────────
+    // Qualquer pessoa pode submeter o formulário público de pré-cadastro.
+    // Somente gestores gerenciam (leem/atualizam).
+    match /solicitacoesAcesso/{id} {
+      allow create: if true;
+      allow read, update: if isGestor();
+      allow delete: if false;
+    }
+
+    // ─── setores ────────────────────────────────────────────────────────────
+    // Catálogo de setores da CGE-MS. Leitura pública (formulário de solicitação
+    // de acesso, antes do login, também precisa listar); só gestor escreve.
+    match /setores/{id} {
+      allow read: if true;
+      allow write: if isGestor();
+    }
+
+    // ─── veiculos ─────────────────────────────────────────────────────────
+    // Gestor e usuário consultam; consulta não vê (só os calendários públicos/mirror).
+    // Usuário também escreve: Checkout/Checkin atualizam status/kmAtual do veículo
+    // que está retirando/devolvendo (bug encontrado em 2026-07-10 — antes só
+    // gestor podia escrever, então esse updateDoc falhava com permission-denied
+    // para toda conta usuario; nunca funcionou em produção).
+    match /veiculos/{id} {
+      allow read: if isGestor() || isUsuario();
+      allow write: if isGestor() || isUsuario();
+    }
+
+    // ─── calendarioPublico ────────────────────────────────────────────────
+    // Coleção com apenas campos não-sensíveis para exibição pública.
+    // Campos: veiculoPlaca, dataSaida, dataRetorno, status (sem condutorNome, destino, motivo).
+    // Leitura livre a qualquer pessoa (inclusive perfil consulta). Escrita só por quem opera a frota.
+    match /calendarioPublico/{id} {
+      allow read: if true;
+      allow write: if isGestor() || isUsuario();
+    }
+
+    // ─── solicitacoes ──────────────────────────────────────────────────────
+    // Leitura restrita a gestor/usuário (LGPD: condutorNome, destino, motivo são sensíveis).
+    // Perfil consulta não lê esta coleção — só o mirror público em 'calendarioPublico'.
+    match /solicitacoes/{id} {
+      allow read: if isGestor() || isUsuario();
+
+      // Usuário cria apenas as próprias solicitações
+      allow create: if isUsuario()
+        && request.resource.data.condutorId == request.auth.uid;
+
+      // Gestor aprova/recusa; usuário cancela a própria solicitação pendente
+      allow update: if isGestor()
+        || (isUsuario()
+            && resource.data.condutorId == request.auth.uid
+            && resource.data.status == "pendente"
+            && request.resource.data.status == "cancelada");
+
+      // Checkout/checkin: usuário atualiza status de aprovada → em_uso → concluida
+      allow update: if isUsuario()
+        && resource.data.condutorId == request.auth.uid
+        && resource.data.status in ["aprovada", "em_uso"];
+
+      allow delete: if false;
+    }
+
+    // ─── usuarios ─────────────────────────────────────────────────────────
+    // Documento ID = Firebase Auth UID (obrigatório após a correção do addDoc).
+    // Cada conta lê apenas o próprio perfil; gestor lê todos.
+    match /usuarios/{uid} {
+      allow read: if isAuth() && (request.auth.uid == uid || isGestor());
+      allow create: if isGestor();
+      allow update: if isGestor() || request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // ─── manutencoes ──────────────────────────────────────────────────────
+    match /manutencoes/{id} {
+      allow read: if isGestor() || isUsuario();
+      allow write: if isGestor();
+    }
+
+    // ─── usos (checkout / checkin) ────────────────────────────────────────
+    match /usos/{id} {
+      allow read: if isGestor() || isUsuario();
+      allow create: if isUsuario();
+      allow update: if isUsuario()
+        && resource.data.condutorId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ─── auditoria ────────────────────────────────────────────────────────
+    // Append-only: create permitido para quem opera a frota; update/delete proibido.
+    match /auditoria/{id} {
+      allow read: if isGestor();
+      allow create: if isGestor() || isUsuario();
+      allow update, delete: if false;
+    }
+
+    // ─── salas ────────────────────────────────────────────────────────────
+    // Cadastro de salas de reunião. Todo perfil autenticado lê (inclusive consulta,
+    // que só enxerga calendários); só gestor cadastra/edita.
+    match /salas/{id} {
+      allow read: if isGestor() || isUsuario() || isConsulta();
+      allow write: if isGestor();
+    }
+
+    // ─── reservasSalas ──────────────────────────────────────────────────────
+    // Reserva auto-confirmada (sem fila de aprovação, decisão do projeto).
+    // Mesma visibilidade de 'salas': todo perfil autenticado lê.
+    match /reservasSalas/{id} {
+      allow read: if isGestor() || isUsuario() || isConsulta();
+
+      // Gestor e usuário reservam para si mesmos (sala é recurso compartilhado por todo mundo, não só condutores)
+      allow create: if (isGestor() || isUsuario())
+        && request.resource.data.responsavelId == request.auth.uid;
+
+      // Qualquer um dos dois cancela a própria reserva; gestor cancela qualquer uma
+      allow update: if isGestor()
+        || ((isGestor() || isUsuario()) && resource.data.responsavelId == request.auth.uid);
+
+      allow delete: if false;
+    }
+
+    // ─── veiculosProprios ───────────────────────────────────────────────────
+    // Anexo I do Decreto 10.154/2000 — Termo de Opção e Cadastramento de Veículo.
+    // Cadastro único por servidor; dado sensível (dados do veículo particular), gestor e o próprio dono leem.
+    match /veiculosProprios/{id} {
+      allow read: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow create: if isUsuario() && request.resource.data.servidorId == request.auth.uid;
+      allow update: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow delete: if false;
+    }
+
+    // ─── indenizacoes ───────────────────────────────────────────────────────
+    // Anexo II do Decreto 10.154/2000 — Boletim Demonstrativo de Viagem e Homologação.
+    // Uma por deslocamento; mesma visibilidade de veiculosProprios (dado financeiro/pessoal sensível).
+    match /indenizacoes/{id} {
+      allow read: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow create: if isUsuario() && request.resource.data.servidorId == request.auth.uid;
+      allow update: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow delete: if false;
+    }
+
+    // ─── equipamentos ───────────────────────────────────────────────────────
+    // Catálogo com patrimônio individual (notebooks, projetores, etc).
+    // Usuário também escreve: precisa atualizar o status ao retirar/devolver.
+    match /equipamentos/{id} {
+      allow read: if isGestor() || isUsuario() || isConsulta();
+      allow write: if isGestor() || isUsuario();
+    }
+
+    // ─── emprestimosEquipamentos ────────────────────────────────────────────
+    // Empréstimo auto-confirmado (mesmo padrão de reservasSalas, sem fila de aprovação).
+    match /emprestimosEquipamentos/{id} {
+      allow read: if isGestor() || isUsuario() || isConsulta();
+
+      allow create: if (isGestor() || isUsuario())
+        && request.resource.data.responsavelId == request.auth.uid;
+
+      // Dono do empréstimo avança o próprio status (retirar/devolver/cancelar); gestor mexe em qualquer um
+      allow update: if isGestor()
+        || ((isGestor() || isUsuario()) && resource.data.responsavelId == request.auth.uid);
+
+      allow delete: if false;
+    }
+  }
+}

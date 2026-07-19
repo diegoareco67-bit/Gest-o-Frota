@@ -1,0 +1,44 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Custom claim sincronizado por Cloud Function (functions/index.js) a partir de
+    // usuarios/{uid}.perfil — evita a chamada cross-service firestore.get(), que não
+    // estava resolvendo em produção neste projeto (ver PLANO.md, "Bug do storage.rules").
+    function perfil() {
+      return request.auth.token.perfil;
+    }
+
+    function isGestor() {
+      return isAuth() && perfil() == "gestor";
+    }
+
+    function isUsuario() {
+      return isAuth() && perfil() == "usuario";
+    }
+
+    // ─── veiculosProprios/{uid}/... ──────────────────────────────────────
+    // Termo de Opção e Cadastramento de Veículo (Anexo I) assinado, um por servidor.
+    match /veiculosProprios/{uid}/{arquivo} {
+      allow read: if isGestor() || (isUsuario() && request.auth.uid == uid);
+      allow write: if isUsuario() && request.auth.uid == uid
+        && request.resource.contentType == "application/pdf"
+        && request.resource.size < 10 * 1024 * 1024;
+      allow delete: if false;
+    }
+
+    // ─── indenizacoes/{uid}/... ──────────────────────────────────────────
+    // Boletim Demonstrativo de Viagem (Anexo II) assinado, um por solicitação.
+    match /indenizacoes/{uid}/{arquivo} {
+      allow read: if isGestor() || (isUsuario() && request.auth.uid == uid);
+      allow write: if isUsuario() && request.auth.uid == uid
+        && request.resource.contentType == "application/pdf"
+        && request.resource.size < 10 * 1024 * 1024;
+      allow delete: if false;
+    }
+  }
+}
