@@ -2,6 +2,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { doc, getDoc, getDocs, updateDoc, setDoc, collection, query, where, limit, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 
 const card: React.CSSProperties = {
@@ -17,6 +18,7 @@ const inputStyle: React.CSSProperties = {
 
 export default function Checkin() {
   const navigate = useNavigate();
+  const { usuario } = useAuth();
   const { id } = useParams<{ id: string }>();
   const [solicitacao, setSolicitacao] = useState<Record<string,string> | null>(null);
   const [uso, setUso] = useState<Record<string,unknown> | null>(null);
@@ -27,17 +29,19 @@ export default function Checkin() {
 
   useEffect(() => {
     async function carregar() {
-      if (!id) return;
+      if (!id || !usuario?.uid) return;
       const solSnap = await getDoc(doc(db, "solicitacoes", id));
       if (solSnap.exists()) {
         setSolicitacao({ id:solSnap.id, ...solSnap.data() } as Record<string,string>);
-        const usoSnap = await getDocs(query(collection(db, "usos"), where("solicitacaoId","==",id), limit(1)));
+        // condutorId no where é necessário para a regra de segurança de 'usos' (dono do
+        // registro) — uma query multi-documento sem esse filtro é rejeitada pelo Firestore.
+        const usoSnap = await getDocs(query(collection(db, "usos"), where("solicitacaoId","==",id), where("condutorId","==",usuario.uid), limit(1)));
         if (!usoSnap.empty) setUso({ id:usoSnap.docs[0].id, ...usoSnap.docs[0].data() });
       }
       setCarregando(false);
     }
     carregar();
-  }, [id]);
+  }, [id, usuario?.uid]);
 
   async function confirmarDevolucao() {
     setErro("");

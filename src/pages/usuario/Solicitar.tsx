@@ -1,6 +1,6 @@
 import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
-import { collection, getDocs, addDoc, serverTimestamp, query, where, limit } from "firebase/firestore";
+import { collection, getDocs, addDoc, setDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +43,9 @@ export default function Solicitar() {
   function gerarProtocolo() { return "SOL" + Date.now().toString().slice(-6); }
 
   async function verificarConflito(veiculoPlaca: string, dataSaida: string, dataRetorno: string): Promise<boolean> {
-    const snap = await getDocs(query(collection(db, "solicitacoes"), where("veiculoPlaca","==",veiculoPlaca), limit(200)));
+    // Lê do mirror público (não-sensível) em vez de 'solicitacoes' — evita que a checagem de
+    // conflito precise de leitura ampla da coleção sensível (LGPD, ver PLANO.md Fase 5).
+    const snap = await getDocs(query(collection(db, "calendarioPublico"), where("veiculoPlaca","==",veiculoPlaca), limit(200)));
     const novaSaida = new Date(dataSaida).getTime(), novoRetorno = new Date(dataRetorno).getTime();
     for (const d of snap.docs) {
       const sol = d.data();
@@ -84,10 +86,18 @@ export default function Solicitar() {
         setEnviando(false); return;
       }
       const protocolo = gerarProtocolo();
-      await addDoc(collection(db, "solicitacoes"), {
+      const novaSolicitacao = await addDoc(collection(db, "solicitacoes"), {
         ...form, protocolo,
         condutorId: usuario?.uid, condutorNome: usuario?.nome, condutorSetor: usuario?.setor,
         status: "pendente", criadoEm: serverTimestamp(),
+      });
+      // Mirror não-sensível no calendarioPublico já na criação (não só na aprovação) —
+      // é o que permite a checagem de conflito acima ler um dado público em vez de 'solicitacoes'.
+      await setDoc(doc(db, "calendarioPublico", novaSolicitacao.id), {
+        veiculoPlaca: form.veiculoPlaca,
+        dataSaida: form.dataSaida,
+        dataRetorno: form.dataRetorno,
+        status: "pendente",
       });
       setProtocoloGerado(protocolo);
       setSucesso(true);

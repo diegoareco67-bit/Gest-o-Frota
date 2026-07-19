@@ -55,17 +55,22 @@ service cloud.firestore {
     // ─── calendarioPublico ────────────────────────────────────────────────
     // Coleção com apenas campos não-sensíveis para exibição pública.
     // Campos: veiculoPlaca, dataSaida, dataRetorno, status (sem condutorNome, destino, motivo).
-    // Leitura livre a qualquer pessoa (inclusive perfil consulta). Escrita só por quem opera a frota.
+    // Leitura livre a qualquer pessoa (inclusive perfil consulta). Escrita por quem opera a
+    // frota — inclui o próprio usuario ao criar uma solicitação (Solicitar.tsx espelha o
+    // registro como "pendente" na hora, não só o gestor na aprovação).
     match /calendarioPublico/{id} {
       allow read: if true;
       allow write: if isGestor() || isUsuario();
     }
 
     // ─── solicitacoes ──────────────────────────────────────────────────────
-    // Leitura restrita a gestor/usuário (LGPD: condutorNome, destino, motivo são sensíveis).
+    // Leitura restrita a gestor, ou ao próprio dono da solicitação (LGPD: condutorNome,
+    // destino, motivo são sensíveis — um usuario não pode mais ler solicitações de outros
+    // condutores; a checagem de conflito de horário em Solicitar.tsx lê do mirror não-sensível
+    // 'calendarioPublico' em vez desta coleção, ver PLANO.md Fase 5).
     // Perfil consulta não lê esta coleção — só o mirror público em 'calendarioPublico'.
     match /solicitacoes/{id} {
-      allow read: if isGestor() || isUsuario();
+      allow read: if isGestor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
 
       // Usuário cria apenas as próprias solicitações
       allow create: if isUsuario()
@@ -103,8 +108,11 @@ service cloud.firestore {
     }
 
     // ─── usos (checkout / checkin) ────────────────────────────────────────
+    // Leitura restrita a gestor, ou ao próprio dono do registro (mesma decisão de LGPD
+    // aplicada a 'solicitacoes' acima). Checkin.tsx sempre inclui o filtro condutorId
+    // na query, exigido pelo Firestore para queries multi-documento sob esta regra.
     match /usos/{id} {
-      allow read: if isGestor() || isUsuario();
+      allow read: if isGestor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
       allow create: if isUsuario();
       allow update: if isUsuario()
         && resource.data.condutorId == request.auth.uid;
