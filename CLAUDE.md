@@ -2,7 +2,9 @@
 
 Sistema web para o Poder Executivo do Estado de Mato Grosso do Sul (CGE-MS) que centraliza o controle de recursos compartilhados do órgão: veículos, salas de reunião, equipamentos e indenização de transporte.
 
-**Não é um projeto do zero.** Já existe em produção o **FrotaGov** (`https://gestaofrotacge530101.web.app`, Firebase project `gestaofrotacge530101`). O Hub absorve o FrotaGov como módulo **Transportes** — mesmo projeto Firebase, mesmo repositório, mesma identidade visual como ponto de partida. Não recriar do zero, não criar projeto Firebase novo.
+**Não é um projeto do zero.** Já existe em produção o **FrotaGov** (Firebase project `gestaofrotacge530101`, ID permanente que não pode ser renomeado). O Hub absorve o FrotaGov como módulo **Transportes** — mesmo projeto Firebase, mesmo repositório, mesma identidade visual como ponto de partida. Não recriar do zero, não criar projeto Firebase novo.
+
+**URL de produção (2026-07-19):** o app é servido em **`https://hubcge.web.app`** (site de hospedagem `hubcge` adicionado ao mesmo projeto, para a URL fazer jus à marca Hub). O antigo `https://gestaofrotacge530101.web.app` continua servindo o mesmo conteúdo (deploy vai para os dois sites via array `hosting` no `firebase.json`), para não quebrar links já divulgados. `hubcge.web.app` é a URL canônica dali em diante.
 
 Idioma de trabalho: pt-BR.
 
