@@ -15,6 +15,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Mocks de teste (`src/firebase/__mocks__/`) estavam quebrando a suíte e2e inteira — corrigido em 2026-07-17/18.** Suíte e2e completa foi de app-não-renderiza para **160/160 testes passando** (127 pré-existentes corrigidos + 33 novos). Ver seção "Infraestrutura de mock e2e corrigida" abaixo.
 - ✅ **Suíte de testes unitários (Vitest/Testing Library) também corrigida em 2026-07-18** — tinha **80 testes falhando desde a Fase 1** (a mesma dívida que este arquivo já vinha citando). Causas: mesma classe de bug dos mocks e2e (exports faltando: `where`, `onSnapshot`, `setDoc`, `deleteDoc`, `getDoc`, `Timestamp`), mais `pendentes` prop obsoleta no `Sidebar` (componente ignora silenciosamente, já calcula sozinho via `onSnapshot`), mais um teste (`Sidebar.test.tsx`) que **nunca mockou o Firestore e fazia chamada real ao projeto de produção** durante os testes. Resultado: **141/141 passando**. `tsc -b` e `vite build` conferidos sem erro. Ver seção "Suíte Vitest corrigida" abaixo.
 - ✅ **Código publicado no GitHub e CI/CD via GitHub Actions funcionando ponta a ponta desde 2026-07-19** — repositório `diegoareco67-bit/Gest-o-Frota`, workflow roda type-check + Vitest + Playwright + build a cada push, e faz deploy automático (hosting, firestore rules, storage rules, functions) quando `main` passa em tudo. Ver seção "CI/CD via GitHub Actions" abaixo.
+- ✅ **Rebrand FrotaGov → Hub concluído em 2026-07-19** (tela de login + Sidebar): nome/identidade visual do CLAUDE.md ("Nome Hub, subtítulo Central de Recursos Compartilhados") finalmente aplicado nas telas — antes só existia no documento. Ver seção "Rebrand FrotaGov → Hub" abaixo.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -79,6 +80,22 @@ Depois da suíte e2e fechar 100%, o usuário pediu pra investigar `npm run test:
 - **2 bugs reais adicionais**, iguais aos já achados na e2e: `serverTimestamp()`/`Timestamp` sem `.toDate()`, e erro de login mockado sem `.code` (`err.code` é o que `login.tsx` usa pra mapear a mensagem).
 
 **Resultado: 141 de 141 testes passando.** `tsc -b` sem erros. `vite build` conclui com sucesso (avisos pré-existentes não relacionados: bundle >500kB por causa do `jsPDF`/`html2canvas`, já registrado como dívida na Fase 2; e um "ineffective dynamic import" em `login.tsx` que importa `firebase/firestore`/`config` dinamicamente apesar de já serem importados estaticamente em outros arquivos — nenhum dos dois é regressão desta sessão).
+
+### ✅ Rebrand FrotaGov → Hub — tela de login e Sidebar, 2026-07-19
+
+Pedido do usuário: "mudanças no layout da tela inicial que faça jus ao hub". Até aqui, o CLAUDE.md já documentava a identidade "Hub — Central de Recursos Compartilhados" (seção "Identidade visual", desde a Fase 0), mas nenhuma tela tinha sido atualizada — login e Sidebar ainda diziam "FrotaGov" em todo lugar.
+
+**Decisão de escopo (pergunta feita ao usuário):** rebrand completo (login + Sidebar), não só a tela de login, pra manter a marca consistente em toda a área autenticada.
+
+- `src/components/login.tsx`: título "FrotaGov" → "Hub", subtítulo "Sistema de Gestão de Frota Oficial" → "Central de Recursos Compartilhados", ícone trocado de caminhão para grade 2×2 (referência Microsoft 365/Google Workspace, como o CLAUDE.md já pedia). **Adicionada vitrine de módulos** — 4 chips (Veículos/Salas/Equipamentos/Indenização, cada um com cor e ícone próprios) entre o subtítulo e o card de login, pra comunicar visualmente que o sistema cobre mais que só frota.
+  - **Restrição encontrada:** Salas e Equipamentos não têm mirror público de dados (só `calendarioPublico`, dos veículos, é legível sem login) — então os chips são só identidade visual/navegação, não calendários ao vivo. Criar mirrors públicos pra esses módulos ficaria como trabalho futuro caso se queira calendário público deles também.
+  - O calendário à direita (`CalendarioGrade`) continua mostrando só a frota (é o único com dado público) — o subtítulo padrão dele ("...da frota oficial") já deixa isso claro, não precisou mudar.
+- `src/components/layout/Sidebar.tsx`: logo "FrotaGov" → "Hub", ícone do caminhão trocado pelo mesmo ícone de grade usado no login (reaproveitado do próprio `IcoMap.dashboard` já existente) — consistência visual entre login e área logada.
+- `index.html`: `<title>` "FrotaGov" → "Hub — CGE-MS".
+- Testes atualizados pra bater com o texto novo: `Login.test.tsx`, `Sidebar.test.tsx`, `e2e/login.spec.ts`, `e2e/gestor.spec.ts`, `e2e/usuario.spec.ts`.
+- Verificado: `tsc -b` sem erro, **141/141 Vitest**, **160/160 e2e**, e checagem visual manual (`npm run dev` + screenshot da tela de login) confirmando layout sem sobreposição/corte de texto.
+
+**Fora do escopo, não alterado:** o e-mail placeholder do login continua `gestor@frota.ms.gov.br` (domínio do sistema, não é branding visual); nome do projeto Firebase (`gestaofrotacge530101`) e URL de produção (`gestaofrotacge530101.web.app`) continuam com "frota" no nome — trocar isso seria migração de projeto/domínio, não um ajuste de tela.
 
 ### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
 

@@ -42,9 +42,9 @@ describe("Sidebar — gestor", () => {
 
   afterEach(() => vi.clearAllMocks());
 
-  it("exibe logo FrotaGov", () => {
+  it("exibe logo Hub", () => {
     renderSidebar("gestor");
-    expect(screen.getByText("FrotaGov")).toBeInTheDocument();
+    expect(screen.getByText("Hub")).toBeInTheDocument();
   });
 
   it("exibe item Dashboard", () => {

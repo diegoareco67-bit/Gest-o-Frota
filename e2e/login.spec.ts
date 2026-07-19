@@ -6,8 +6,8 @@ test.describe("Login — renderização", () => {
     await page.goto("/login");
   });
 
-  test("exibe o título FrotaGov", async ({ page }) => {
-    await expect(page.getByText("FrotaGov", { exact: true })).toBeVisible();
+  test("exibe o título Hub", async ({ page }) => {
+    await expect(page.getByText("Hub", { exact: true })).toBeVisible();
   });
 
   test("exibe o campo de e-mail institucional", async ({ page }) => {

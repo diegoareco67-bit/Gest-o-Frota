@@ -5,6 +5,17 @@ import { auth } from "../firebase/config";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { CalendarioGrade } from "./CalendarioGrade";
 
+const MODULOS = [
+  { label:"Veículos", cor:"#1E3A8A", bg:"#EFF6FF", border:"#BFDBFE",
+    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
+  { label:"Salas", cor:"#7C3AED", bg:"#F5F3FF", border:"#DDD6FE",
+    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg> },
+  { label:"Equipamentos", cor:"#0891B2", bg:"#ECFEFF", border:"#A5F3FC",
+    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg> },
+  { label:"Indenização", cor:"#15803D", bg:"#F0FDF4", border:"#BBF7D0",
+    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg> },
+];
+
 export default function Login() {
   const {login}  = useAuth();
   const navigate = useNavigate();
@@ -64,10 +75,20 @@ export default function Login() {
 
         {/* Ícone */}
         <div style={{width:68,height:68,borderRadius:"50%",background:"#EFF6FF",border:"2px solid #BFDBFE",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:10}}>
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         </div>
-        <div style={{fontSize:24,fontWeight:900,color:"#0F172A",letterSpacing:-0.5,marginBottom:2}}>FrotaGov</div>
-        <div style={{fontSize:11,color:"#64748B",marginBottom:24,textAlign:"center"}}>Sistema de Gestão de Frota Oficial</div>
+        <div style={{fontSize:24,fontWeight:900,color:"#0F172A",letterSpacing:-0.5,marginBottom:2}}>Hub</div>
+        <div style={{fontSize:11,color:"#64748B",marginBottom:16,textAlign:"center"}}>Central de Recursos Compartilhados</div>
+
+        {/* Vitrine de módulos */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,width:"100%",marginBottom:20}}>
+          {MODULOS.map(m=>(
+            <div key={m.label} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 8px",borderRadius:8,background:m.bg,border:`1px solid ${m.border}`}}>
+              <span style={{color:m.cor,display:"flex",flexShrink:0}} aria-hidden="true">{m.icone}</span>
+              <span style={{fontSize:10.5,fontWeight:700,color:m.cor,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.label}</span>
+            </div>
+          ))}
+        </div>
 
         {/* Card */}
         <div style={{width:"100%",border:"1px solid #E2E8F0",borderRadius:12,padding:"20px 18px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",marginBottom:12}}>

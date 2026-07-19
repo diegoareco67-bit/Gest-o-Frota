@@ -162,10 +162,10 @@ export function Sidebar({perfil}: SidebarProps) {
       {/* Logo + botão fechar em mobile */}
       <div style={s.brand}>
         <div style={s.logoBox}>
-          {IcoMap.truck}
+          {IcoMap.dashboard}
         </div>
         <div style={{flex:1}}>
-          <div style={s.logoTitle}>FrotaGov</div>
+          <div style={s.logoTitle}>Hub</div>
           <div style={s.logoSub}>CGE · MS</div>
         </div>
         {isMobile && (

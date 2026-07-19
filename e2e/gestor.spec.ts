@@ -12,8 +12,8 @@ test.describe("Gestor — Dashboard", () => {
     await expect(page.getByText(/maria/i).first()).toBeVisible({ timeout: 8000 });
   });
 
-  test("exibe a logo FrotaGov", async ({ page }) => {
-    await expect(page.getByText("FrotaGov").first()).toBeVisible();
+  test("exibe a logo Hub", async ({ page }) => {
+    await expect(page.getByText("Hub", { exact: true }).first()).toBeVisible();
   });
 
   test("dashboard renderiza sem travar", async ({ page }) => {

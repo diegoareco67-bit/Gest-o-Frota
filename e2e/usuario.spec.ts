@@ -17,8 +17,8 @@ test.describe("Usuario — Dashboard", () => {
     await expect(saudacao).toBeVisible({ timeout: 8000 });
   });
 
-  test("exibe a logo FrotaGov na sidebar", async ({ page }) => {
-    await expect(page.getByText("FrotaGov").first()).toBeVisible();
+  test("exibe a logo Hub na sidebar", async ({ page }) => {
+    await expect(page.getByText("Hub", { exact: true }).first()).toBeVisible();
   });
 
   test("exibe o rótulo 'Usuário' na sidebar", async ({ page }) => {

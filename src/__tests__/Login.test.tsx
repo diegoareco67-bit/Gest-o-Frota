@@ -23,9 +23,9 @@ describe("Login — renderização", () => {
     );
   });
 
-  it("exibe o título FrotaGov", () => {
+  it("exibe o título Hub", () => {
     renderLogin();
-    expect(screen.getByText("FrotaGov")).toBeInTheDocument();
+    expect(screen.getByText("Hub")).toBeInTheDocument();
   });
 
   it("exibe o campo de e-mail institucional", () => {
