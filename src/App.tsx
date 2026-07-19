@@ -18,6 +18,7 @@ const Relatorios = lazy(() => import("./pages/gestor/Relatorios"));
 const Usuarios = lazy(() => import("./pages/gestor/Usuarios"));
 const ManualUso = lazy(() => import("./pages/gestor/ManualUso"));
 const Auditoria = lazy(() => import("./pages/gestor/Auditoria"));
+const Seguranca = lazy(() => import("./pages/gestor/Seguranca"));
 const Setores = lazy(() => import("./pages/gestor/Setores"));
 const DashboardUsuario = lazy(() => import("./pages/usuario/Dashboard"));
 const Solicitar = lazy(() => import("./pages/usuario/Solicitar"));
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/gestor" element={<RotaProtegida perfil="gestor"><DashboardGestor /></RotaProtegida>} />
           <Route path="/gestor/aprovacoes" element={<RotaProtegida perfil="gestor"><Aprovacoes /></RotaProtegida>} />
           <Route path="/gestor/manual" element={<RotaProtegida perfil="gestor"><ManualUso /></RotaProtegida>} />
+          <Route path="/gestor/seguranca" element={<RotaProtegida perfil="gestor"><Seguranca /></RotaProtegida>} />
           <Route path="/gestor/veiculos" element={<RotaProtegida perfil="gestor"><Veiculos /></RotaProtegida>} />
           <Route path="/gestor/manutencao" element={<RotaProtegida perfil="gestor"><Manutencao /></RotaProtegida>} />
           <Route path="/gestor/usuarios" element={<RotaProtegida perfil="gestor"><Usuarios /></RotaProtegida>} />

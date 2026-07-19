@@ -21,6 +21,7 @@ const IcoMap = {
   building:  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/><line x1="9" y1="18" x2="15" y2="18"/></svg>,
   manual:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
   shield:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>,
+  lock:      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
 };
 
 type IcoKey = keyof typeof IcoMap;
@@ -34,6 +35,7 @@ function getSections(perfil:"gestor"|"usuario"|"consulta"|"auditor", pendentes=0
       {icon:"dashboard",label:"Dashboard",  path:"/gestor"},
       {icon:"check",    label:"Aprovações", path:"/gestor/aprovacoes", badge:pendentes||undefined},
       {icon:"manual",   label:"Manual de Uso da Aplicação", path:"/gestor/manual"},
+      {icon:"lock",     label:"Segurança (2FA)", path:"/gestor/seguranca"},
     ]},
     { label:"GESTÃO", items:[
       {icon:"truck",  label:"Veículos",      path:"/gestor/veiculos"},
@@ -92,6 +94,7 @@ const ICO_COLORS: Record<IcoKey, string> = {
   building:  "#7EB8F7",
   manual:    "#FCD34D",
   shield:    "#6DCF92",
+  lock:      "#FCA5A5",
 };
 
 interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; pendentes?:number; }

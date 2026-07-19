@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, doc, updateDoc, setDoc, deleteDoc, query, orderBy, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
+import { notificarCondutor } from "../../firebase/notificacoes";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface Solicitacao {
@@ -42,6 +43,7 @@ export default function Aprovacoes() {
   const [avisosCnh, setAvisosCnh] = useState<Record<string,string>>({});
   const [erroGlobal, setErroGlobal] = useState("");
   const [erroModal, setErroModal] = useState("");
+  const [emailsPorUid, setEmailsPorUid] = useState<Record<string,string>>({});
 
   useEffect(() => { carregar(); }, []);
 
@@ -51,25 +53,25 @@ export default function Aprovacoes() {
       const snap = await getDocs(query(collection(db, "solicitacoes"), orderBy("criadoEm", "desc"), limit(500)));
       const lista = snap.docs.map(d => ({ id: d.id, ...d.data() } as Solicitacao));
       setSolicitacoes(lista);
-      // Verificar CNH dos condutores com solicitações pendentes
+      // Carrega usuários (para checar CNH e obter o e-mail do condutor para notificação)
+      const usersSnap = await getDocs(query(collection(db, "usuarios"), limit(500)));
+      const usersByUid: Record<string, { vencimentoCnh?: string; email?: string }> = {};
+      const emails: Record<string,string> = {};
+      usersSnap.forEach(d => { const data = d.data(); if (data.uid) { usersByUid[data.uid] = data; if (data.email) emails[data.uid] = data.email; } });
+      setEmailsPorUid(emails);
+      // Avisos de CNH das solicitações pendentes
       const avisos: Record<string,string> = {};
       const hoje = new Date(); hoje.setHours(0,0,0,0);
-      const pendentes = lista.filter(s => s.status === "pendente" && s.condutorId);
-      if (pendentes.length > 0) {
-        const usersSnap = await getDocs(query(collection(db, "usuarios"), limit(500)));
-        const usersByUid: Record<string, { vencimentoCnh?: string }> = {};
-        usersSnap.forEach(d => { const data = d.data(); if (data.uid) usersByUid[data.uid] = data; });
-        pendentes.forEach(sol => {
-          if (!sol.condutorId) return;
-          const venc = usersByUid[sol.condutorId]?.vencimentoCnh;
-          if (venc) {
-            const vencDate = new Date(venc + "T00:00:00");
-            const dias = Math.ceil((vencDate.getTime() - hoje.getTime()) / (1000*60*60*24));
-            if (dias < 0) avisos[sol.id] = `CNH vencida em ${vencDate.toLocaleDateString("pt-BR")}`;
-            else if (dias <= 60) avisos[sol.id] = `CNH vence em ${dias} dia(s) — ${vencDate.toLocaleDateString("pt-BR")}`;
-          }
-        });
-      }
+      lista.filter(s => s.status === "pendente" && s.condutorId).forEach(sol => {
+        if (!sol.condutorId) return;
+        const venc = usersByUid[sol.condutorId]?.vencimentoCnh;
+        if (venc) {
+          const vencDate = new Date(venc + "T00:00:00");
+          const dias = Math.ceil((vencDate.getTime() - hoje.getTime()) / (1000*60*60*24));
+          if (dias < 0) avisos[sol.id] = `CNH vencida em ${vencDate.toLocaleDateString("pt-BR")}`;
+          else if (dias <= 60) avisos[sol.id] = `CNH vence em ${dias} dia(s) — ${vencDate.toLocaleDateString("pt-BR")}`;
+        }
+      });
       setAvisosCnh(avisos);
     } catch (e) { console.error(e); }
     finally { setCarregando(false); }
@@ -98,6 +100,11 @@ export default function Aprovacoes() {
       await registrarAuditoria("aprovar_solicitacao", usuario?.uid || "", usuario?.nome || "", {
         solicitacaoId: id, protocolo: sol?.protocolo, condutorNome: sol?.condutorNome, veiculoPlaca: sol?.veiculoPlaca,
       });
+      await notificarCondutor({
+        email: sol?.condutorId ? emailsPorUid[sol.condutorId] ?? "" : "",
+        nomeCondutor: sol?.condutorNome ?? "", protocolo: sol?.protocolo ?? "",
+        veiculoPlaca: sol?.veiculoPlaca ?? "", status: "aprovada",
+      });
     } catch (e) { console.error(e); setErroGlobal("Erro ao aprovar solicitação. Tente novamente."); }
     finally { setProcessando(false); }
   }
@@ -121,6 +128,11 @@ export default function Aprovacoes() {
       await registrarAuditoria("recusar_solicitacao", usuario?.uid || "", usuario?.nome || "", {
         solicitacaoId: modal.id, protocolo: modal.protocolo, motivo: motivoRecusa.trim(),
         condutorNome: sol?.condutorNome, veiculoPlaca: sol?.veiculoPlaca,
+      });
+      await notificarCondutor({
+        email: sol?.condutorId ? emailsPorUid[sol.condutorId] ?? "" : "",
+        nomeCondutor: sol?.condutorNome ?? "", protocolo: modal.protocolo,
+        veiculoPlaca: sol?.veiculoPlaca ?? "", status: "recusada", motivo: motivoRecusa.trim(),
       });
       setModal(null);
       setMotivoRecusa("");

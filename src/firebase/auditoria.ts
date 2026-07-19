@@ -20,7 +20,8 @@ export type AcaoAuditoria =
   | "cancelar_emprestimo_equipamento"
   | "aprovar_veiculo_proprio"
   | "recusar_veiculo_proprio"
-  | "enviar_indenizacao";
+  | "enviar_indenizacao"
+  | "anonimizar_usuario";
 
 /**
  * Grava um registro imutável na coleção `auditoria`.

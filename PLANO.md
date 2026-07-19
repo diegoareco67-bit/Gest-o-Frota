@@ -2,6 +2,16 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
+## Rumo a 100% — fechamento das ressalvas (2026-07-19)
+
+Após o parecer "Apto com ressalvas", o usuário pediu para fechar todas as ressalvas restantes. Feito por ondas:
+
+- **Polimento técnico:** `firestore.indexes.json` versionado (índice `usuarios` existente + novo `solicitacoes` condutorId/criadoEm que a tela Minhas Solicitações precisa — corrige um índice que faltava em produção); CI passou a deployar `--only firestore` (rules+indexes). Code-splitting por rota (`React.lazy`+`Suspense` no `App.tsx`) — bundle inicial de **1.240 kB → 647 kB** (jsPDF e telas internas fora do carregamento inicial).
+- **Notificação por e-mail** (aprovação/recusa de solicitação de veículo): `src/firebase/notificacoes.ts` chama o mesmo Apps Script (`VITE_APPS_SCRIPT_URL`) com `tipo:"notificacao_solicitacao"`, guardado por `import.meta.env.PROD` (não dispara em dev/e2e). `Aprovacoes.tsx` passou a carregar o e-mail do condutor e a notificar em aprovar/recusar. **Pendente de você:** colar o trecho de `docs/apps-script-notificacao.md` no seu Apps Script (enquanto não colar, aprovação/recusa funciona, só não manda o e-mail).
+- **Retenção/anonimização (LGPD):** ação `Anonimizar dados (LGPD)` em `Usuarios.tsx` para contas **inativas** — substitui nome/e-mail/matrícula/CNH/setor por valores anonimizados, mantendo uid/perfil para a trilha de auditoria (`anonimizado:true`), com confirmação e registro em auditoria (`anonimizar_usuario`). Seção "Retenção e anonimização" adicionada ao Aviso de Privacidade com prazos **propostos** (a confirmar com a gestão documental do órgão).
+- **MFA (TOTP) opcional para o Gestor:** tela `gestor/Seguranca.tsx` (rota `/gestor/seguranca`, item "Segurança (2FA)" no Sidebar) para o gestor ativar/remover 2FA por app autenticador; `login.tsx` ganhou o desafio de código quando a conta tem 2FA (`auth/multi-factor-auth-required` → `getMultiFactorResolver`). Stubs de MFA adicionados ao mock de auth (senão o import quebraria o e2e). **Pendente de você (console):** habilitar TOTP em Firebase Auth → Sign-in method → Advanced → MFA. É opcional (não forçado), como o relatório recomendou.
+- **Verificação:** `tsc -b` limpo, **141 Vitest**, **184 e2e** (novos: Segurança 3, anonimização 1), lint limpo (obrigatório no CI).
+
 ## Correções da auditoria técnica (2026-07-19) — em andamento
 
 Após a auditoria de homologação (artifact publicado), correções por onda seguindo o plano aprovado:

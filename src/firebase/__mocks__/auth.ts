@@ -66,6 +66,36 @@ export function signOut(_auth: unknown) {
   return Promise.resolve();
 }
 
+// ─── MFA (TOTP) — stubs ───────────────────────────────────────────────
+// Os testes nunca exercitam MFA de verdade (as contas mockadas não têm 2º fator),
+// mas login.tsx e a tela de Segurança importam estas funções — sem os stubs o
+// import quebraria a aplicação inteira sob o mock.
+export function multiFactor(_user: unknown) {
+  return {
+    enrolledFactors: [] as { uid: string; displayName?: string }[],
+    getSession: () => Promise.resolve({}),
+    enroll: (_assertion: unknown, _name?: string) => Promise.resolve(),
+    unenroll: (_factor: unknown) => Promise.resolve(),
+  };
+}
+
+export const TotpMultiFactorGenerator = {
+  FACTOR_ID: "totp",
+  generateSecret: (_session: unknown) => Promise.resolve({
+    secretKey: "MOCKSECRETKEY234567ABCDEF",
+    generateQrCodeUrl: (_acc?: string, _iss?: string) => "otpauth://totp/Hub:teste?secret=MOCKSECRETKEY234567ABCDEF&issuer=Hub",
+  }),
+  assertionForEnrollment: (_secret: unknown, _otp: string) => ({}),
+  assertionForSignIn: (_uid: string, _otp: string) => ({}),
+};
+
+export function getMultiFactorResolver(_auth: unknown, _error: unknown) {
+  return {
+    hints: [{ uid: "mock-hint", displayName: "App Autenticador" }],
+    resolveSignIn: (_assertion: unknown) => Promise.resolve({ user: authObj.currentUser }),
+  };
+}
+
 export function onAuthStateChanged(_auth: unknown, callback: Listener) {
   listeners.push(callback);
   setTimeout(() => callback(getStoredUser()), 0);

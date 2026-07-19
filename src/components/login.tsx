@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { auth } from "../firebase/config";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail, getMultiFactorResolver, TotpMultiFactorGenerator, type MultiFactorResolver } from "firebase/auth";
 import { CalendarioGrade } from "./CalendarioGrade";
 
 const MODULOS = [
@@ -35,6 +35,8 @@ export default function Login() {
   const [resetOk,setResetOk]     = useState(false);
   const [erroReset,setErroReset] = useState("");
   const [abaCalendario,setAbaCalendario] = useState<"veiculos"|"salas">("veiculos");
+  const [mfaResolver,setMfaResolver] = useState<MultiFactorResolver|null>(null);
+  const [mfaCode,setMfaCode] = useState("");
 
   async function handleReset(e:React.FormEvent){
     e.preventDefault(); setErroReset(""); setResetLoad(true);
@@ -49,21 +51,38 @@ export default function Login() {
     }finally{setResetLoad(false);}
   }
 
+  async function irParaDashboard(){
+    const {getDoc,doc}=await import("firebase/firestore");
+    const {db:_db}    =await import("../firebase/config");
+    const snap=await getDoc(doc(_db,"usuarios",auth.currentUser!.uid));
+    const perfil=snap.data()?.perfil;
+    const destino=perfil==="gestor"||perfil==="usuario"||perfil==="consulta"||perfil==="auditor" ? `/${perfil}` : "/consulta";
+    navigate(destino,{replace:true});
+  }
+
   async function handleLogin(e:React.FormEvent){
     e.preventDefault(); setErro(""); setLoad(true);
     try{
       await login(email,senha);
-      const {getDoc,doc}=await import("firebase/firestore");
-      const {db:_db}    =await import("../firebase/config");
-      const {auth}      =await import("../firebase/config");
-      const snap=await getDoc(doc(_db,"usuarios",auth.currentUser!.uid));
-      const perfil=snap.data()?.perfil;
-      const destino=perfil==="gestor"||perfil==="usuario"||perfil==="consulta"||perfil==="auditor" ? `/${perfil}` : "/consulta";
-      navigate(destino,{replace:true});
+      await irParaDashboard();
     }catch(err:unknown){
       const c=(err as {code?:string}).code??"";
+      // Conta com 2FA ativo: o login pede o código do autenticador
+      if(c==="auth/multi-factor-auth-required"){ setMfaResolver(getMultiFactorResolver(auth, err as never)); return; }
       const map:Record<string,string>={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/too-many-requests":"Muitas tentativas. Aguarde."};
       setErro(map[c]??"Erro ao fazer login.");
+    }finally{setLoad(false);}
+  }
+
+  async function resolverMfa(e:React.FormEvent){
+    e.preventDefault(); setErro(""); setLoad(true);
+    if(!mfaResolver||mfaCode.length<6){ setErro("Informe o código de 6 dígitos do aplicativo."); setLoad(false); return; }
+    try{
+      const assertion=TotpMultiFactorGenerator.assertionForSignIn(mfaResolver.hints[0].uid, mfaCode);
+      await mfaResolver.resolveSignIn(assertion);
+      await irParaDashboard();
+    }catch{
+      setErro("Código incorreto. Confira no aplicativo e tente de novo.");
     }finally{setLoad(false);}
   }
 
@@ -111,6 +130,29 @@ export default function Login() {
                 ← Voltar ao login
               </button>
             </div>
+          ) : mfaResolver ? (
+            /* ── Desafio 2FA (código do autenticador) ── */
+            <>
+              <div style={{fontSize:15,fontWeight:700,color:"#0F172A",marginBottom:6,textAlign:"center"}}>Verificação em <span style={{color:"#1E3A8A"}}>duas etapas</span></div>
+              <p style={{fontSize:12,color:"#64748B",textAlign:"center",marginBottom:18,lineHeight:1.5}}>Digite o código de 6 dígitos<br/>do seu aplicativo autenticador.</p>
+              <form onSubmit={resolverMfa} noValidate>
+                <div style={{marginBottom:14}}>
+                  <label htmlFor="mfa-code" style={{display:"block",fontSize:12,fontWeight:600,color:"#374151",marginBottom:5}}>Código de verificação</label>
+                  <input id="mfa-code" value={mfaCode} required inputMode="numeric" autoFocus placeholder="000000"
+                    onChange={e=>{setMfaCode(e.target.value.replace(/\D/g,"").slice(0,6));setErro("");}}
+                    style={{width:"100%",padding:"10px 12px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:20,letterSpacing:6,textAlign:"center",boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}/>
+                </div>
+                {erro&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:7,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erro}</div>}
+                <button type="submit" disabled={load}
+                  style={{width:"100%",padding:"12px",background:load?"#94A3B8":"#1E3A8A",color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:700,cursor:load?"not-allowed":"pointer",marginBottom:8}}>
+                  {load?"Verificando...":"Verificar e entrar"}
+                </button>
+                <button type="button" onClick={()=>{setMfaResolver(null);setMfaCode("");setErro("");}}
+                  style={{width:"100%",padding:"10px",background:"none",border:"1px solid #E2E8F0",borderRadius:8,fontSize:13,color:"#64748B",cursor:"pointer",fontFamily:"inherit"}}>
+                  ← Voltar ao login
+                </button>
+              </form>
+            </>
           ) : modoReset ? (
             /* ── Formulário de reset ── */
             <>

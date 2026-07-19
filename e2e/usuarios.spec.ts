@@ -102,4 +102,20 @@ test.describe("Gestor — Usuários — Toggle Ativo", () => {
 
     await expect(page.getByText("Ativo").first()).toBeVisible({ timeout: 5000 });
   });
+
+  test("anonimizar dados de usuário inativo (LGPD)", async ({ page }) => {
+    await fazerLogin(page, gestor);
+    await page.goto("/gestor/usuarios");
+    await page.waitForLoadState("networkidle");
+
+    // Só é possível anonimizar depois de desativar a conta
+    await page.getByRole("button", { name: /desativar/i }).first().click();
+    await page.waitForLoadState("networkidle");
+
+    await page.getByRole("button", { name: /anonimizar dados/i }).first().click();
+    await page.getByRole("button", { name: /sim, anonimizar/i }).click();
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByText(/dados pessoais anonimizados/i).first()).toBeVisible({ timeout: 5000 });
+  });
 });

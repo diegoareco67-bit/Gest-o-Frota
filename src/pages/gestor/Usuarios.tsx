@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, setDoc, updateDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../../firebase/config";
+import { registrarAuditoria } from "../../firebase/auditoria";
+import { useAuth } from "../../contexts/AuthContext";
 import { useSetores } from "../../hooks/useSetores";
 import { useEscClose } from "../../hooks/useEscClose";
 import type { Perfil } from "../../types";
 
-interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; }
+interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; anonimizado?:boolean; }
 
 const PERFIL_LABEL: Record<string, string> = { usuario:"Usuário", consulta:"Consulta", auditor:"Auditor" };
 
@@ -29,6 +31,7 @@ interface SolicitacaoAcesso {
 }
 
 export default function Usuarios() {
+  const { usuario } = useAuth();
   const [aba, setAba] = useState<"usuarios"|"solicitacoes">("usuarios");
   const [lista, setLista] = useState<UsuarioConta[]>([]);
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoAcesso[]>([]);
@@ -43,6 +46,7 @@ export default function Usuarios() {
   const [erroSol, setErroSol] = useState("");
   const [sucessoMsg, setSucessoMsg] = useState("");
   const [confirmRecusar, setConfirmRecusar] = useState(false);
+  const [confirmAnonimizar, setConfirmAnonimizar] = useState<UsuarioConta|null>(null);
   const setores = useSetores();
 
   useEscClose(() => setModal(false), modal);
@@ -145,6 +149,23 @@ export default function Usuarios() {
     carregarTudo();
   }
 
+  // Retenção/LGPD: substitui os dados pessoais por valores anonimizados, mantendo o
+  // documento (uid/perfil) para integridade da trilha de auditoria. Só para contas
+  // inativas — o registro histórico é preservado sem o dado pessoal.
+  async function anonimizar(c: UsuarioConta) {
+    await updateDoc(doc(db, "usuarios", c.id), {
+      nome: "Usuário anonimizado", email: "", matricula: "",
+      numeroCnh: "", vencimentoCnh: "", setor: "",
+      anonimizado: true, anonimizadoEm: serverTimestamp(),
+    });
+    await registrarAuditoria("anonimizar_usuario", usuario?.uid || "", usuario?.nome || "", {
+      usuarioAnonimizadoId: c.id, perfil: c.perfil,
+    });
+    setConfirmAnonimizar(null);
+    setSucessoMsg("Dados pessoais anonimizados. O registro foi mantido sem o dado pessoal para a trilha de auditoria.");
+    carregarTudo();
+  }
+
 
   return (
     <div style={s.page}>
@@ -227,9 +248,21 @@ export default function Usuarios() {
                             </div>
                           );
                         })()}
-                        <button onClick={() => toggleAtivo(c)} style={{ ...s.btnToggle, ...(c.ativo ? { color:"#991b1b", borderColor:"#fecaca", background:"#fff5f5" } : { color:"#166534", borderColor:"#bbf7d0", background:"#f0fdf4" }) }}>
-                          {c.ativo ? "Desativar usuário" : "Reativar usuário"}
-                        </button>
+                        {c.anonimizado && (
+                          <div style={{ fontSize:11, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", border:"1px solid #E1EAF5", borderRadius:8, padding:"6px 10px", marginBottom:8 }}>
+                            🔒 Dados pessoais anonimizados (LGPD)
+                          </div>
+                        )}
+                        {!c.anonimizado && (
+                          <button onClick={() => toggleAtivo(c)} style={{ ...s.btnToggle, ...(c.ativo ? { color:"#991b1b", borderColor:"#fecaca", background:"#fff5f5" } : { color:"#166534", borderColor:"#bbf7d0", background:"#f0fdf4" }) }}>
+                            {c.ativo ? "Desativar usuário" : "Reativar usuário"}
+                          </button>
+                        )}
+                        {!c.ativo && !c.anonimizado && (
+                          <button onClick={() => setConfirmAnonimizar(c)} style={{ ...s.btnToggle, marginTop:6, color:"#7A95B2", borderColor:"#E1EAF5", background:"#F8FAFC" }}>
+                            🔒 Anonimizar dados (LGPD)
+                          </button>
+                        )}
                       </div>
                       );
                     })}
@@ -387,6 +420,18 @@ export default function Usuarios() {
           corConfirmar="#EF4444"
           onConfirmar={recusar}
           onCancelar={() => setConfirmRecusar(false)}
+        />
+      )}
+
+      {confirmAnonimizar && (
+        <ModalConfirm
+          titulo="Anonimizar dados (LGPD)"
+          mensagem={`Deseja anonimizar os dados pessoais de ${confirmAnonimizar.nome}? Nome, e-mail, matrícula, CNH e setor serão apagados. O registro é mantido (sem dado pessoal) para a trilha de auditoria. Esta ação não pode ser desfeita.`}
+          labelConfirmar="Sim, anonimizar"
+          labelCancelar="Voltar"
+          corConfirmar="#334155"
+          onConfirmar={() => anonimizar(confirmAnonimizar)}
+          onCancelar={() => setConfirmAnonimizar(null)}
         />
       )}
     </div>
