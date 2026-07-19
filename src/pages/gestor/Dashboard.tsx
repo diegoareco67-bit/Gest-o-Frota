@@ -4,7 +4,13 @@ import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Calendario from "../../components/Calendario";
+import { CalendarioGrade } from "../../components/CalendarioGrade";
 import { Sidebar } from "../../components/layout/Sidebar";
+
+const STATUS_SALAS = {
+  confirmada: { cor:"#3B82F6", label:"Reservada" },
+  cancelada:  { cor:"#94A3B8", label:"Cancelada" },
+};
 
 interface Stats {
   veiculosDisponiveis: number;
@@ -124,10 +130,26 @@ export default function DashboardGestor() {
 
               {/* Bento inferior: calendário + ações rápidas */}
               <div style={s.bento}>
-                {/* Calendário */}
+                {/* Calendários */}
                 <div style={s.bentoLeft}>
-                  <SectionTitle>Calendário de Agendamentos</SectionTitle>
+                  <SectionTitle>Calendário de Agendamentos — Veículos</SectionTitle>
                   <div style={s.card}><Calendario /></div>
+
+                  <div style={{ height:16 }} />
+
+                  <div style={s.card}>
+                    <CalendarioGrade
+                      colecao="reservasSalas"
+                      titulo="Salas"
+                      subtitulo="Disponibilidade das salas de reunião"
+                      tema="claro"
+                      campoTitulo="salaNome"
+                      campoDataInicio="dataInicio"
+                      campoDataFim="dataFim"
+                      statusMap={STATUS_SALAS}
+                      statusFiltro={["confirmada"]}
+                    />
+                  </div>
                 </div>
 
                 {/* Ações Rápidas */}

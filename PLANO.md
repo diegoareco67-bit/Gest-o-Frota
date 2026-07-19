@@ -18,6 +18,7 @@ Lista de tarefas viva. Atualizar conforme o progresso — não é histórico con
 - ✅ **Rebrand FrotaGov → Hub concluído em 2026-07-19** (tela de login + Sidebar): nome/identidade visual do CLAUDE.md ("Nome Hub, subtítulo Central de Recursos Compartilhados") finalmente aplicado nas telas — antes só existia no documento. Ver seção "Rebrand FrotaGov → Hub" abaixo.
 - ✅ **Calendário público de Salas na tela de login, 2026-07-19** — pedido do usuário pra dar mais substância ao "hub" além do rebrand visual: a tela de login agora tem abas Veículos/Salas, ambas com dado real (não só o chip estático). Ver seção "Calendário público de Salas" abaixo.
 - ✅ **Etiqueta do veículo no calendário público passa a mostrar marca+modelo, 2026-07-19** — usuário notou que a etiqueta só mostrava a placa, sem dar pra identificar visualmente "a Chevrolet" ou "a Fiat Titano". Corrigido em `calendarioPublico` (campo novo `veiculoLabel`); Salas já mostrava `salaNome` (nome real), não precisou mudar.
+- ✅ **Dashboard do gestor ganhou o calendário de Salas também, 2026-07-19** — antes só tinha o de Veículos. Agora mostra os dois, empilhados, mesmo padrão do login/consulta.
 
 ### ✅ Infraestrutura de mock e2e corrigida em 2026-07-17 — causa real dos "80 testes falhando"
 
@@ -122,6 +123,14 @@ Depois de ver as duas abas funcionando, o usuário perguntou como diferenciar "a
 - `veiculoPlaca` continua gravado no mirror (não removido) — ainda é usado pelo `where("veiculoPlaca","==",...)` da checagem de conflito em `Solicitar.tsx`.
 - Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e**. Não deu pra confirmar visualmente com dado real em produção porque não há reserva ativa agora — calendário fica vazio até a próxima solicitação aprovada, mas a lógica foi conferida por tipo e pelos testes automatizados.
 - **Efeito colateral aceito:** mirrors antigos (criados antes desta mudança) não têm `veiculoLabel` — vão aparecer com etiqueta em branco até vencerem/serem substituídos por novas solicitações, que já nascem com o campo preenchido. Não corrigido retroativamente (são poucos registros transitórios, se auto-resolvem).
+
+### ✅ Calendário de Salas no dashboard do gestor — 2026-07-19
+
+Depois de ver os dois calendários funcionando na tela de login, o usuário mandou um print do dashboard interno do gestor (`gestor/Dashboard.tsx`) pedindo os dois ali também — até então só tinha "Calendário de Agendamentos" (só veículos, componente `Calendario.tsx`, que é diferente do `CalendarioGrade` usado nas outras telas: mostra os status reais da solicitação — Pendente/Aprovada/Em Uso/Concluída — lendo `solicitacoes` direto, sem precisar de mirror já que é área autenticada).
+
+- `gestor/Dashboard.tsx`: adicionado um segundo card abaixo do calendário de Veículos, com `CalendarioGrade colecao="reservasSalas"` — mesmo padrão já usado em `Salas.tsx` e `pages/consulta/Dashboard.tsx` (área autenticada lê a coleção real direto, não precisa do mirror público `calendarioPublicoSalas`, que é só pra tela de login sem login).
+- Título da seção existente renomeado pra "Calendário de Agendamentos — Veículos" (deixa explícito que é só frota, já que agora tem um segundo calendário logo abaixo).
+- Verificado: `tsc -b` sem erro, **141/141 Vitest**, **163/163 e2e**, e checagem visual — login mockado como gestor via `PLAYWRIGHT_TEST=1` no `npm run dev` (sem precisar de credencial real de produção) confirmando os dois calendários empilhados, sem sobreposição, painel de Ações Rápidas intacto.
 
 ### ✅ CI/CD via GitHub Actions — configurado e funcionando em 2026-07-19
 
