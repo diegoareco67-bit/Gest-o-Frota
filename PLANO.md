@@ -12,10 +12,15 @@ Após a auditoria de homologação (artifact publicado), correções por onda se
 - **`auditoria`**: create exige `usuarioId == request.auth.uid` (barra autoria forjada).
 - **`solicitacoesAcesso`**: guarda de forma no create (campos obrigatórios + tamanhos máximos).
 
-### ✅ Onda 1b — App Check no formulário público (reCAPTCHA v3, gratuito)
-- `src/firebase/config.ts` inicializa App Check com `ReCaptchaV3Provider`, **guardado** pela presença de `VITE_RECAPTCHA_SITE_KEY` — em dev/e2e (sem a chave) fica desligado, não quebra nada; em produção ativa quando o secret existir.
-- Env novo `VITE_RECAPTCHA_SITE_KEY` (`.env.example`, secret do GitHub Actions).
-- **Pendente de você (console):** gerar chave reCAPTCHA v3, registrar o app em App Check, habilitar enforcement em "monitorar" antes de forçar. Enquanto o secret não existir, a produção roda sem App Check (só com a guarda de forma da regra).
+### ✅ Onda 1b — App Check no formulário público (reCAPTCHA v3, gratuito) — CONCLUÍDO e FORÇADO em 2026-07-19
+- `src/firebase/config.ts` inicializa App Check com `ReCaptchaV3Provider`, guardado por `import.meta.env.PROD && VITE_RECAPTCHA_SITE_KEY` — **o guard de `PROD` é essencial**: sem ele, o servidor de e2e (Playwright, modo dev) enxergava o secret no CI e tentava atestar contra localhost, quebrando os testes (aconteceu no run #14, corrigido no #15).
+- Env `VITE_RECAPTCHA_SITE_KEY` configurado como secret do GitHub Actions; chave reCAPTCHA v3 registrada para os domínios `hubcge.web.app`, `gestaofrotacge530101.web.app` e `.firebaseapp.com`.
+- **App Check ativado e em enforcement em produção:** registrado no Firebase Console (chave secreta do reCAPTCHA v3), verificado no monitor (tráfego ao vivo ~100% verificado após o deploy), e **enforcement ligado ("Aplicada") em Cloud Firestore e Cloud Storage**. Confirmado com teste de fumaça: login em `hubcge.web.app` e telas com dados (Veículos, Dashboard) carregam normalmente com o enforcement ativo.
+- Authentication (App Check pré-lançamento) deixado em "Monitorando" de propósito — forçar o login traria risco por pouco ganho, já que dados/arquivos já estão protegidos.
+- Backend não é afetado: Cloud Function e deploy do CI usam Admin SDK / conta de serviço, que não passam pelo App Check.
+
+### ✅ URL de produção migrada para hubcge.web.app (2026-07-19)
+O app agora é servido em **`https://hubcge.web.app`** (site de hospedagem `hubcge` adicionado ao mesmo projeto — o ID do projeto Firebase `gestaofrotacge530101` é permanente e não pode ser renomeado). `firebase.json` virou array de hosting: deploy vai para os dois sites (o novo `hubcge` e o antigo `gestaofrotacge530101`, mantido para não quebrar links já divulgados). `hubcge.web.app` é a URL canônica dali em diante.
 
 ### ✅ Onda 2 — governança
 - **Perfil `auditor` novo** (`types.ts`, `AuthContext`, `RotaProtegida` aceita lista de perfis, `Sidebar`, `App.tsx`, `firestore.rules`) — só leitura de auditoria + relatórios, nenhuma escrita. Landing em `/auditor`.
