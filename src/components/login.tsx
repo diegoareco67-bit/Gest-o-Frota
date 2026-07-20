@@ -5,21 +5,16 @@ import { auth } from "../firebase/config";
 import { sendPasswordResetEmail, getMultiFactorResolver, TotpMultiFactorGenerator, type MultiFactorResolver } from "firebase/auth";
 import { CalendarioGrade } from "./CalendarioGrade";
 
-const MODULOS = [
-  { label:"Veículos", cor:"#1E3A8A", bg:"#EFF6FF", border:"#BFDBFE",
-    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
-  { label:"Salas", cor:"#7C3AED", bg:"#F5F3FF", border:"#DDD6FE",
-    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg> },
-  { label:"Equipamentos", cor:"#0891B2", bg:"#ECFEFF", border:"#A5F3FC",
-    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg> },
-  { label:"Indenização", cor:"#15803D", bg:"#F0FDF4", border:"#BBF7D0",
-    icone:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg> },
-];
-
 const STATUS_SALAS_PUBLICO = {
   confirmada: { cor:"#3B82F6", label:"Reservada" },
   cancelada:  { cor:"#94A3B8", label:"Cancelada" },
 };
+
+// Ícones das abas do calendário (SVG em currentColor — herdam a cor do botão).
+// Emoji de camionete (🛻) não existe na fonte do Windows 10, por isso usamos SVG.
+const IcoCalendarioAba = <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>;
+const IcoCamioneteAba = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 16V11h7l2-3h3v3h8v5M2 16h20"/><circle cx="6.5" cy="18.5" r="2.3"/><circle cx="17.5" cy="18.5" r="2.3"/></svg>;
+const IcoPortaAba = <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg>;
 
 export default function Login() {
   const {login}  = useAuth();
@@ -104,16 +99,6 @@ export default function Login() {
         </div>
         <div style={{fontSize:24,fontWeight:900,color:"#0F172A",letterSpacing:-0.5,marginBottom:2}}>Hub</div>
         <div style={{fontSize:11,color:"#64748B",marginBottom:16,textAlign:"center"}}>Central de Recursos Compartilhados</div>
-
-        {/* Vitrine de módulos */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,width:"100%",marginBottom:20}}>
-          {MODULOS.map(m=>(
-            <div key={m.label} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 8px",borderRadius:8,background:m.bg,border:`1px solid ${m.border}`}}>
-              <span style={{color:m.cor,display:"flex",flexShrink:0}} aria-hidden="true">{m.icone}</span>
-              <span style={{fontSize:10.5,fontWeight:700,color:m.cor,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.label}</span>
-            </div>
-          ))}
-        </div>
 
         {/* Card */}
         <div style={{width:"100%",border:"1px solid #E2E8F0",borderRadius:12,padding:"20px 18px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",marginBottom:12}}>
@@ -265,18 +250,21 @@ export default function Login() {
           <text x="110" y="129" textAnchor="middle" fill="white" fontSize="11.5" fontFamily="Arial, sans-serif" fontWeight="400">de Mato Grosso do Sul</text>
         </svg>
         <div style={{flex:1,padding:"40px 48px",overflowY:"auto",position:"relative",zIndex:1}}>
-          <div style={{display:"flex",gap:8,marginBottom:18}} role="tablist" aria-label="Selecionar calendário público">
+          <div style={{display:"flex",gap:10,marginBottom:20}} role="tablist" aria-label="Selecionar calendário público">
             {(["veiculos","salas"] as const).map(aba=>(
               <button key={aba} type="button" role="tab" aria-selected={abaCalendario===aba}
                 onClick={()=>setAbaCalendario(aba)}
                 style={{
-                  padding:"8px 18px",borderRadius:999,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                  display:"flex",alignItems:"center",gap:8,
+                  padding:"12px 22px",borderRadius:14,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
                   border: abaCalendario===aba ? "1px solid #fff" : "1px solid rgba(255,255,255,0.14)",
                   background: abaCalendario===aba ? "#fff" : "rgba(255,255,255,0.07)",
                   color: abaCalendario===aba ? "#0F172A" : "rgba(255,255,255,0.65)",
                   transition:"background 0.15s, color 0.15s",
                 }}>
-                {aba==="veiculos" ? "🚚 Veículos" : "🚪 Salas"}
+                <span style={{display:"flex"}}>{IcoCalendarioAba}</span>
+                <span style={{display:"flex"}}>{aba==="veiculos" ? IcoCamioneteAba : IcoPortaAba}</span>
+                {aba==="veiculos" ? "Veículos" : "Salas"}
               </button>
             ))}
           </div>
