@@ -10,11 +10,10 @@ const STATUS_SALAS_PUBLICO = {
   cancelada:  { cor:"#94A3B8", label:"Cancelada" },
 };
 
-// Ícones das abas do calendário (SVG em currentColor — herdam a cor do botão).
-// Emoji de veículo pode não existir na fonte do Windows 10, por isso usamos ícone SVG.
+// Ícone de calendário das abas (SVG em currentColor — herda a cor do botão).
+// O ícone do modelo usa emoji colorido: 🚗 e 🚪 são emojis antigos, suportados no
+// Windows 10 (o tofu só acontecia com 🛻, recente). Ver memória win10-emoji-tofu.
 const IcoCalendarioAba = <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>;
-const IcoCarroAba = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>;
-const IcoPortaAba = <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg>;
 
 export default function Login() {
   const {login}  = useAuth();
@@ -263,7 +262,7 @@ export default function Login() {
                   transition:"background 0.15s, color 0.15s",
                 }}>
                 <span style={{display:"flex"}}>{IcoCalendarioAba}</span>
-                <span style={{display:"flex"}}>{aba==="veiculos" ? IcoCarroAba : IcoPortaAba}</span>
+                <span aria-hidden="true" style={{fontSize:19,lineHeight:1}}>{aba==="veiculos" ? "🚗" : "🚪"}</span>
                 {aba==="veiculos" ? "Veículos" : "Salas"}
               </button>
             ))}
