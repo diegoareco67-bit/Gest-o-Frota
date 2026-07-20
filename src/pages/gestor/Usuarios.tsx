@@ -2,8 +2,9 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { ModalConfirm } from "../../components/ModalConfirm";
 import { useEffect, useState } from "react";
 import { collection, getDocs, setDoc, updateDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
-import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../../firebase/config";
+import { criarContaSemTrocarSessao } from "../../firebase/criarConta";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSetores } from "../../hooks/useSetores";
@@ -83,11 +84,12 @@ export default function Usuarios() {
     setAprovando(true);
     try {
       const senha = Math.random().toString(36).slice(-8) + "Aa1!";
-      const cred = await createUserWithEmailAndPassword(auth, editForm.email, senha);
+      // Cria a conta numa instância secundária para NÃO deslogar o gestor.
+      const novoUid = await criarContaSemTrocarSessao(editForm.email, senha);
       // IMPORTANTE: usar setDoc com o UID como ID do documento para que
       // AuthContext e as Security Rules possam buscar por getDoc(doc(db,"usuarios",uid))
-      await setDoc(doc(db, "usuarios", cred.user.uid), {
-        uid: cred.user.uid,
+      await setDoc(doc(db, "usuarios", novoUid), {
+        uid: novoUid,
         nome: editForm.nomeCompleto,
         email: editForm.email,
         perfil: "usuario",
@@ -127,9 +129,10 @@ export default function Usuarios() {
       // A conta é criada e um e-mail de definição de senha é enviado — mesmo padrão
       // seguro já usado na aprovação de solicitação de acesso (unificado em 2026-07-19).
       const senhaDescartavel = Math.random().toString(36).slice(-10) + "Aa1!";
-      const cred = await createUserWithEmailAndPassword(auth, form.email, senhaDescartavel);
-      await setDoc(doc(db, "usuarios", cred.user.uid), {
-        uid: cred.user.uid, nome: form.nome, email: form.email, perfil: form.perfil,
+      // Cria a conta numa instância secundária para NÃO deslogar o gestor.
+      const novoUid = await criarContaSemTrocarSessao(form.email, senhaDescartavel);
+      await setDoc(doc(db, "usuarios", novoUid), {
+        uid: novoUid, nome: form.nome, email: form.email, perfil: form.perfil,
         setor: form.setor, matricula: form.matricula, ativo: true, criadoEm: serverTimestamp(),
       });
       await sendPasswordResetEmail(auth, form.email);

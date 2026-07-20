@@ -28,6 +28,8 @@ vi.mock("firebase/auth", () => ({
   getAuth: vi.fn(() => ({})),
 }));
 vi.mock("../firebase/config", () => ({ db: {}, auth: {} }));
+// Criação de conta é feita por um helper (instância secundária, não desloga o gestor).
+vi.mock("../firebase/criarConta", () => ({ criarContaSemTrocarSessao: vi.fn() }));
 vi.mock("../contexts/AuthContext");
 // useSetores tem sua própria chamada getDocs assíncrona (coleção "setores");
 // mockada diretamente para não depender da ordem de resolução dos getDocs deste teste.
@@ -39,7 +41,7 @@ vi.mock("../hooks/useSetores", () => ({
 }));
 
 import { getDocs, setDoc, updateDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { criarContaSemTrocarSessao } from "../firebase/criarConta";
 import Usuarios from "../pages/gestor/Usuarios";
 
 function mkSnap(items: Array<{ id: string; data: Record<string, unknown> }>) {
@@ -112,7 +114,7 @@ describe("Usuarios — modal Novo Usuário", () => {
     );
     vi.mocked(getDocs)
       .mockResolvedValue(mkSnap(usuarios) as any);
-    vi.mocked(createUserWithEmailAndPassword).mockResolvedValue({ user: { uid: "new-uid" } } as any);
+    vi.mocked(criarContaSemTrocarSessao).mockResolvedValue("new-uid");
     vi.mocked(setDoc).mockResolvedValue(undefined);
   });
 
@@ -159,7 +161,7 @@ describe("Usuarios — modal Novo Usuário", () => {
     });
   });
 
-  it("preencher e cadastrar chama createUserWithEmailAndPassword", async () => {
+  it("preencher e cadastrar cria a conta sem trocar a sessão do gestor", async () => {
     renderUsuarios();
     const btnNovo = await screen.findByRole("button", { name: /novo usuário/i });
     await userEvent.click(btnNovo);
@@ -174,8 +176,7 @@ describe("Usuarios — modal Novo Usuário", () => {
     await userEvent.click(screen.getByRole("button", { name: /^cadastrar$/i }));
 
     await waitFor(() => {
-      expect(vi.mocked(createUserWithEmailAndPassword)).toHaveBeenCalledWith(
-        expect.anything(),
+      expect(vi.mocked(criarContaSemTrocarSessao)).toHaveBeenCalledWith(
         "pedro@cge.ms.gov.br",
         expect.any(String)
       );

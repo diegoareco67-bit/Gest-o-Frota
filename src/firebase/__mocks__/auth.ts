@@ -59,7 +59,15 @@ export function sendEmailVerification(_user: unknown) {
 export function createUserWithEmailAndPassword(_auth: unknown, email: string, _password: string) {
   const uid = "uid-new-" + Math.random().toString(36).slice(2, 8);
   const user: MockUser = { uid, email };
+  // Não chama notificar(): criar conta não pode trocar a sessão atual (do gestor).
   return Promise.resolve({ user });
+}
+
+// Instância secundária de Auth (usada por criarConta.ts para criar usuários sem
+// deslogar o gestor). No mock devolvemos o mesmo objeto — createUser não muda a sessão.
+export const inMemoryPersistence = { type: "NONE" };
+export function initializeAuth(_app: unknown, _opts?: unknown) {
+  return authObj;
 }
 
 export function sendPasswordResetEmail(_auth: unknown, _email: string) {
