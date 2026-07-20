@@ -1,4 +1,5 @@
 import { useState } from "react";
+import QRCode from "qrcode";
 import { multiFactor, TotpMultiFactorGenerator, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
@@ -16,6 +17,7 @@ export default function Seguranca() {
   const [jaAtivo, setJaAtivo] = useState(() => auth.currentUser ? multiFactor(auth.currentUser).enrolledFactors.length > 0 : false);
   const [etapa, setEtapa] = useState<"inicio" | "codigo">("inicio");
   const [segredo, setSegredo] = useState<SegredoTotp | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState("");
   const [codigo, setCodigo] = useState("");
   const [processando, setProcessando] = useState(false);
   const [erro, setErro] = useState("");
@@ -40,6 +42,10 @@ export default function Seguranca() {
       const session = await multiFactor(auth.currentUser!).getSession();
       const totp = await TotpMultiFactorGenerator.generateSecret(session) as unknown as SegredoTotp;
       setSegredo(totp);
+      try {
+        const otpauth = totp.generateQrCodeUrl(usuario?.email || "conta", "Hub CGE-MS");
+        setQrDataUrl(await QRCode.toDataURL(otpauth, { width: 200, margin: 1 }));
+      } catch { setQrDataUrl(""); /* sem QR: cai no modo chave manual */ }
       setEtapa("codigo");
     } catch (e: unknown) {
       const c = (e as { code?: string }).code ?? "";
@@ -121,9 +127,14 @@ export default function Seguranca() {
               </div>
             ) : (
               <div>
-                <p style={s.texto}><strong>1.</strong> No seu aplicativo autenticador, adicione uma conta e informe manualmente esta chave:</p>
-                <div style={s.chave}>{segredo?.secretKey}</div>
-                <p style={s.textoPequeno}>Ou use o link/QR (otpauth): <span style={{ wordBreak: "break-all", color: "#5A7A9A" }}>{segredo?.generateQrCodeUrl(usuario?.email || "conta", "Hub CGE-MS")}</span></p>
+                <p style={s.texto}><strong>1.</strong> Escaneie o QR code abaixo com seu aplicativo autenticador (Google Authenticator, Microsoft Authenticator, etc.):</p>
+                {qrDataUrl && (
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
+                    <img src={qrDataUrl} alt="QR code para configurar o 2FA no aplicativo autenticador" width={200} height={200} style={{ border: "1px solid #E1EAF5", borderRadius: 8, padding: 8, background: "#fff" }} />
+                  </div>
+                )}
+                <p style={s.textoPequeno}>Não consegue escanear? Adicione uma conta manualmente com esta chave:</p>
+                <div style={{ ...s.chave, marginTop: 6 }}>{segredo?.secretKey}</div>
                 <p style={{ ...s.texto, marginTop: 14 }}><strong>2.</strong> Digite o código de 6 dígitos que o aplicativo mostrar:</p>
                 <input value={codigo} onChange={e => { setCodigo(e.target.value.replace(/\D/g, "").slice(0, 6)); setErro(""); }}
                   inputMode="numeric" placeholder="000000" aria-label="Código de verificação"
