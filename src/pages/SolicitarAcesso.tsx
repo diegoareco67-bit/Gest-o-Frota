@@ -65,7 +65,7 @@ export default function SolicitarAcesso() {
       <div style={{ ...s.card, maxWidth:560, textAlign:"left" }}>
         <div style={{ textAlign:"center", marginBottom:"1.5rem" }}>
           <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:56, height:56, borderRadius:"50%", background:"#dbeafe", marginBottom:12 }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><path d="M2 16V11h7l2-3h3v3h8v5M2 16h20"/><circle cx="6.5" cy="18.5" r="2.3"/><circle cx="17.5" cy="18.5" r="2.3"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
           </div>
           <h1 style={s.titulo}>Solicitação de Acesso</h1>
           <p style={{ fontSize:12, color:"#7A95B2", margin:0 }}>

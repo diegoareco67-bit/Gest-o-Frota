@@ -20,7 +20,7 @@ interface Resumo { totalVeiculos:number; disponiveis:number; emUso:number; manut
 
 const REPORT_CARDS = [
   {id:"frota",    title:"Utilização da Frota",    sub:"Análise de uso dos veículos",     cor:"#1E3A8A", bgIco:"#dbeafe",
-    ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><path d="M2 16V11h7l2-3h3v3h8v5M2 16h20"/><circle cx="6.5" cy="18.5" r="2.3"/><circle cx="17.5" cy="18.5" r="2.3"/></svg>},
+    ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>},
   {id:"manut",    title:"Manutenções",             sub:"Histórico de manutenções",        cor:"#D97706", bgIco:"#fef9c3",
     ico:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>},
   {id:"solic",    title:"Solicitações",            sub:"Solicitações por período",        cor:"#0891B2", bgIco:"#cffafe",
