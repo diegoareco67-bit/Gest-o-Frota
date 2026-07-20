@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { multiFactor, TotpMultiFactorGenerator } from "firebase/auth";
+import { multiFactor, TotpMultiFactorGenerator, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
@@ -20,6 +20,19 @@ export default function Seguranca() {
   const [processando, setProcessando] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
+  // MFA exige e-mail verificado — contas criadas por senha não vêm verificadas.
+  const emailVerificado = auth.currentUser?.emailVerified ?? false;
+  const [verifEnviado, setVerifEnviado] = useState(false);
+
+  async function enviarVerificacao() {
+    setErro(""); setProcessando(true);
+    try {
+      if (auth.currentUser) await sendEmailVerification(auth.currentUser);
+      setVerifEnviado(true);
+    } catch {
+      setErro("Não foi possível enviar o e-mail de verificação. Tente novamente.");
+    } finally { setProcessando(false); }
+  }
 
   async function iniciar() {
     setErro(""); setProcessando(true);
@@ -91,7 +104,20 @@ export default function Seguranca() {
             ) : etapa === "inicio" ? (
               <div>
                 <p style={s.texto}>A verificação em duas etapas adiciona uma camada extra de segurança: além da senha, o login passa a exigir um código temporário de um aplicativo autenticador (Google Authenticator, Microsoft Authenticator, etc.). Recomendado para o perfil de gestor.</p>
-                <button onClick={iniciar} disabled={processando} style={s.btnPrimario}>{processando ? "Preparando..." : "Ativar verificação em duas etapas"}</button>
+                {emailVerificado ? (
+                  <button onClick={iniciar} disabled={processando} style={s.btnPrimario}>{processando ? "Preparando..." : "Ativar verificação em duas etapas"}</button>
+                ) : verifEnviado ? (
+                  <div style={{ ...s.texto, background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: "12px 14px", color: "#1e40af", marginBottom: 0 }}>
+                    📧 E-mail de verificação enviado para <strong>{usuario?.email}</strong>. Clique no link do e-mail e depois <strong>recarregue esta página</strong> para ativar o 2FA.
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ ...s.texto, background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 14px", color: "#854d0e" }}>
+                      Para ativar o 2FA, seu e-mail (<strong>{usuario?.email}</strong>) precisa estar verificado. Envie o e-mail de verificação, clique no link e volte aqui.
+                    </div>
+                    <button onClick={enviarVerificacao} disabled={processando} style={s.btnPrimario}>{processando ? "Enviando..." : "Enviar e-mail de verificação"}</button>
+                  </div>
+                )}
               </div>
             ) : (
               <div>

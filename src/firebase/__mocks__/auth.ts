@@ -3,6 +3,7 @@ type Listener = (user: MockUser | null) => void;
 interface MockUser {
   uid: string;
   email: string;
+  emailVerified?: boolean;
 }
 
 const STORAGE_KEY = "__frotagov_mock_auth__";
@@ -46,9 +47,13 @@ export function signInWithEmailAndPassword(_auth: unknown, email: string, passwo
     : email.includes("auditor") ? "uid-auditor-teste"
     : email.includes("outro") ? "uid-outro-servidor"
     : "uid-usuario-teste";
-  const user: MockUser = { uid, email };
+  const user: MockUser = { uid, email, emailVerified: true };
   notificar(user);
   return Promise.resolve({ user });
+}
+
+export function sendEmailVerification(_user: unknown) {
+  return Promise.resolve();
 }
 
 export function createUserWithEmailAndPassword(_auth: unknown, email: string, _password: string) {
