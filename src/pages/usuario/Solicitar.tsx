@@ -101,6 +101,7 @@ export default function Solicitar() {
         dataSaida: form.dataSaida,
         dataRetorno: form.dataRetorno,
         status: "pendente",
+        condutorId: usuario?.uid,
       });
       setProtocoloGerado(protocolo);
       setSucesso(true);

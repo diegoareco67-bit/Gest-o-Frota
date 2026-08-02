@@ -72,6 +72,7 @@ export default function Salas() {
       // Mirror não-sensível pra exibição pública na tela de login (LGPD: sem responsavelNome/motivo)
       await setDoc(doc(db, "calendarioPublicoSalas", novaReserva.id), {
         salaNome: sala?.nome || "", dataInicio, dataFim, status: "confirmada",
+        responsavelId: usuario?.uid,
       });
       await registrarAuditoria("reservar_sala", usuario?.uid || "", usuario?.nome || "", {
         reservaId: novaReserva.id, salaNome: sala?.nome, dataInicio, dataFim,

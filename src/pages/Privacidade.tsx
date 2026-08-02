@@ -47,15 +47,16 @@ export default function Privacidade() {
         </Secao>
 
         <Secao titulo="Retenção e anonimização">
-          Os dados são mantidos pelo tempo necessário ao cumprimento das finalidades acima e às
-          obrigações de prestação de contas do órgão. Como parâmetros de referência (a serem
-          confirmados pela gestão documental do órgão, conforme a tabela de temporalidade
-          aplicável): registros de solicitação/uso de veículos, reservas de salas e equipamentos
-          por até 5 anos; boletins de indenização de transporte pelo prazo da legislação de
-          prestação de contas; contas de usuário podem ter seus dados pessoais anonimizados após
-          período de inatividade. A trilha de auditoria é mantida de forma imutável para fins de
-          rastreabilidade. Encerrado o prazo, os dados pessoais são anonimizados, preservando-se
-          apenas registros não identificáveis quando exigidos por lei.
+          Enquanto a conta do servidor estiver ativa, os dados pessoais são mantidos pelo tempo
+          necessário ao cumprimento das finalidades acima. Após a inativação da conta (desligamento,
+          transferência ou fim de vínculo), os registros de solicitação/uso de veículos, reservas de
+          salas e equipamentos, e boletins de indenização de transporte são mantidos por até 5
+          (cinco) anos, conforme a Tabela de Temporalidade de Documentos das Atividades-Meio do Poder
+          Executivo Estadual (Decreto Estadual nº 15.721/2021, Anexo III). Findo esse prazo, os dados
+          pessoais são anonimizados, preservando-se apenas o identificador técnico e o perfil de
+          acesso para a trilha de auditoria, que é mantida de forma imutável para fins de
+          rastreabilidade e não se sujeita a prazo adicional de guarda como dado pessoal, por não
+          mais identificar o titular.
         </Secao>
 
         <Secao titulo="Direitos do titular">

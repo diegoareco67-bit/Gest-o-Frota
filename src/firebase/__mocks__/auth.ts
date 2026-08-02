@@ -46,6 +46,7 @@ export function signInWithEmailAndPassword(_auth: unknown, email: string, passwo
     : email.includes("consulta") ? "uid-consulta-teste"
     : email.includes("auditor") ? "uid-auditor-teste"
     : email.includes("outro") ? "uid-outro-servidor"
+    : email.includes("terceiro") ? "uid-terceiro-servidor"
     : "uid-usuario-teste";
   const user: MockUser = { uid, email, emailVerified: true };
   notificar(user);

@@ -80,7 +80,7 @@ Nome **Hub**, subtítulo "Central de Recursos Compartilhados". Visual minimalist
 
 ## Legislação aplicável
 
-Lei Federal nº 13.709/2018 (LGPD) · Lei nº 12.527/2011 (Lei de Acesso à Informação) · Decreto Estadual nº 10.154/2000 (Indenização de Transporte) · Decreto Estadual nº 15.572/2020 (LGPD no Poder Executivo de MS) · Política Estadual de Segurança da Informação.
+Lei Federal nº 13.709/2018 (LGPD) · Lei nº 12.527/2011 (Lei de Acesso à Informação) · Decreto Estadual nº 10.154/2000 (Indenização de Transporte) · Decreto Estadual nº 15.572/2020 (LGPD no Poder Executivo de MS) · Política Estadual de Segurança da Informação · Decreto Estadual nº 15.721/2021 (Plano de Classificação e Tabela de Temporalidade de Documentos das Atividades-Meio do Executivo — base dos prazos de retenção/anonimização usados no Hub) · Resolução CGE/MS nº 133/2025 (Política de Privacidade e Proteção de Dados Pessoais da CGE/MS — referência de base legal, não vincula diretamente o Hub por ser de outro órgão, mas usada como parâmetro).
 
 ## Onde está o plano de fases
 

@@ -95,6 +95,7 @@ export default function Aprovacoes() {
         dataSaida:    sol?.dataSaida   ?? "",
         dataRetorno:  sol?.dataRetorno ?? "",
         status: "aprovada",
+        condutorId: sol?.condutorId ?? "",
       });
       setSolicitacoes(p => p.map(s => s.id === id ? { ...s, status: "aprovada" } : s));
       await registrarAuditoria("aprovar_solicitacao", usuario?.uid || "", usuario?.nome || "", {

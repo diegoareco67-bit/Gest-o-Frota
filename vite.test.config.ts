@@ -8,6 +8,7 @@ export default defineConfig({
     alias: [
       { find: /^firebase\/auth$/,      replacement: resolve(__dirname, "src/firebase/__mocks__/auth.ts") },
       { find: /^firebase\/firestore$/, replacement: resolve(__dirname, "src/firebase/__mocks__/firestore.ts") },
+      { find: /^firebase\/storage$/,   replacement: resolve(__dirname, "src/firebase/__mocks__/storage.ts") },
     ],
   },
 });

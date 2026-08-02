@@ -97,7 +97,7 @@ const ICO_COLORS: Record<IcoKey, string> = {
   lock:      "#FCA5A5",
 };
 
-interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; pendentes?:number; }
+interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; }
 
 export function Sidebar({perfil}: SidebarProps) {
   const {usuario, logout} = useAuth();

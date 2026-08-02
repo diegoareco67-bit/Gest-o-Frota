@@ -84,22 +84,31 @@ service cloud.firestore {
 
     // ─── calendarioPublico ────────────────────────────────────────────────
     // Coleção com apenas campos não-sensíveis para exibição pública.
-    // Campos: veiculoPlaca, dataSaida, dataRetorno, status (sem condutorNome, destino, motivo).
-    // Leitura livre a qualquer pessoa (inclusive perfil consulta). Escrita por quem opera a
-    // frota — inclui o próprio usuario ao criar uma solicitação (Solicitar.tsx espelha o
-    // registro como "pendente" na hora, não só o gestor na aprovação).
+    // Campos: veiculoPlaca, dataSaida, dataRetorno, status, condutorId (sem condutorNome,
+    // destino, motivo — condutorId não é PII, é só o uid usado para escopar a escrita).
+    // Leitura livre a qualquer pessoa (inclusive perfil consulta). Escrita: gestor tem acesso
+    // total; usuario só pode escrever/apagar o próprio evento (dono da solicitação) — fechado
+    // em 2026-08-02, antes qualquer usuario podia alterar/apagar o evento de outro (vandalismo
+    // no calendário público, sem exposição de dado sensível).
     match /calendarioPublico/{id} {
       allow read: if true;
-      allow write: if isGestor() || isUsuario();
+      allow create: if isGestor()
+        || (isUsuario() && request.resource.data.condutorId == request.auth.uid);
+      allow update, delete: if isGestor()
+        || (isUsuario() && resource.data.condutorId == request.auth.uid);
     }
 
     // ─── calendarioPublicoSalas ─────────────────────────────────────────────
     // Mesmo padrão de 'calendarioPublico', mirror não-sensível de 'reservasSalas'
     // pra exibir o calendário de salas também na tela de login (pré-autenticação).
-    // Campos: salaNome, dataInicio, dataFim, status (sem responsavelNome, motivo).
+    // Campos: salaNome, dataInicio, dataFim, status, responsavelId (sem responsavelNome, motivo).
+    // Mesma correção de escopo de escrita de 2026-08-02.
     match /calendarioPublicoSalas/{id} {
       allow read: if true;
-      allow write: if isGestor() || isUsuario();
+      allow create: if isGestor()
+        || (isUsuario() && request.resource.data.responsavelId == request.auth.uid);
+      allow update, delete: if isGestor()
+        || (isUsuario() && resource.data.responsavelId == request.auth.uid);
     }
 
     // ─── solicitacoes ──────────────────────────────────────────────────────
