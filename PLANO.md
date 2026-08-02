@@ -2,6 +2,18 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
+## ✅ Uso real em produção — "e-mail de solicitação de acesso não chega" investigado (2026-08-02)
+
+Usuário testou `/solicitar-acesso` em produção como um servidor externo simulado, duas vezes, e o e-mail nunca chegou. **Não é bug** — é comportamento por design mal comunicado: `SolicitarAcesso.tsx` só grava o documento em `solicitacoesAcesso` (status `"pendente"`); nenhum e-mail é disparado nesse momento. O e-mail (`sendPasswordResetEmail`) só é enviado quando um **gestor aprova** a solicitação em `gestor/Usuarios.tsx` — como ninguém aprovou as duas solicitações de teste, era esperado que nada chegasse. A tela de sucesso já mencionava isso, mas de forma discreta.
+
+Erro relatado à parte ("Algo deu errado", ErrorBoundary) na primeira tentativa: não encontrada nenhuma falha de código na página (o hook `useSetores` já trata erro sem quebrar a UI); avaliado como provável chunk JS desatualizado no cache do navegador logo após deploy (code-splitting por rota) — resolvido com o refresh que o usuário já fez, sem necessidade de mudança de código.
+
+Correções aplicadas:
+- **`src/pages/SolicitarAcesso.tsx`**: tela de sucesso reescrita para deixar explícito que "nenhum e-mail é enviado agora" e que o envio só ocorre após aprovação do gestor, com aviso pra checar a caixa de spam.
+- **Cooldown de 24h contra reenvio repetido** (client-side, via `localStorage` — não dá pra checar duplicata no servidor sem abrir leitura pública de `solicitacoesAcesso`, o que vazaria CNH/matrícula de outros solicitantes): após um envio bem-sucedido, uma nova visita a `/solicitar-acesso` no mesmo navegador mostra a tela de sucesso de novo (com aviso do prazo restante) em vez do formulário, até o cooldown expirar. Não é à prova de burla (limpar o localStorage libera de novo), mas resolve o caso de uso real — clicar "enviar" várias vezes achando que não funcionou.
+- Novo `e2e/solicitar-acesso.spec.ts` (3 testes): envio + texto da tela de sucesso, bloqueio dentro do cooldown, liberação após cooldown expirado.
+- Verificado: `tsc -b` limpo, **190 e2e** (187 + 3 novos), lint limpo.
+
 ## Rumo a 100% — fechamento das ressalvas (2026-07-19)
 
 Após o parecer "Apto com ressalvas", o usuário pediu para fechar todas as ressalvas restantes. Feito por ondas:

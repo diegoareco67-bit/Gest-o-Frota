@@ -4,12 +4,35 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useSetores } from "../hooks/useSetores";
 
+// Cooldown client-side entre solicitações — a coleção solicitacoesAcesso só pode ser lida
+// pelo gestor (LGPD/App Check), então não dá pra checar duplicata no servidor sem abrir
+// leitura pública. Um cooldown local evita o caso comum de "não chegou e-mail, deixa eu
+// mandar de novo" (o e-mail só chega depois da aprovação do gestor, nunca na hora do envio).
+const CHAVE_COOLDOWN = "hub_ultima_solicitacao_acesso";
+const COOLDOWN_HORAS = 24;
+
+function lerUltimaSolicitacao(): { email: string; ts: number } | null {
+  try {
+    const bruto = localStorage.getItem(CHAVE_COOLDOWN);
+    return bruto ? JSON.parse(bruto) : null;
+  } catch { return null; }
+}
+
+function emCooldown(): { ativo: boolean; email?: string; horasRestantes?: number } {
+  const ultima = lerUltimaSolicitacao();
+  if (!ultima) return { ativo: false };
+  const horasPassadas = (Date.now() - ultima.ts) / (1000 * 60 * 60);
+  if (horasPassadas >= COOLDOWN_HORAS) return { ativo: false };
+  return { ativo: true, email: ultima.email, horasRestantes: Math.ceil(COOLDOWN_HORAS - horasPassadas) };
+}
+
 export default function SolicitarAcesso() {
   const navigate = useNavigate();
   const setores = useSetores();
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState("");
+  const cooldown = emCooldown();
   const [form, setForm] = useState({
     nomeCompleto: "",
     email: "",
@@ -37,6 +60,7 @@ export default function SolicitarAcesso() {
         status: "pendente",
         criadoEm: serverTimestamp(),
       });
+      localStorage.setItem(CHAVE_COOLDOWN, JSON.stringify({ email: form.email, ts: Date.now() }));
       setSucesso(true);
     } catch (err) {
       console.error(err);
@@ -46,19 +70,31 @@ export default function SolicitarAcesso() {
     }
   }
 
-  if (sucesso) return (
-    <div style={s.page}>
-      <div style={{ ...s.card, textAlign:"center" }}>
-        <div style={{ fontSize:56, marginBottom:16 }}>✅</div>
-        <h2 style={s.titulo}>Solicitação Enviada!</h2>
-        <p style={{ color:"#5A7A9A", fontSize:14, lineHeight:1.6, marginBottom:24 }}>
-          Sua solicitação foi enviada ao gestor da Controladoria-Geral do Estado de MS.<br/><br/>
-          Após análise e aprovação, você receberá um e-mail em <strong>{form.email}</strong> com seus dados de acesso ao sistema.
-        </p>
-        <button onClick={() => navigate("/login")} style={s.btnPrimario}>Voltar ao Login</button>
+  if (sucesso || cooldown.ativo) {
+    const emailExibido = sucesso ? form.email : cooldown.email;
+    return (
+      <div style={s.page}>
+        <div style={{ ...s.card, textAlign:"center" }}>
+          <div style={{ fontSize:56, marginBottom:16 }}>✅</div>
+          <h2 style={s.titulo}>Solicitação Enviada!</h2>
+          <p style={{ color:"#5A7A9A", fontSize:14, lineHeight:1.6, marginBottom:16 }}>
+            Sua solicitação foi enviada ao gestor da Controladoria-Geral do Estado de MS.<br/><br/>
+            <strong>Nenhum e-mail é enviado agora.</strong> O e-mail com os dados de acesso só é disparado
+            depois que um gestor analisar e <strong>aprovar</strong> a solicitação — isso pode levar algum
+            tempo, não é automático. Quando chegar, será para <strong>{emailExibido}</strong> (confira também
+            a caixa de spam/lixo eletrônico).
+          </p>
+          {!sucesso && cooldown.horasRestantes !== undefined && (
+            <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#1e40af", marginBottom:16 }}>
+              Você já enviou uma solicitação recentemente. Se precisar enviar outra, aguarde
+              cerca de {cooldown.horasRestantes}h ou entre em contato com o gestor diretamente.
+            </div>
+          )}
+          <button onClick={() => navigate("/login")} style={s.btnPrimario}>Voltar ao Login</button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div style={s.page}>
