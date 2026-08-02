@@ -70,7 +70,7 @@ describe("Solicitar — renderização", () => {
     renderSolicitar();
     await within(screen.getByRole("main")).findByText("Nova Solicitação", { exact: true });
     const select = screen.getByRole("combobox");
-    expect(select.textContent).toContain("ABC-1234");
+    await waitFor(() => expect(select.textContent).toContain("ABC-1234"));
   });
 
   it("exibe campo de Destino", async () => {
