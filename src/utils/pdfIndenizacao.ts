@@ -1,7 +1,14 @@
 import { jsPDF } from "jspdf";
 
 const AZUL: [number, number, number] = [30, 58, 138];
-const VALOR_KM = 0.8; // Decreto 10.154/2000, redação do Decreto nº 12.606/2008
+
+// Valor de fallback quando o doc configuracoes/indenizacao não existe/não carrega.
+// O valor real, editável pelo gestor sem precisar de deploy (tela Configurações),
+// vem de configuracoes/indenizacao (ver useConfiguracaoIndenizacao). Decreto
+// 10.154/2000, redação vigente do Decreto nº 12.606/2008 no momento em que este
+// fallback foi fixado — se o decreto for reajustado de novo, o valor certo é
+// atualizar configuracoes/indenizacao pela UI, não este número.
+export const VALOR_KM_PADRAO = 0.8;
 
 export async function calcularHashSHA256(blob: Blob): Promise<string> {
   const buffer = await blob.arrayBuffer();
@@ -195,13 +202,13 @@ export interface DadosAnexoII {
   totalKmRodados: number;
 }
 
-export function calcularValor(totalKmRodados: number): number {
-  return Math.round(totalKmRodados * VALOR_KM * 100) / 100;
+export function calcularValor(totalKmRodados: number, valorPorKm: number = VALOR_KM_PADRAO): number {
+  return Math.round(totalKmRodados * valorPorKm * 100) / 100;
 }
 
-export function gerarPdfAnexoII(d: DadosAnexoII): Blob {
+export function gerarPdfAnexoII(d: DadosAnexoII, valorPorKm: number = VALOR_KM_PADRAO): Blob {
   const doc = new jsPDF();
-  const valor = calcularValor(d.totalKmRodados);
+  const valor = calcularValor(d.totalKmRodados, valorPorKm);
 
   cabecalho(doc, "ANEXO II — Decreto Estadual nº 10.154, de 6 de dezembro de 2000", "Boletim Demonstrativo de Viagem e Homologação da Indenização de Despesas de Transporte");
 
@@ -283,7 +290,7 @@ export function gerarPdfAnexoII(d: DadosAnexoII): Blob {
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.text(`${d.totalKmRodados} km × R$ ${VALOR_KM.toFixed(2).replace(".", ",")} = R$ ${valor.toFixed(2).replace(".", ",")}`, 14, y);
+  doc.text(`${d.totalKmRodados} km × R$ ${valorPorKm.toFixed(2).replace(".", ",")} = R$ ${valor.toFixed(2).replace(".", ",")}`, 14, y);
   y += 8;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);

@@ -6,12 +6,14 @@ import { db, storage } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
+import { useConfiguracaoIndenizacao } from "../../hooks/useConfiguracaoIndenizacao";
 import { gerarPdfAnexoII, calcularHashSHA256, calcularValor, type TrajetoLinha } from "../../utils/pdfIndenizacao";
 
 interface VeiculoProprio { id: string; placa: string; status: string; }
 interface Indenizacao {
   id: string; protocolo: string; servidorId: string; veiculoPlaca: string;
   servicoARealizar: string; localidadesServico: string; totalKmRodados: number;
+  valorTotal?: number;
   status: string; pdfUrl: string; criadoEm?: { toDate: () => Date };
 }
 
@@ -27,6 +29,7 @@ const TRAJETO_VAZIO: TrajetoLinha = { data: "", odometroInicial: "", trajetoPerc
 
 export default function Indenizacoes() {
   const { usuario } = useAuth();
+  const { valorPorKm } = useConfiguracaoIndenizacao();
   const [veiculo, setVeiculo] = useState<VeiculoProprio | null>(null);
   const [lista, setLista] = useState<Indenizacao[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -95,7 +98,7 @@ export default function Indenizacoes() {
       justificativaAlteracao: form.justificativaAlteracao,
       odometroFinal: form.odometroFinal,
       totalKmRodados,
-    });
+    }, valorPorKm);
     setPdfBlob(blob);
     setPdfUrlPreview(URL.createObjectURL(blob));
   }
@@ -115,7 +118,7 @@ export default function Indenizacoes() {
         servidorId: usuario.uid, servidorNome: usuario.nome, servidorSetor: usuario.setor,
         veiculoPlaca: veiculo?.placa || "",
         ...form, trajetos, totalKmRodados,
-        valorTotal: calcularValor(totalKmRodados),
+        valorTotal: calcularValor(totalKmRodados, valorPorKm),
         status: "gerado", pdfUrl, pdfHash: hash,
         criadoEm: serverTimestamp(),
       });
@@ -146,7 +149,7 @@ export default function Indenizacoes() {
       });
       await registrarAuditoria("enviar_indenizacao", usuario.uid, usuario.nome || "", {
         indenizacaoId: docRef.id, protocolo: protocoloAtual, totalKmRodados,
-        valorTotal: calcularValor(totalKmRodados), emailConfirmado,
+        valorTotal: calcularValor(totalKmRodados, valorPorKm), emailConfirmado,
       });
 
       setSucesso(true);
@@ -195,7 +198,7 @@ export default function Indenizacoes() {
                       <div style={{ fontSize: 13, color: "#7A95B2", fontWeight: 600 }}>#{i.protocolo}</div>
                       <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{i.localidadesServico}</div>
                       <div style={{ fontSize: 12, color: "#5A7A9A", marginTop: 2 }}>{i.servicoARealizar}</div>
-                      <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>{i.totalKmRodados} km · R$ {calcularValor(i.totalKmRodados).toFixed(2).replace(".", ",")}</div>
+                      <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>{i.totalKmRodados} km · R$ {(i.valorTotal ?? calcularValor(i.totalKmRodados, valorPorKm)).toFixed(2).replace(".", ",")}</div>
                     </div>
                     <span style={{ ...s.badge, background: STATUS_LABEL[i.status]?.bg, color: STATUS_LABEL[i.status]?.cor }}>
                       {STATUS_LABEL[i.status]?.label || i.status}
@@ -259,7 +262,7 @@ export default function Indenizacoes() {
                     </div>
                   ))}
                   <button type="button" onClick={() => setTrajetos(prev => [...prev, { ...TRAJETO_VAZIO }])} style={s.btnMini}>+ Adicionar trajeto</button>
-                  <div style={{ fontSize: 12, color: "#7A95B2", marginTop: 6 }}>Total: {totalKmRodados} km · R$ {calcularValor(totalKmRodados).toFixed(2).replace(".", ",")}</div>
+                  <div style={{ fontSize: 12, color: "#7A95B2", marginTop: 6 }}>Total: {totalKmRodados} km · R$ {calcularValor(totalKmRodados, valorPorKm).toFixed(2).replace(".", ",")}</div>
                 </div>
 
                 <div>

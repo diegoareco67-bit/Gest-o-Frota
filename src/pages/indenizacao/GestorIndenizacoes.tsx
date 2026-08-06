@@ -4,6 +4,7 @@ import { collection, getDocs, updateDoc, doc, query, limit } from "firebase/fire
 import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
+import { useConfiguracaoIndenizacao } from "../../hooks/useConfiguracaoIndenizacao";
 import { calcularValor } from "../../utils/pdfIndenizacao";
 
 interface VeiculoProprio {
@@ -13,6 +14,7 @@ interface VeiculoProprio {
 interface Indenizacao {
   id: string; protocolo: string; servidorNome: string; servidorSetor: string; veiculoPlaca: string;
   servicoARealizar: string; localidadesServico: string; totalKmRodados: number;
+  valorTotal?: number;
   status: string; pdfUrl: string; criadoEm?: { toDate: () => Date };
 }
 
@@ -24,6 +26,7 @@ const STATUS_LABEL: Record<string, { cor: string; bg: string; label: string }> =
 
 export default function GestorIndenizacoes() {
   const { usuario } = useAuth();
+  const { valorPorKm } = useConfiguracaoIndenizacao();
   const [aba, setAba] = useState<"veiculos" | "indenizacoes">("veiculos");
   const [veiculos, setVeiculos] = useState<VeiculoProprio[]>([]);
   const [indenizacoes, setIndenizacoes] = useState<Indenizacao[]>([]);
@@ -131,7 +134,7 @@ export default function GestorIndenizacoes() {
                         <div style={{ fontSize: 12, color: "#7A95B2", fontWeight: 600 }}>#{i.protocolo}</div>
                         <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{i.servidorNome} · {i.servidorSetor}</div>
                         <div style={{ fontSize: 13, color: "#334155", marginTop: 4 }}>{i.localidadesServico} — {i.servicoARealizar}</div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>🚗 {i.veiculoPlaca} · {i.totalKmRodados} km · R$ {calcularValor(i.totalKmRodados).toFixed(2).replace(".", ",")}</div>
+                        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>🚗 {i.veiculoPlaca} · {i.totalKmRodados} km · R$ {(i.valorTotal ?? calcularValor(i.totalKmRodados, valorPorKm)).toFixed(2).replace(".", ",")}</div>
                       </div>
                       <span style={{ ...s.badge, background: STATUS_LABEL[i.status]?.bg, color: STATUS_LABEL[i.status]?.cor }}>
                         {STATUS_LABEL[i.status]?.label || i.status}

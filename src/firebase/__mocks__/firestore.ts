@@ -43,6 +43,9 @@ const store: Record<string, MockDoc[]> = {
     { id: "vp-002", data: { servidorId: "uid-outro-servidor", servidorNome: "Pedro Motorista", categoriaFuncional: "Motorista", marca: "Volkswagen", modelo: "Gol", placa: "TST-0002", localidade: "Campo Grande", data: "2025-02-01T00:00:00.000Z", status: "pendente", pdfUrl: "https://example.com/termo2.pdf", pdfHash: "hash-teste-2" } },
   ],
   indenizacoes: [],
+  configuracoes: [
+    { id: "indenizacao", data: { valorPorKm: 0.8, atualizadoEm: mockTimestamp(new Date("2025-01-01T00:00:00")), atualizadoPor: "Maria Gestora" } },
+  ],
   auditoria: [
     { id: "aud-001", data: { acao: "aprovar_solicitacao", usuarioId: "uid-gestor-teste", usuarioNome: "Maria Gestora", detalhes: { protocolo: "SOL001", veiculoPlaca: "ABC-1234" }, criadoEm: mockTimestamp(new Date("2025-01-20T10:00:00")) } },
     { id: "aud-002", data: { acao: "checkout", usuarioId: "uid-usuario-teste", usuarioNome: "João Usuário", detalhes: { veiculoPlaca: "ABC-1234", kmSaida: 45000 }, criadoEm: mockTimestamp(new Date("2025-01-20T11:00:00")) } },

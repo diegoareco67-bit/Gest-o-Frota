@@ -231,6 +231,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ─── configuracoes ──────────────────────────────────────────────────────
+    // Valores paramétricos editáveis pelo gestor sem precisar de deploy de código
+    // (ex.: valor do km da indenização de transporte, Decreto 10.154/2000 — reajustado
+    // por decreto de tempos em tempos). Leitura: gestor e usuário (o usuário precisa do
+    // valor pra calcular o Anexo II ao preencher o formulário). Escrita: só gestor.
+    match /configuracoes/{id} {
+      allow read: if isGestor() || isUsuario();
+      allow write: if isGestor();
+    }
+
     // ─── equipamentos ───────────────────────────────────────────────────────
     // Catálogo com patrimônio individual (notebooks, projetores, etc).
     // Só o gestor cadastra/edita o item inteiro. O usuário escreve apenas o campo

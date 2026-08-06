@@ -32,6 +32,7 @@ const ACAO_LABEL: Record<string, { texto: string; cor: string; bg: string }> = {
   aprovar_veiculo_proprio:         { texto: "Aprovou veículo próprio",   cor: "#166534", bg: "#dcfce7" },
   recusar_veiculo_proprio:         { texto: "Recusou veículo próprio",   cor: "#991b1b", bg: "#fee2e2" },
   enviar_indenizacao:              { texto: "Enviou indenização ao RH",  cor: "#0369a1", bg: "#e0f2fe" },
+  alterar_configuracao:            { texto: "Alterou configuração",      cor: "#854d0e", bg: "#fef9c3" },
 };
 
 function resumoDetalhes(d?: Record<string, unknown>): string {
