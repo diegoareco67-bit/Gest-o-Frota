@@ -21,7 +21,7 @@ const MANUAIS: Manual[] = [
     arquivo: "manual-salas.pdf",
     titulo: "Salas",
     descricao: "Cadastro de salas e gestão de reservas.",
-    cor: "#7C3AED", bg: "#F5F3FF",
+    cor: "#1E3A8A", bg: "#EFF6FF",
     icone: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg>,
   },
   {
@@ -100,9 +100,9 @@ const s: Record<string, React.CSSProperties> = {
   title:      { fontSize: 18, fontWeight: 700, color: "#0F172A" },
   sub:        { color: "#7A95B2", fontSize: 12, marginTop: 2 },
   grid:       { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 },
-  card:       { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", alignItems: "flex-start" },
-  iconWrap:   { width: 44, height: 44, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 },
+  card:       { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", alignItems: "flex-start" },
+  iconWrap:   { width: 44, height: 44, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 },
   cardTitulo: { fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 4 },
-  cardDesc:   { fontSize: 12.5, color: "#7A95B2", marginBottom: 16, lineHeight: 1.4 },
-  btnBaixar:  { display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "#1E3A8A", color: "#fff", borderRadius: 8, fontSize: 12.5, fontWeight: 700, textDecoration: "none", marginTop: "auto" },
+  cardDesc:   { fontSize: 13, color: "#7A95B2", marginBottom: 16, lineHeight: 1.4 },
+  btnBaixar:  { display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "#1E3A8A", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 700, textDecoration: "none", marginTop: "auto" },
 };

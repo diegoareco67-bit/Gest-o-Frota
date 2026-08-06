@@ -155,7 +155,7 @@ export default function Relatorios() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               CSV Agendamentos
             </button>
-            <button onClick={exportarManutencoes} style={{background:"#7C3AED",color:"#fff",border:"none",borderRadius:8,padding:"9px 14px",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+            <button onClick={exportarManutencoes} style={{background:"#1E3A8A",color:"#fff",border:"none",borderRadius:8,padding:"9px 14px",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               CSV Manutenções
             </button>
@@ -210,7 +210,7 @@ export default function Relatorios() {
                       {label:"Total Solicitações",   val:resumo.totalSolicitacoes,sub:"no período",             cor:"#0891B2"},
                       {label:"Aprovadas",            val:resumo.aprovadas,        sub:"executadas",             cor:"#059669"},
                       {label:"Pendentes",            val:resumo.pendentes,        sub:"aguardando",             cor:"#DC2626"},
-                      {label:"Usuários",              val:resumo.totalUsuarios,    sub:"ativos",                 cor:"#7C3AED"},
+                      {label:"Usuários",              val:resumo.totalUsuarios,    sub:"ativos",                 cor:"#1E3A8A"},
                       {label:"Manutenções",          val:resumo.totalManutencoes, sub:"registradas",            cor:"#D97706"},
                       {label:"Custo Manutenções",    val:`R$ ${resumo.custoManutencao.toFixed(2)}`,sub:"total gasto",cor:"#DC2626"},
                       {label:"Disponibilidade",      val:`${resumo.disponibilidade}%`,sub:"da frota livre",    cor:"#059669"},
@@ -229,10 +229,10 @@ export default function Relatorios() {
                     <div style={{display:"flex",gap:4,height:12,borderRadius:99,overflow:"hidden",background:"#F1F5F9"}}>
                       <div style={{background:"#22C55E",width:`${resumo.totalVeiculos>0?(resumo.disponiveis/resumo.totalVeiculos)*100:0}%`,transition:"width 0.5s"}}/>
                       <div style={{background:"#3B82F6",width:`${resumo.totalVeiculos>0?(resumo.emUso/resumo.totalVeiculos)*100:0}%`,transition:"width 0.5s"}}/>
-                      <div style={{background:"#FACC15",width:`${resumo.totalVeiculos>0?(resumo.manutencao/resumo.totalVeiculos)*100:0}%`,transition:"width 0.5s"}}/>
+                      <div style={{background:"#F59E0B",width:`${resumo.totalVeiculos>0?(resumo.manutencao/resumo.totalVeiculos)*100:0}%`,transition:"width 0.5s"}}/>
                     </div>
                     <div style={{display:"flex",gap:16,marginTop:8}}>
-                      {[{cor:"#22C55E",l:"Disponível"},{cor:"#3B82F6",l:"Em uso"},{cor:"#FACC15",l:"Manutenção"}].map(x=>(
+                      {[{cor:"#22C55E",l:"Disponível"},{cor:"#3B82F6",l:"Em uso"},{cor:"#F59E0B",l:"Manutenção"}].map(x=>(
                         <div key={x.l} style={{display:"flex",alignItems:"center",gap:5}}>
                           <div style={{width:8,height:8,borderRadius:"50%",background:x.cor}}/>
                           <span style={{fontSize:11,color:"#5A7A9A"}}>{x.l}</span>

@@ -8,6 +8,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { useConfiguracaoIndenizacao } from "../../hooks/useConfiguracaoIndenizacao";
 import { gerarPdfAnexoII, calcularHashSHA256, calcularValor, type TrajetoLinha } from "../../utils/pdfIndenizacao";
+import { IcoCheckCirculo, IcoDocumento, IcoX } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface VeiculoProprio { id: string; placa: string; status: string; }
 interface Indenizacao {
@@ -181,7 +183,7 @@ export default function Indenizacoes() {
 
         <div style={s.content}>
           {carregando ? (
-            <div style={s.vazio}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : bloqueadoSemVeiculo ? (
             <div style={s.aviso}>
               Você precisa ter o <a href="/usuario/veiculo-proprio" style={s.link}>Termo de Opção (Anexo I)</a> aprovado pelo gestor antes de solicitar indenização.
@@ -204,7 +206,7 @@ export default function Indenizacoes() {
                       {STATUS_LABEL[i.status]?.label || i.status}
                     </span>
                   </div>
-                  {i.pdfUrl && <a href={i.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}>📄 Ver boletim assinado</a>}
+                  {i.pdfUrl && <a href={i.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}><IcoDocumento tam={14}/> Ver boletim assinado</a>}
                 </div>
               ))}
             </div>
@@ -257,7 +259,7 @@ export default function Indenizacoes() {
                       <input type="text" placeholder="Trajeto percorrido" value={t.trajetoPercorrido} onChange={e => atualizarTrajeto(i, "trajetoPercorrido", e.target.value)} style={{ ...s.input, flex: 1 }} />
                       <input type="number" placeholder="Km" value={t.kmRodados} onChange={e => atualizarTrajeto(i, "kmRodados", e.target.value)} style={{ ...s.input, flex: "0 0 70px" }} />
                       {trajetos.length > 1 && (
-                        <button type="button" onClick={() => setTrajetos(prev => prev.filter((_, idx) => idx !== i))} style={s.btnRemover}>✕</button>
+                        <button type="button" onClick={() => setTrajetos(prev => prev.filter((_, idx) => idx !== i))} style={s.btnRemover}><IcoX tam={14}/></button>
                       )}
                     </div>
                   ))}
@@ -297,7 +299,7 @@ export default function Indenizacoes() {
                 <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo — ele vai automaticamente por e-mail para o RH:</div>
                 <input type="file" accept="application/pdf" onChange={e => setArquivoAssinado(e.target.files?.[0] || null)} style={s.input} />
                 {erro && <div role="alert" style={s.erro}>{erro}</div>}
-                {sucesso && <div style={s.ok}>✅ Boletim enviado ao RH!</div>}
+                {sucesso && <div style={s.ok}><IcoCheckCirculo tam={14}/> Boletim enviado ao RH!</div>}
                 <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                   <button onClick={fecharModal} style={s.btnSecundario}>{sucesso ? "Fechar" : "Cancelar"}</button>
                   {!sucesso && <button onClick={enviarAssinado} disabled={enviando || !arquivoAssinado} style={s.btnPrimario}>{enviando ? "Enviando..." : "Enviar ao RH"}</button>}
@@ -319,7 +321,7 @@ const s: Record<string, React.CSSProperties> = {
   sub:     { color: "#7A95B2", fontSize: 12, marginTop: 2 },
   btnNovo: { background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" },
   content: { padding: "20px 24px", flex: 1, maxWidth: 640 },
-  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.1rem 1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.1rem 1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   vazio:   { fontSize: 13, color: "#94A3B8" },
   aviso:   { background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "#854d0e" },
   label:   { display: "block", fontSize: 12, color: "#5A7A9A", marginBottom: 4, fontWeight: 600 },
@@ -334,6 +336,6 @@ const s: Record<string, React.CSSProperties> = {
   link:    { color: "#1E3A8A", fontSize: 13, fontWeight: 600, textDecoration: "none" },
   passo:   { fontSize: 13, color: "#334155" },
   overlay: { position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "2rem" },
-  modal:   { background: "#ffffff", borderRadius: 16, padding: "1.75rem", width: "100%", maxWidth: 620, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
-  modalTitulo: { fontSize: 17, fontWeight: 700, color: "#0F172A", marginTop: 0, marginBottom: "1.25rem" },
+  modal:   { background: "#ffffff", borderRadius: 12, padding: "1.75rem", width: "100%", maxWidth: 620, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
+  modalTitulo: { fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 0, marginBottom: "1.25rem" },
 };

@@ -8,6 +8,8 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
+import { IcoMonitor, IcoPorta } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface Sala { id:string; nome:string; capacidade:number; localizacao:string; equipamentos:string; ativo:boolean; }
 interface ReservaSala { id:string; salaId:string; salaNome:string; responsavelId:string; responsavelNome:string; responsavelSetor:string; motivo:string; dataInicio:string; dataFim:string; status:string; }
@@ -128,14 +130,7 @@ export default function Salas() {
         <div style={s.grid}>
           <div style={s.card}>
             <CalendarioGrade
-              colecao="reservasSalas"
-              titulo="Salas"
-              subtitulo="Disponibilidade das salas de reunião"
-              tema="claro"
-              campoTitulo="salaNome"
-              campoDataInicio="dataInicio"
-              campoDataFim="dataFim"
-              statusMap={STATUS_SALAS}
+              colecao="reservasSalas"titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
               statusFiltro={["confirmada"]}
             />
           </div>
@@ -151,8 +146,8 @@ export default function Salas() {
                   <div style={s.vazio}>Nenhuma sala cadastrada ainda.</div>
                 ) : salas.map(sala => (
                   <div key={sala.id} style={s.linhaSala}>
-                    <div>🚪 {sala.nome} · {sala.capacidade} lugares{sala.localizacao ? ` · ${sala.localizacao}` : ""}</div>
-                    {sala.equipamentos && <div style={{ fontSize:11, color:"#94A3B8", marginTop:2 }}>🖥️ {sala.equipamentos}</div>}
+                    <div><IcoPorta tam={14}/> {sala.nome} · {sala.capacidade} lugares{sala.localizacao ? ` · ${sala.localizacao}` : ""}</div>
+                    {sala.equipamentos && <div style={{ fontSize:11, color:"#94A3B8", marginTop:2 }}><IcoMonitor tam={14}/> {sala.equipamentos}</div>}
                   </div>
                 ))}
               </div>
@@ -161,7 +156,7 @@ export default function Salas() {
             <div style={s.card}>
               <div style={{ fontSize:13, fontWeight:700, color:"#0F172A", marginBottom:10 }}>Próximas reservas</div>
               {carregando ? (
-                <div style={s.vazio}>Carregando...</div>
+                <SkeletonLista itens={3} />
               ) : proximasReservas.length === 0 ? (
                 <div style={s.vazio}>Nenhuma reserva futura.</div>
               ) : proximasReservas.map(r => (
@@ -198,7 +193,7 @@ export default function Salas() {
                 </select>
                 {form.salaId && salas.find(sl => sl.id === form.salaId)?.equipamentos && (
                   <div style={{ fontSize:11, color:"#7A95B2", marginTop:5 }}>
-                    🖥️ {salas.find(sl => sl.id === form.salaId)?.equipamentos}
+                    <IcoMonitor tam={14}/> {salas.find(sl => sl.id === form.salaId)?.equipamentos}
                   </div>
                 )}
               </div>
@@ -262,12 +257,8 @@ export default function Salas() {
 
       {confirmCancelar && (
         <ModalConfirm
-          titulo="Cancelar Reserva"
-          mensagem={`Deseja cancelar a reserva de ${confirmCancelar.salaNome}? Esta ação não pode ser desfeita.`}
-          labelConfirmar="Sim, cancelar"
-          labelCancelar="Voltar"
-          corConfirmar="#EF4444"
-          onConfirmar={() => cancelar(confirmCancelar)}
+          titulo="Cancelar Reserva"mensagem={`Deseja cancelar a reserva de ${confirmCancelar.salaNome}? Esta ação não pode ser desfeita.`}
+          labelConfirmar="Sim, cancelar"labelCancelar="Voltar"corConfirmar="#EF4444"onConfirmar={() => cancelar(confirmCancelar)}
           onCancelar={() => setConfirmCancelar(null)}
         />
       )}
@@ -284,14 +275,14 @@ const s: Record<string, React.CSSProperties> = {
   btnNovo:     { background:"#1E3A8A", color:"#fff", border:"none", borderRadius:8, padding:"10px 20px", fontSize:13, fontWeight:700, cursor:"pointer" },
   btnMini:     { background:"#F1F5F9", color:"#1E3A8A", border:"1px solid #E1EAF5", borderRadius:6, padding:"5px 10px", fontSize:11, fontWeight:700, cursor:"pointer" },
   grid:        { padding:"20px 24px", flex:1, overflowY:"auto", display:"grid", gridTemplateColumns:"1fr 320px", gap:16, alignItems:"start" },
-  card:        { background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:14, padding:"1.25rem", boxShadow:"0 1px 3px rgba(0,0,0,0.05)" },
+  card:        { background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:12, padding:"1.25rem", boxShadow:"0 1px 3px rgba(0,0,0,0.05)" },
   vazio:       { fontSize:12, color:"#94A3B8" },
   linhaSala:   { fontSize:12, color:"#334155", padding:"4px 0", borderBottom:"1px solid #F1F5F9" },
   linhaReserva:{ padding:"8px 0", borderBottom:"1px solid #F1F5F9" },
   btnCancelar: { marginTop:4, padding:"4px 10px", border:"1px solid #fecaca", borderRadius:6, background:"#fff5f5", color:"#991b1b", fontSize:11, fontWeight:600, cursor:"pointer" },
   overlay:     { position:"fixed", inset:0, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(2px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 },
-  modal:       { background:"#ffffff", borderRadius:16, padding:"1.75rem", width:"100%", maxWidth:420, boxShadow:"0 20px 60px rgba(0,0,0,0.3)" },
-  modalTitulo: { fontSize:17, fontWeight:700, color:"#0F172A", marginTop:0, marginBottom:"1.25rem" },
+  modal:       { background:"#ffffff", borderRadius:12, padding:"1.75rem", width:"100%", maxWidth:420, boxShadow:"0 20px 60px rgba(0,0,0,0.3)" },
+  modalTitulo: { fontSize:18, fontWeight:700, color:"#0F172A", marginTop:0, marginBottom:"1.25rem" },
   label:       { display:"block", fontSize:12, color:"#5A7A9A", marginBottom:4, fontWeight:600 },
   input:       { width:"100%", padding:"9px 12px", border:"1px solid #E1EAF5", borderRadius:8, fontSize:13, boxSizing:"border-box", background:"#fff", color:"#0F172A", fontFamily:"inherit" },
   erro:        { background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"8px 12px", fontSize:12, color:"#DC2626", fontWeight:500 },

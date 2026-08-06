@@ -5,6 +5,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { gerarPdfAnexoI, calcularHashSHA256 } from "../../utils/pdfIndenizacao";
+import { IcoCheckCirculo, IcoDocumento } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface VeiculoProprio {
   id: string; servidorId: string; servidorNome: string; categoriaFuncional: string;
@@ -97,19 +99,19 @@ export default function VeiculoProprio() {
 
         <div style={s.content}>
           {carregando ? (
-            <div style={s.vazio}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : registro ? (
             <div style={s.card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>{registro.marca} {registro.modelo} — {registro.placa}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{registro.marca} {registro.modelo} — {registro.placa}</div>
                   <div style={{ fontSize: 12, color: "#7A95B2", marginTop: 2 }}>Categoria funcional: {registro.categoriaFuncional}</div>
                 </div>
                 <span style={{ ...s.badge, background: STATUS_LABEL[registro.status].bg, color: STATUS_LABEL[registro.status].cor }}>
                   {STATUS_LABEL[registro.status].label}
                 </span>
               </div>
-              <a href={registro.pdfUrl} target="_blank" rel="noreferrer" style={s.link}>📄 Ver termo assinado</a>
+              <a href={registro.pdfUrl} target="_blank" rel="noreferrer" style={s.link}><IcoDocumento tam={14}/> Ver termo assinado</a>
               {registro.status === "recusado" && (
                 <div style={{ ...s.aviso, marginTop: 12 }}>Seu termo foi recusado. Fale com o gestor para entender o motivo e reenviar.</div>
               )}
@@ -159,7 +161,7 @@ export default function VeiculoProprio() {
                   <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo:</div>
                   <input type="file" accept="application/pdf" onChange={e => setArquivoAssinado(e.target.files?.[0] || null)} style={s.input} />
                   {erro && <div role="alert" style={s.erro}>{erro}</div>}
-                  {sucesso && <div style={s.ok}>✅ Termo enviado! Aguardando aprovação do gestor.</div>}
+                  {sucesso && <div style={s.ok}><IcoCheckCirculo tam={14}/> Termo enviado! Aguardando aprovação do gestor.</div>}
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => { setPdfBlob(null); setPdfUrlPreview(""); }} style={s.btnSecundario}>Voltar</button>
                     <button onClick={enviarAssinado} disabled={enviando || !arquivoAssinado} style={s.btnPrimario}>{enviando ? "Enviando..." : "Enviar Termo Assinado"}</button>
@@ -181,7 +183,7 @@ const s: Record<string, React.CSSProperties> = {
   title:   { fontSize: 18, fontWeight: 700, color: "#0F172A" },
   sub:     { color: "#7A95B2", fontSize: 12, marginTop: 2 },
   content: { padding: "20px 24px", flex: 1, maxWidth: 560 },
-  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   vazio:   { fontSize: 13, color: "#94A3B8" },
   label:   { display: "block", fontSize: 12, color: "#5A7A9A", marginBottom: 4, fontWeight: 600 },
   input:   { width: "100%", padding: "9px 12px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", color: "#0F172A", fontFamily: "inherit" },

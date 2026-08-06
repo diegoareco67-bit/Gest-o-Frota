@@ -69,5 +69,5 @@ const s: Record<string, React.CSSProperties> = {
   title:   { margin:0, fontSize:18, fontWeight:700, color:"#0F172A" },
   sub:     { margin:"3px 0 0", fontSize:12, color:"#7A95B2" },
   content: { padding:"24px 28px", flex:1, maxWidth:640, display:"flex", flexDirection:"column", gap:20 },
-  card:    { background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:14, padding:"1.25rem", boxShadow:"0 1px 3px rgba(0,0,0,0.05)" },
+  card:    { background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:12, padding:"1.25rem", boxShadow:"0 1px 3px rgba(0,0,0,0.05)" },
 };

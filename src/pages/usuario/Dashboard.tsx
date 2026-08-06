@@ -4,6 +4,7 @@ import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { IcoCarro, IcoPrancheta } from "../../components/Icone";
 
 interface Solicitacao {
   id: string; protocolo: string; veiculoPlaca: string;
@@ -13,7 +14,7 @@ interface Solicitacao {
 const card: React.CSSProperties = {
   background: "#ffffff",
   border: "1px solid #E1EAF5",
-  borderRadius: 14,
+  borderRadius: 12,
   boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
 };
 
@@ -27,7 +28,7 @@ function IcoCar() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>;
 }
 function IcoClipboard() {
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
+  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
 }
 function IcoPlus() {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
@@ -35,11 +36,11 @@ function IcoPlus() {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; color: string; bg: string }> = {
-    pendente:  { label:"Pendente",  color:"#854d0e", bg:"#fef9c3"  },
-    aprovada:  { label:"Aprovada",  color:"#166534", bg:"#dcfce7"  },
-    recusada:  { label:"Recusada",  color:"#991b1b", bg:"#fee2e2"  },
-    em_uso:    { label:"Em Uso",    color:"#1e40af", bg:"#dbeafe"  },
-    concluida: { label:"Concluída", color:"#475569", bg:"#f1f5f9"  },
+    pendente:  { label:"Pendente",  color:"#854d0e", bg:"#fef9c3"},
+    aprovada:  { label:"Aprovada",  color:"#166534", bg:"#dcfce7"},
+    recusada:  { label:"Recusada",  color:"#991b1b", bg:"#fee2e2"},
+    em_uso:    { label:"Em Uso",    color:"#1e40af", bg:"#dbeafe"},
+    concluida: { label:"Concluída", color:"#475569", bg:"#f1f5f9"},
   };
   const m = map[status] ?? { label: status, color:"#475569", bg:"#f1f5f9" };
   return (
@@ -54,7 +55,7 @@ function StatCard({ icon, label, valor, sub, accentColor, iconBg }: { icon: Reac
     <div style={{ ...card, padding:"18px 16px", display:"flex", flexDirection:"column", gap:8, position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:accentColor, borderRadius:"14px 14px 0 0" }} />
       <div style={{ width:40, height:40, borderRadius:"50%", background:iconBg, display:"flex", alignItems:"center", justifyContent:"center" }}>{icon}</div>
-      <div style={{ fontSize:26, fontWeight:800, color:"#0F172A", lineHeight:1 }}>{valor}</div>
+      <div style={{ fontSize:24, fontWeight:800, color:"#0F172A", lineHeight:1 }}>{valor}</div>
       <div style={{ fontSize:13, fontWeight:700, color:"#334155" }}>{label}</div>
       <div style={{ fontSize:11, color:"#7A95B2" }}>{sub}</div>
     </div>
@@ -117,10 +118,10 @@ export default function DashboardCondutor() {
             <>
               {/* Stat cards */}
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:14, marginBottom:28 }}>
-                <StatCard icon={<IcoHourglass/>} label="Pendentes"  valor={pendentes}  sub="aguardando aprovação" accentColor="#FACC15" iconBg="#fef9c3" />
-                <StatCard icon={<IcoCheck/>}     label="Aprovadas"  valor={aprovadas}  sub="prontas para uso"     accentColor="#22C55E" iconBg="#dcfce7" />
-                <StatCard icon={<IcoCar/>}       label="Em Uso"     valor={emUso}      sub="viagem em andamento"  accentColor="#3B82F6" iconBg="#dbeafe" />
-                <StatCard icon={<IcoClipboard/>} label="Concluídas" valor={concluidas} sub="histórico total"      accentColor="#7C3AED" iconBg="#ede9fe" />
+                <StatCard icon={<IcoHourglass/>} label="Pendentes"valor={pendentes}  sub="aguardando aprovação" accentColor="#F59E0B" iconBg="#fef9c3" />
+                <StatCard icon={<IcoCheck/>}     label="Aprovadas"valor={aprovadas}  sub="prontas para uso"accentColor="#22C55E" iconBg="#dcfce7" />
+                <StatCard icon={<IcoCar/>}       label="Em Uso"valor={emUso}      sub="viagem em andamento"accentColor="#3B82F6" iconBg="#dbeafe" />
+                <StatCard icon={<IcoClipboard/>} label="Concluídas" valor={concluidas} sub="histórico total"accentColor="#1E3A8A" iconBg="#DBEAFE" />
               </div>
 
               {/* Solicitações recentes */}
@@ -135,7 +136,7 @@ export default function DashboardCondutor() {
 
                 {recentes.length === 0 ? (
                   <div style={{ textAlign:"center", padding:"2.5rem 1rem", color:"#7A95B2" }}>
-                    <div style={{ fontSize:40, marginBottom:10 }}>📋</div>
+                    <div style={{ fontSize:40, marginBottom:10 }}><IcoPrancheta tam={14}/></div>
                     <div style={{ fontSize:13 }}>Nenhuma solicitação ainda</div>
                     <button onClick={() => navigate("/usuario/solicitar")}
                       style={{ marginTop:14, background:"#1E3A8A", color:"#fff", border:"none", borderRadius:8, padding:"9px 18px", fontSize:12, fontWeight:700, cursor:"pointer" }}>
@@ -145,13 +146,13 @@ export default function DashboardCondutor() {
                 ) : (
                   <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                     {recentes.map(sol => (
-                      <div key={sol.id} style={{ background:"#F8FAFC", border:"1px solid #E1EAF5", borderRadius:10, padding:"14px 16px" }}>
+                      <div key={sol.id} style={{ background:"#F8FAFC", border:"1px solid #E1EAF5", borderRadius:8, padding:"14px 16px" }}>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontSize:11, color:"#7A95B2", marginBottom:3 }}>#{sol.protocolo || sol.id.slice(0,8).toUpperCase()}</div>
                             <div style={{ fontSize:14, fontWeight:600, color:"#0F172A", marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{sol.destino}</div>
                             <div style={{ fontSize:12, color:"#5A7A9A" }}>
-                              <span style={{ marginRight:10 }}>🚗 {sol.veiculoPlaca}</span>
+                              <span style={{ marginRight:10 }}><IcoCarro tam={14}/> {sol.veiculoPlaca}</span>
                               <span>{sol.dataSaida?.slice(0,10)}</span>
                             </div>
                           </div>
@@ -182,7 +183,7 @@ export default function DashboardCondutor() {
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:14 }}>
                 <button onClick={() => navigate("/usuario/solicitar")}
                   style={{ ...card, padding:"18px 20px", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14, transition:"box-shadow 0.15s" }}>
-                  <div style={{ width:44, height:44, borderRadius:11, background:"#dbeafe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#dbeafe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   </div>
                   <div>
@@ -193,7 +194,7 @@ export default function DashboardCondutor() {
 
                 <button onClick={() => navigate("/usuario/solicitacoes")}
                   style={{ ...card, padding:"18px 20px", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14, transition:"box-shadow 0.15s" }}>
-                  <div style={{ width:44, height:44, borderRadius:11, background:"#ede9fe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#DBEAFE", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <IcoClipboard/>
                   </div>
                   <div>
@@ -204,8 +205,8 @@ export default function DashboardCondutor() {
 
                 <button onClick={() => navigate("/salas")}
                   style={{ ...card, padding:"18px 20px", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14, transition:"box-shadow 0.15s" }}>
-                  <div style={{ width:44, height:44, borderRadius:11, background:"#f3e8ff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="#7C3AED"/></svg>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#f3e8ff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill="#1E3A8A"/></svg>
                   </div>
                   <div>
                     <div style={{ fontSize:13, fontWeight:700, color:"#0F172A" }}>Salas</div>
@@ -215,7 +216,7 @@ export default function DashboardCondutor() {
 
                 <button onClick={() => navigate("/equipamentos")}
                   style={{ ...card, padding:"18px 20px", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14, transition:"box-shadow 0.15s" }}>
-                  <div style={{ width:44, height:44, borderRadius:11, background:"#cffafe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#cffafe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891B2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
                   </div>
                   <div>
@@ -226,7 +227,7 @@ export default function DashboardCondutor() {
 
                 <button onClick={() => navigate("/usuario/indenizacoes")}
                   style={{ ...card, padding:"18px 20px", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14, transition:"box-shadow 0.15s" }}>
-                  <div style={{ width:44, height:44, borderRadius:11, background:"#d1fae5", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#d1fae5", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg>
                   </div>
                   <div>

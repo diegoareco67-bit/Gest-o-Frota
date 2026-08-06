@@ -20,12 +20,12 @@ export class ErrorBoundary extends Component<Props, State> {
     return (
       <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center",
         background:"#F1F5F9", fontFamily:"'Sora',system-ui,sans-serif", padding:"1rem" }}>
-        <div style={{ background:"#fff", borderRadius:16, border:"1px solid #fecaca",
+        <div style={{ background:"#fff", borderRadius:12, border:"1px solid #fecaca",
           padding:"2rem 2.5rem", maxWidth:440, width:"100%", textAlign:"center",
           boxShadow:"0 4px 24px rgba(0,0,0,0.08)" }}>
 
-          <div style={{ fontSize:48, marginBottom:12 }}>⚠️</div>
-          <div style={{ fontSize:20, fontWeight:700, color:"#0F172A", marginBottom:8 }}>
+          <div style={{ fontSize:48, marginBottom:12 }}></div>
+          <div style={{ fontSize:18, fontWeight:700, color:"#0F172A", marginBottom:8 }}>
             Algo deu errado
           </div>
           <p style={{ fontSize:14, color:"#64748B", lineHeight:1.6, marginBottom:24 }}>
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <summary style={{ cursor:"pointer", fontWeight:600, marginBottom:6 }}>Detalhes técnicos</summary>
               <pre style={{ whiteSpace:"pre-wrap", wordBreak:"break-all", background:"#F8FAFC",
                 padding:"10px 12px", borderRadius:8, maxHeight:140, overflow:"auto",
-                border:"1px solid #F1F5F9", fontSize:10, lineHeight:1.6 }}>
+                border:"1px solid #F1F5F9", fontSize:11, lineHeight:1.6 }}>
                 {this.state.error.message}
                 {"\n\n"}
                 {this.state.error.stack?.split("\n").slice(0, 6).join("\n")}

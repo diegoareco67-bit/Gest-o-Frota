@@ -5,10 +5,12 @@ import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { IcoAlerta } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 const card: React.CSSProperties = {
   background:"#ffffff", border:"1px solid #E1EAF5",
-  borderRadius:14, boxShadow:"0 1px 3px rgba(0,0,0,0.05)",
+  borderRadius:12, boxShadow:"0 1px 3px rgba(0,0,0,0.05)",
 };
 const inputStyle: React.CSSProperties = {
   width:"100%", padding:"10px 14px",
@@ -75,7 +77,7 @@ export default function Checkout() {
 
         <div style={{ padding:"24px 28px", flex:1, overflowY:"auto" }}>
           {carregando ? (
-            <div style={{ textAlign:"center", padding:"5rem", color:"#7A95B2" }}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : !solicitacao ? (
             <div style={{ textAlign:"center", padding:"5rem", color:"#7A95B2" }}>Solicitação não encontrada.</div>
           ) : (
@@ -122,17 +124,17 @@ export default function Checkout() {
                 </div>
 
                 <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"12px 14px", fontSize:13, color:"#854d0e", marginBottom:20 }}>
-                  ⚠️ Ao confirmar, você declara ter vistoriado o veículo e está ciente das condições atuais.
+                  <IcoAlerta tam={14}/> Ao confirmar, você declara ter vistoriado o veículo e está ciente das condições atuais.
                 </div>
 
                 {erro && (
                   <div role="alert" style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#DC2626", marginBottom:12, fontWeight:500 }}>
-                    ⚠️ {erro}
+                    <IcoAlerta tam={14}/> {erro}
                   </div>
                 )}
                 <button onClick={confirmarSaida} disabled={enviando}
-                  style={{ width:"100%", padding:"12px", background: enviando ? "#94A3B8" : "#22C55E", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700, cursor: enviando ? "not-allowed" : "pointer" }}>
-                  {enviando ? "Registrando..." : "✓ Confirmar Retirada"}
+                  style={{ width:"100%", padding:"12px", background: enviando ? "#94A3B8" : "#22C55E", color:"#fff", border:"none", borderRadius:8, fontSize:15, fontWeight:700, cursor: enviando ? "not-allowed" : "pointer" }}>
+                  {enviando ? "Registrando..." : "<IcoCheck tam={14}/> Confirmar Retirada"}
                 </button>
               </div>
             </div>
@@ -146,7 +148,7 @@ export default function Checkout() {
 function InfoItem({ label, valor }: { label:string; valor:string }) {
   return (
     <div>
-      <div style={{ fontSize:10, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
+      <div style={{ fontSize:11, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
       <div style={{ fontSize:14, color:"#0F172A", fontWeight:500 }}>{valor || "—"}</div>
     </div>
   );

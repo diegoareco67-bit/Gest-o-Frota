@@ -4,6 +4,10 @@ import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
 import type { AcaoAuditoria } from "../../firebase/auditoria";
+import { badgeEstado } from "../../design/estilos";
+import { EstadoVazio } from "../../components/EstadoVazio";
+import { SkeletonTabela } from "../../components/Skeleton";
+import { IcoPrancheta } from "../../components/Icone";
 
 interface RegistroAuditoria {
   id: string;
@@ -14,25 +18,36 @@ interface RegistroAuditoria {
   criadoEm?: { toDate: () => Date };
 }
 
-const ACAO_LABEL: Record<string, { texto: string; cor: string; bg: string }> = {
-  aprovar_solicitacao:             { texto: "Aprovou solicitação",       cor: "#166534", bg: "#dcfce7" },
-  recusar_solicitacao:             { texto: "Recusou solicitação",       cor: "#991b1b", bg: "#fee2e2" },
-  checkout:                        { texto: "Retirou veículo",           cor: "#1e40af", bg: "#dbeafe" },
-  checkin:                         { texto: "Devolveu veículo",          cor: "#475569", bg: "#f1f5f9" },
-  cadastrar_veiculo:               { texto: "Cadastrou veículo",         cor: "#1e40af", bg: "#dbeafe" },
-  editar_veiculo:                  { texto: "Editou veículo",            cor: "#854d0e", bg: "#fef9c3" },
-  registrar_manutencao:            { texto: "Registrou manutenção",      cor: "#854d0e", bg: "#fef9c3" },
-  concluir_manutencao:             { texto: "Concluiu manutenção",       cor: "#166534", bg: "#dcfce7" },
-  reservar_sala:                   { texto: "Reservou sala",             cor: "#5b21b6", bg: "#ede9fe" },
-  cancelar_reserva_sala:           { texto: "Cancelou reserva de sala",  cor: "#991b1b", bg: "#fee2e2" },
-  reservar_equipamento:            { texto: "Reservou equipamento",      cor: "#0369a1", bg: "#e0f2fe" },
-  retirar_equipamento:             { texto: "Retirou equipamento",       cor: "#1e40af", bg: "#dbeafe" },
-  devolver_equipamento:            { texto: "Devolveu equipamento",      cor: "#475569", bg: "#f1f5f9" },
-  cancelar_emprestimo_equipamento: { texto: "Cancelou empréstimo",       cor: "#991b1b", bg: "#fee2e2" },
-  aprovar_veiculo_proprio:         { texto: "Aprovou veículo próprio",   cor: "#166534", bg: "#dcfce7" },
-  recusar_veiculo_proprio:         { texto: "Recusou veículo próprio",   cor: "#991b1b", bg: "#fee2e2" },
-  enviar_indenizacao:              { texto: "Enviou indenização ao RH",  cor: "#0369a1", bg: "#e0f2fe" },
-  alterar_configuracao:            { texto: "Alterou configuração",      cor: "#854d0e", bg: "#fef9c3" },
+/**
+ * A cor do badge vem da NATUREZA da ação, não do módulo — antes cada tipo de ação
+ * ganhava uma cor própria (roxo p/ sala, ciano p/ equipamento...), o que gerava
+ * variedade decorativa sem significado. Agora só 5 estados semânticos.
+ */
+const ACAO_LABEL: Record<string, { texto: string; estado: keyof typeof badgeEstado }> = {
+  // Aprovações e conclusões
+  aprovar_solicitacao:             { texto: "Aprovou solicitação",       estado: "sucesso" },
+  concluir_manutencao:             { texto: "Concluiu manutenção",       estado: "sucesso" },
+  aprovar_veiculo_proprio:         { texto: "Aprovou veículo próprio",   estado: "sucesso" },
+  // Recusas e cancelamentos
+  recusar_solicitacao:             { texto: "Recusou solicitação",       estado: "perigo" },
+  cancelar_reserva_sala:           { texto: "Cancelou reserva de sala",  estado: "perigo" },
+  cancelar_emprestimo_equipamento: { texto: "Cancelou empréstimo",       estado: "perigo" },
+  recusar_veiculo_proprio:         { texto: "Recusou veículo próprio",   estado: "perigo" },
+  anonimizar_usuario:              { texto: "Anonimizou dados (LGPD)",   estado: "perigo" },
+  // Criação e retirada (movimento de saída)
+  checkout:                        { texto: "Retirou veículo",           estado: "info" },
+  cadastrar_veiculo:               { texto: "Cadastrou veículo",         estado: "info" },
+  reservar_sala:                   { texto: "Reservou sala",             estado: "info" },
+  reservar_equipamento:            { texto: "Reservou equipamento",      estado: "info" },
+  retirar_equipamento:             { texto: "Retirou equipamento",       estado: "info" },
+  enviar_indenizacao:              { texto: "Enviou indenização ao RH",  estado: "info" },
+  // Alterações que merecem atenção
+  editar_veiculo:                  { texto: "Editou veículo",            estado: "alerta" },
+  registrar_manutencao:            { texto: "Registrou manutenção",      estado: "alerta" },
+  alterar_configuracao:            { texto: "Alterou configuração",      estado: "alerta" },
+  // Devoluções (fecha o ciclo, sem carga)
+  checkin:                         { texto: "Devolveu veículo",          estado: "neutro" },
+  devolver_equipamento:            { texto: "Devolveu equipamento",      estado: "neutro" },
 };
 
 function resumoDetalhes(d?: Record<string, unknown>): string {
@@ -88,13 +103,11 @@ export default function Auditoria() {
         <div style={{ padding: "20px 24px", flex: 1, overflowY: "auto" }}>
           <div style={{ position: "relative", maxWidth: 360, marginBottom: 16 }}>
             <svg style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A95B2" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar por ação, autor ou detalhe..."
-              aria-label="Buscar na trilha de auditoria"
-              style={{ width: "100%", padding: "9px 12px 9px 32px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", fontFamily: "inherit", color: "#0F172A" }} />
+            <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar por ação, autor ou detalhe..."aria-label="Buscar na trilha de auditoria"style={{ width: "100%", padding: "9px 12px 9px 32px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", fontFamily: "inherit", color: "#0F172A" }} />
           </div>
 
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #E1EAF5", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-            <div style={{ overflowX: "auto" }}>
+            <div className="tabela-rolavel">
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
                 <thead>
                   <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E1EAF5" }}>
@@ -105,20 +118,22 @@ export default function Auditoria() {
                 </thead>
                 <tbody>
                   {carregando ? (
-                    <tr><td colSpan={4} style={{ textAlign: "center", padding: "3rem", color: "#94A3B8", fontSize: 13 }}>Carregando trilha...</td></tr>
+                    <SkeletonTabela linhas={6} colunas={4} />
                   ) : filtrados.length === 0 ? (
-                    <tr><td colSpan={4} style={{ textAlign: "center", padding: "3rem" }}>
-                      <div style={{ fontSize: 40, marginBottom: 8 }}>📋</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>Nenhum registro encontrado</div>
-                      <div style={{ fontSize: 12, color: "#7A95B2" }}>As ações do sistema aparecem aqui conforme acontecem</div>
+                    <tr><td colSpan={4}>
+                      <EstadoVazio
+                        icone={<IcoPrancheta tam={22} />}
+                        titulo="Nenhum registro encontrado"
+                        descricao={busca ? "Nenhuma ação corresponde à busca. Tente outro termo." : "As ações do sistema aparecem aqui conforme acontecem — aprovações, retiradas, cadastros e alterações."}
+                      />
                     </td></tr>
                   ) : filtrados.map(r => {
-                    const a = ACAO_LABEL[r.acao] || { texto: r.acao, cor: "#475569", bg: "#f1f5f9" };
+                    const a = ACAO_LABEL[r.acao] || { texto: r.acao, estado: "neutro" as const };
                     return (
                       <tr key={r.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
                         <td style={{ padding: "12px 16px", fontSize: 12, color: "#7A95B2", whiteSpace: "nowrap" }}>{fmt(r)}</td>
                         <td style={{ padding: "12px 16px" }}>
-                          <span style={{ background: a.bg, color: a.cor, padding: "3px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>{a.texto}</span>
+                          <span style={{ ...badgeEstado[a.estado], padding: "3px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>{a.texto}</span>
                         </td>
                         <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: "#0F172A", whiteSpace: "nowrap" }}>{r.usuarioNome || "—"}</td>
                         <td style={{ padding: "12px 16px", fontSize: 12, color: "#5A7A9A" }}>{resumoDetalhes(r.detalhes)}</td>

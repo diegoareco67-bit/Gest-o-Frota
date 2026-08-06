@@ -100,7 +100,8 @@ test.describe("Gestor — Indenizações — aprovação do Anexo I", () => {
   });
 
   test("aba Indenizações mostra a lista", async ({ page }) => {
-    await page.getByRole("button", { name: /💰 indenizações/i }).click();
+    // Escopado ao conteúdo: "Indenizações" também é um item da Sidebar
+    await page.locator("main").getByRole("button", { name: /indenizações \(/i }).click();
     await expect(page.getByText(/nenhuma indenização|#IND/i)).toBeVisible({ timeout: 5000 });
   });
 });

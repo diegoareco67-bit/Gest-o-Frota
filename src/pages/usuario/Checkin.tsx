@@ -5,10 +5,12 @@ import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { IcoAlerta, IcoCheck, IcoLocal } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 const card: React.CSSProperties = {
   background:"#ffffff", border:"1px solid #E1EAF5",
-  borderRadius:14, boxShadow:"0 1px 3px rgba(0,0,0,0.05)",
+  borderRadius:12, boxShadow:"0 1px 3px rgba(0,0,0,0.05)",
 };
 const inputStyle: React.CSSProperties = {
   width:"100%", padding:"10px 14px",
@@ -84,7 +86,7 @@ export default function Checkin() {
 
         <div style={{ padding:"24px 28px", flex:1, overflowY:"auto" }}>
           {carregando ? (
-            <div style={{ textAlign:"center", padding:"5rem", color:"#7A95B2" }}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : !solicitacao ? (
             <div style={{ textAlign:"center", padding:"5rem", color:"#7A95B2" }}>Solicitação não encontrada.</div>
           ) : (
@@ -109,7 +111,7 @@ export default function Checkin() {
                   <input type="number" placeholder={`Mínimo: ${kmSaida.toLocaleString("pt-BR")} km`} value={form.kmChegada} onChange={e=>setForm(p=>({...p,kmChegada:e.target.value}))} style={inputStyle} />
                   {kmRodadoPreview !== null && (
                     <div style={{ marginTop:8, padding:"8px 12px", background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, fontSize:13, color:"#1e40af", fontWeight:500 }}>
-                      📍 Total percorrido: {kmRodadoPreview.toLocaleString("pt-BR")} km
+                      <IcoLocal tam={14}/> Total percorrido: {kmRodadoPreview.toLocaleString("pt-BR")} km
                     </div>
                   )}
                 </div>
@@ -132,10 +134,10 @@ export default function Checkin() {
                   <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:8, fontWeight:600 }}>Tipo de Ocorrência</label>
                   <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                     {[
-                      { val:"normal",  label:"✅ Normal",   cor:"#22C55E", bg:"#dcfce7" },
-                      { val:"avaria",  label:"🔧 Avaria",   cor:"#D97706", bg:"#fef9c3" },
-                      { val:"sinistro",label:"⚠️ Sinistro", cor:"#EF4444", bg:"#fee2e2" },
-                      { val:"multa",   label:"🚦 Multa",    cor:"#7C3AED", bg:"#ede9fe" },
+                      { val:"normal",  label:"<IcoCheckCirculo tam={14}/> Normal",   cor:"#22C55E", bg:"#dcfce7" },
+                      { val:"avaria",  label:" Avaria",   cor:"#D97706", bg:"#fef9c3" },
+                      { val:"sinistro",label:" Sinistro", cor:"#EF4444", bg:"#fee2e2" },
+                      { val:"multa",   label:"<IcoSemaforo tam={14}/> Multa",    cor:"#1E3A8A", bg:"#DBEAFE" },
                     ].map(o=>(
                       <button key={o.val} type="button" onClick={()=>setForm(p=>({...p,tipoOcorrencia:o.val}))}
                         style={{ padding:"8px 14px", borderRadius:8, fontSize:13, cursor:"pointer", fontWeight:600,
@@ -164,18 +166,18 @@ export default function Checkin() {
                 </div>
 
                 <div style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:8, padding:"12px 14px", fontSize:13, color:"#166534", marginBottom:20 }}>
-                  ✓ Ao confirmar, o veículo será liberado como disponível para outros condutores.
+                  <IcoCheck tam={14}/> Ao confirmar, o veículo será liberado como disponível para outros condutores.
                 </div>
 
                 {erro && (
                   <div role="alert" style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#DC2626", marginBottom:12, fontWeight:500 }}>
-                    ⚠️ {erro}
+                    <IcoAlerta tam={14}/> {erro}
                   </div>
                 )}
 
                 <button onClick={confirmarDevolucao} disabled={enviando}
-                  style={{ width:"100%", padding:"12px", background: enviando ? "#94A3B8" : "#1E3A8A", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700, cursor: enviando ? "not-allowed" : "pointer" }}>
-                  {enviando ? "Registrando..." : "✓ Confirmar Devolução"}
+                  style={{ width:"100%", padding:"12px", background: enviando ? "#94A3B8" : "#1E3A8A", color:"#fff", border:"none", borderRadius:8, fontSize:15, fontWeight:700, cursor: enviando ? "not-allowed" : "pointer" }}>
+                  {enviando ? "Registrando..." : "<IcoCheck tam={14}/> Confirmar Devolução"}
                 </button>
               </div>
             </div>
@@ -189,7 +191,7 @@ export default function Checkin() {
 function InfoItem({ label, valor }: { label:string; valor:string }) {
   return (
     <div>
-      <div style={{ fontSize:10, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
+      <div style={{ fontSize:11, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
       <div style={{ fontSize:14, color:"#0F172A", fontWeight:500 }}>{valor || "—"}</div>
     </div>
   );

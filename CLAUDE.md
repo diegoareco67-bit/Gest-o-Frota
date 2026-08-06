@@ -74,6 +74,23 @@ Perfis de acesso (visão de longo prazo, do documento original): Administrador, 
 
 **Implementação atual:** 4 perfis existem no código — `"gestor" | "usuario" | "consulta" | "auditor"` (`src/types.ts`). O antigo perfil `"condutor"` foi renomeado para `"usuario"` porque agora reserva salas além de veículos; `"consulta"` é só leitura, só vê calendários; `"auditor"` (adicionado em 2026-07-19 na correção da auditoria — segregação de função) é só leitura da trilha de auditoria e dos relatórios, sem nenhuma permissão de escrita nem tela de gestão. Os demais perfis Administrador/Administrativo/Chefia/Servidor do documento original seguem sem implementação — quando chegar a Fase 4 (Administração), decidir se viram variações de `"usuario"`/`"gestor"` ou perfis novos de verdade.
 
+## Sistema de design — leia antes de mexer em qualquer tela
+
+Desde 2026-08-06 o projeto tem tokens centralizados. **Regras que não devem ser quebradas:**
+
+- **Nenhum hex solto em componente.** Toda cor sai de `src/design/tokens.ts`.
+- **Um único accent** (azul institucional `#1E3A8A`). As cores de estado (verde/vermelho/âmbar/azul/neutro) são semânticas — usar só para comunicar situação do dado, nunca para "dar variedade visual".
+- **Raio:** só `6` (inputs/badges), `8` (botões/cards compactos), `12` (cards/modais) e `999` (pill). Não reintroduzir 10, 14 ou 16.
+- **Tipografia:** escala de `tokens.ts` (11/12/13/14/15/18/24). Sans-serif sempre — serifa é marca clássica de interface gerada por IA.
+- **Ícone é SVG** (`src/components/Icone.tsx`), nunca emoji: emoji não herda `currentColor`, destoa do resto e emojis recentes viram quadradinho no Windows 10.
+- **Estilos repetidos** (`page`, `topbar`, `card`, `input`, `btnPrimario`...) vêm de `src/design/estilos.ts`. Só declare estilo local quando for realmente específico da tela.
+- **Hover/active/focus ficam no CSS global** (`src/index.css`), não no componente — estilo inline não suporta pseudo-classe. Um `<button>` novo já ganha os estados automaticamente.
+- **Loading usa skeleton** (`src/components/Skeleton.tsx`), não "Carregando..." em texto.
+- **Tela vazia usa `<EstadoVazio>`** com descrição explicando como popular — não só informar que está vazio.
+- **Tabela larga** vai dentro de `<div className="tabela-rolavel">`.
+
+Baseline visual em `C:\Users\barbarah\Documents\HubCGE` (marcos 1.0 e 1.1) — comparar antes/depois ao mexer em layout.
+
 ## Identidade visual
 
 Nome **Hub**, subtítulo "Central de Recursos Compartilhados". Visual minimalista institucional (referência: Microsoft 365, Google Workspace, Atlassian) — cantos arredondados, cartões, sombras leves. Paleta: azul-marinho, azul médio, verde, cinza claro, branco. Calendário aparece na interface, não no logotipo.

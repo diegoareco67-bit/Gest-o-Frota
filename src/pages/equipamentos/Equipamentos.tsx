@@ -8,6 +8,7 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface Equipamento { id: string; nome: string; tipo: string; patrimonio: string; status: string; ativo: boolean; }
 interface Emprestimo {
@@ -155,7 +156,7 @@ export default function Equipamentos() {
                 {ehGestor && <button onClick={() => setModalEquip(true)} style={s.btnMini}>+ Novo equipamento</button>}
               </div>
               {carregando ? (
-                <div style={s.vazio}>Carregando...</div>
+                <SkeletonLista itens={3} />
               ) : equipamentos.length === 0 ? (
                 <div style={s.vazio}>Nenhum equipamento cadastrado ainda.</div>
               ) : (
@@ -195,7 +196,7 @@ export default function Equipamentos() {
           <div style={s.card}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 10 }}>{ehGestor ? "Todos os empréstimos ativos" : "Meus empréstimos"}</div>
             {carregando ? (
-              <div style={s.vazio}>Carregando...</div>
+              <SkeletonLista itens={3} />
             ) : meusEProximos.length === 0 ? (
               <div style={s.vazio}>Nenhum empréstimo ativo.</div>
             ) : meusEProximos.map(e => (
@@ -313,15 +314,15 @@ const s: Record<string, React.CSSProperties> = {
   btnNovo:     { background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" },
   btnMini:     { background: "#F1F5F9", color: "#1E3A8A", border: "1px solid #E1EAF5", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" },
   grid:        { padding: "20px 24px", flex: 1, overflowY: "auto", display: "grid", gridTemplateColumns: "1fr 320px", gap: 16, alignItems: "start" },
-  card:        { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  card:        { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   vazio:       { fontSize: 12, color: "#94A3B8" },
   linhaEquip:  { border: "1px solid #F1F5F9", borderRadius: 8, padding: "8px 10px" },
   linhaEmprestimo: { padding: "8px 0", borderBottom: "1px solid #F1F5F9" },
   btnAcao:     { padding: "4px 10px", border: "1px solid #bfdbfe", borderRadius: 6, background: "#eff6ff", color: "#1e40af", fontSize: 11, fontWeight: 600, cursor: "pointer" },
   btnCancelar: { padding: "4px 10px", border: "1px solid #fecaca", borderRadius: 6, background: "#fff5f5", color: "#991b1b", fontSize: 11, fontWeight: 600, cursor: "pointer" },
   overlay:     { position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
-  modal:       { background: "#ffffff", borderRadius: 16, padding: "1.75rem", width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
-  modalTitulo: { fontSize: 17, fontWeight: 700, color: "#0F172A", marginTop: 0, marginBottom: "1.25rem" },
+  modal:       { background: "#ffffff", borderRadius: 12, padding: "1.75rem", width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
+  modalTitulo: { fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 0, marginBottom: "1.25rem" },
   label:       { display: "block", fontSize: 12, color: "#5A7A9A", marginBottom: 4, fontWeight: 600 },
   input:       { width: "100%", padding: "9px 12px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", color: "#0F172A", fontFamily: "inherit" },
   erro:        { background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#DC2626", fontWeight: 500 },

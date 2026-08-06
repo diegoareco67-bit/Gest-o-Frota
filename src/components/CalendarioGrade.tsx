@@ -11,8 +11,8 @@ const DIAS  = ["DOM","SEG","TER","QUA","QUI","SEX","SÁB"];
 const STATUS_VEICULOS: Record<string,StatusInfo> = {
   aprovada:   {cor:"#22C55E",label:"Disponível"},
   em_uso:     {cor:"#3B82F6",label:"Em uso"},
-  pendente:   {cor:"#FACC15",label:"Manutenção"},
-  manutencao: {cor:"#FACC15",label:"Manutenção"},
+  pendente:   {cor:"#F59E0B",label:"Manutenção"},
+  manutencao: {cor:"#F59E0B",label:"Manutenção"},
   concluida:  {cor:"#94A3B8",label:"Livre"},
 };
 const STATUS_FILTRO_VEICULOS = ["aprovada","em_uso","concluida"];
@@ -111,22 +111,22 @@ export function CalendarioGrade({
     <div style={{display:"flex",flexDirection:"column",gap:20,height:"100%"}}>
       {(titulo || subtitulo) && (
         <div style={{textAlign: escuro ? "center" : "left"}}>
-          {titulo && <div style={{fontSize:22,fontWeight:900,color:corTitulo,letterSpacing:1}}>{titulo}</div>}
+          {titulo && <div style={{fontSize:24,fontWeight:900,color:corTitulo,letterSpacing:1}}>{titulo}</div>}
           {subtitulo && <div style={{fontSize:12,color:corSubtitulo,marginTop:4}}>{subtitulo}</div>}
         </div>
       )}
 
-      <div style={{background:bgCard,backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",border:borderCard,borderRadius:16,padding:"18px",flex:1,display:"flex",flexDirection:"column",boxShadow: escuro ? "none" : "0 1px 3px rgba(0,0,0,0.05)"}}>
+      <div style={{background:bgCard,backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",border:borderCard,borderRadius:12,padding:"18px",flex:1,display:"flex",flexDirection:"column",boxShadow: escuro ? "none" : "0 1px 3px rgba(0,0,0,0.05)"}}>
         {/* Nav */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-          <button onClick={()=>nav(-1)} aria-label="Mês anterior" style={{background:bgBtnNav,border:borderBtnNav,borderRadius:8,width:34,height:34,fontSize:22,cursor:"pointer",color:corBtnNav,display:"flex",alignItems:"center",justifyContent:"center"}}><span aria-hidden="true">‹</span></button>
+          <button onClick={()=>nav(-1)} aria-label="Mês anterior" style={{background:bgBtnNav,border:borderBtnNav,borderRadius:8,width:34,height:34,fontSize:24,cursor:"pointer",color:corBtnNav,display:"flex",alignItems:"center",justifyContent:"center"}}><span aria-hidden="true">‹</span></button>
           <span style={{fontSize:18,fontWeight:800,color:corMesAno}} aria-live="polite" aria-atomic="true">{MESES[mes]} {ano}</span>
-          <button onClick={()=>nav(1)} aria-label="Próximo mês" style={{background:bgBtnNav,border:borderBtnNav,borderRadius:8,width:34,height:34,fontSize:22,cursor:"pointer",color:corBtnNav,display:"flex",alignItems:"center",justifyContent:"center"}}><span aria-hidden="true">›</span></button>
+          <button onClick={()=>nav(1)} aria-label="Próximo mês" style={{background:bgBtnNav,border:borderBtnNav,borderRadius:8,width:34,height:34,fontSize:24,cursor:"pointer",color:corBtnNav,display:"flex",alignItems:"center",justifyContent:"center"}}><span aria-hidden="true">›</span></button>
         </div>
 
         {/* Dias semana */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}}>
-          {DIAS.map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:corDiaLabel,padding:"4px 0"}}>{d}</div>)}
+          {DIAS.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,color:corDiaLabel,padding:"4px 0"}}>{d}</div>)}
         </div>
 
         {/* Grid */}
@@ -155,7 +155,7 @@ export function CalendarioGrade({
         <div style={{display:"flex",gap:14,flexWrap:"wrap",marginTop:12,paddingTop:10,borderTop:borderLegenda}}>
           {legendaItens.map(x=>(
             <div key={x.label} style={{display:"flex",alignItems:"center",gap:5}}>
-              <div style={{width:10,height:10,borderRadius:3,background:x.cor}}/>
+              <div style={{width:10,height:10,borderRadius:99,background:x.cor}}/>
               <span style={{fontSize:11,color:corLegenda,fontWeight:500}}>{x.label}</span>
             </div>
           ))}
@@ -163,8 +163,8 @@ export function CalendarioGrade({
       </div>
 
       {/* Realtime badge */}
-      <div style={{background:bgBadge,border:borderBadge,borderRadius:10,padding:"12px 16px",display:"flex",alignItems:"center",gap:12}}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FACC15" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div style={{background:bgBadge,border:borderBadge,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"center",gap:12}}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <div>
           <div style={{color:corBadgeTitulo,fontWeight:700,fontSize:13}}>Consulta em tempo real</div>
           <div style={{color:corBadgeSub,fontSize:12}}>As informações são atualizadas automaticamente.</div>

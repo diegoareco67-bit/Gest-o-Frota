@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useSetores } from "../hooks/useSetores";
+import { IcoAlerta, IcoCadeado, IcoCheckCirculo, IcoCredencial, IcoJornal } from "../components/Icone";
 
 // Cooldown client-side entre solicitações — a coleção solicitacoesAcesso só pode ser lida
 // pelo gestor (LGPD/App Check), então não dá pra checar duplicata no servidor sem abrir
@@ -75,7 +76,7 @@ export default function SolicitarAcesso() {
     return (
       <div style={s.page}>
         <div style={{ ...s.card, textAlign:"center" }}>
-          <div style={{ fontSize:56, marginBottom:16 }}>✅</div>
+          <div style={{ fontSize:56, marginBottom:16 }}><IcoCheckCirculo tam={14}/></div>
           <h2 style={s.titulo}>Solicitação Enviada!</h2>
           <p style={{ color:"#5A7A9A", fontSize:14, lineHeight:1.6, marginBottom:16 }}>
             Sua solicitação foi enviada ao gestor da Controladoria-Geral do Estado de MS.<br/><br/>
@@ -110,11 +111,11 @@ export default function SolicitarAcesso() {
         </div>
 
         <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#854d0e", marginBottom:"0.85rem" }}>
-          ⚠️ Para solicitar acesso, você deve possuir publicação no Diário Oficial do Estado de MS habilitando-o como condutor de veículo oficial. Informe os dados da publicação abaixo.
+          <IcoAlerta tam={14}/> Para solicitar acesso, você deve possuir publicação no Diário Oficial do Estado de MS habilitando-o como condutor de veículo oficial. Informe os dados da publicação abaixo.
         </div>
 
         <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#1e40af", marginBottom:"1.5rem", lineHeight:1.5 }}>
-          🔒 Os dados informados serão tratados pela Controladoria-Geral do Estado de MS (CGE-MS) apenas para
+          <IcoCadeado tam={14}/> Os dados informados serão tratados pela Controladoria-Geral do Estado de MS (CGE-MS) apenas para
           análise do seu cadastro no sistema, com base no art. 7º, III e art. 23 da LGPD.{" "}
           <button type="button" onClick={() => navigate("/privacidade")} style={{ background:"none", border:"none", padding:0, color:"#1e40af", fontWeight:700, textDecoration:"underline", cursor:"pointer", fontSize:12, fontFamily:"inherit" }}>Ver Aviso de Privacidade</button>.
         </div>
@@ -122,7 +123,7 @@ export default function SolicitarAcesso() {
         <form onSubmit={enviar} noValidate style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
 
           <div style={s.secao}>
-            <div style={s.secaoTitulo}>👤 Dados Pessoais</div>
+            <div style={s.secaoTitulo}> Dados Pessoais</div>
             <Campo label="Nome Completo *" placeholder="João da Silva" value={form.nomeCompleto} onChange={v => set("nomeCompleto", v)} />
             <Campo label="E-mail Institucional *" placeholder="joao.silva@cge.ms.gov.br" type="email" value={form.email} onChange={v => set("email", v)} />
             <div style={s.grid2}>
@@ -139,7 +140,7 @@ export default function SolicitarAcesso() {
           </div>
 
           <div style={s.secao}>
-            <div style={s.secaoTitulo}>🪪 Habilitação (CNH)</div>
+            <div style={s.secaoTitulo}><IcoCredencial tam={14}/> Habilitação (CNH)</div>
             <div style={s.grid2}>
               <Campo label="Número da CNH *" placeholder="00000000000" value={form.numeroCnh} onChange={v => set("numeroCnh", v)} />
               <Campo label="Vencimento da CNH *" type="date" value={form.vencimentoCnh} onChange={v => set("vencimentoCnh", v)} />
@@ -147,7 +148,7 @@ export default function SolicitarAcesso() {
           </div>
 
           <div style={s.secao}>
-            <div style={s.secaoTitulo}>📰 Publicação no Diário Oficial do Estado de MS</div>
+            <div style={s.secaoTitulo}><IcoJornal tam={14}/> Publicação no Diário Oficial do Estado de MS</div>
             <p style={{ fontSize:12, color:"#7A95B2", margin:"0 0 4px" }}>
               Informe os dados da publicação que autoriza sua habilitação como condutor oficial.
             </p>
@@ -160,7 +161,7 @@ export default function SolicitarAcesso() {
 
           {erro && (
             <div role="alert" style={{ background:"#fff5f5", border:"1px solid #fecaca", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#dc2626" }}>
-              ⚠️ {erro}
+              <IcoAlerta tam={14}/> {erro}
             </div>
           )}
 
@@ -189,9 +190,9 @@ function Campo({ label, placeholder, value, onChange, type="text", id }: { label
 
 const s: Record<string, React.CSSProperties> = {
   page:         { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#F1F5F9", padding:"2rem 1rem", fontFamily:"'Sora',system-ui,sans-serif" },
-  card:         { background:"#ffffff", borderRadius:16, border:"1px solid #E1EAF5", padding:"2rem", width:"100%", maxWidth:400, textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.08)" },
-  titulo:       { fontSize:20, fontWeight:700, color:"#0F172A", margin:"0 0 8px" },
-  secao:        { background:"#F8FAFC", border:"1px solid #E1EAF5", borderRadius:10, padding:"1.25rem", display:"flex", flexDirection:"column", gap:"0.75rem" },
+  card:         { background:"#ffffff", borderRadius:12, border:"1px solid #E1EAF5", padding:"2rem", width:"100%", maxWidth:400, textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.08)" },
+  titulo:       { fontSize:18, fontWeight:700, color:"#0F172A", margin:"0 0 8px" },
+  secao:        { background:"#F8FAFC", border:"1px solid #E1EAF5", borderRadius:8, padding:"1.25rem", display:"flex", flexDirection:"column", gap:"0.75rem" },
   secaoTitulo:  { fontSize:13, fontWeight:700, color:"#334155", marginBottom:4 },
   grid2:        { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:"0.75rem" },
   btnPrimario:  { padding:"10px 24px", background:"#1E3A8A", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:700, cursor:"pointer" },

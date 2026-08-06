@@ -9,6 +9,9 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSetores } from "../../hooks/useSetores";
 import { useEscClose } from "../../hooks/useEscClose";
+import { EstadoVazio } from "../../components/EstadoVazio";
+import { SkeletonGrade } from "../../components/Skeleton";
+import { IcoAlerta, IcoCadeado, IcoCarro, IcoCheckCirculo, IcoCredencial, IcoEmail, IcoJornal, IcoPessoa, IcoPrancheta, IcoPredio, IcoX } from "../../components/Icone";
 import type { Perfil } from "../../types";
 
 interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; anonimizado?:boolean; }
@@ -187,61 +190,56 @@ export default function Usuarios() {
         <div style={{ padding:"20px 24px", flex:1, overflowY:"auto" }}>
           {sucessoMsg && (
             <div role="status" aria-live="polite" style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#166534", marginBottom:12, fontWeight:500, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <span>✅ {sucessoMsg}</span>
-              <button onClick={()=>setSucessoMsg("")} aria-label="Fechar notificação" style={{ background:"none", border:"none", color:"#166534", cursor:"pointer", fontSize:16, padding:"0 4px" }}>✕</button>
+              <span><IcoCheckCirculo tam={14}/> {sucessoMsg}</span>
+              <button onClick={()=>setSucessoMsg("")} aria-label="Fechar notificação" style={{ background:"none", border:"none", color:"#166534", cursor:"pointer", fontSize:15, padding:"0 4px" }}><IcoX tam={14}/></button>
             </div>
           )}
           {/* Abas */}
-          <div style={{ display:"flex", gap:4, marginBottom:"1.5rem", background:"#F1F5F9", borderRadius:10, padding:4, width:"fit-content", border:"1px solid #E1EAF5" }}>
+          <div style={{ display:"flex", gap:4, marginBottom:"1.5rem", background:"#F1F5F9", borderRadius:8, padding:4, width:"fit-content", border:"1px solid #E1EAF5" }}>
             <button onClick={() => setAba("usuarios")} style={{ ...s.abaBtn, ...(aba==="usuarios" ? s.abaAtiva : {}) }}>
-              👤 Usuários ({lista.length})
+               Usuários ({lista.length})
             </button>
             <button onClick={() => setAba("solicitacoes")} style={{ ...s.abaBtn, ...(aba==="solicitacoes" ? s.abaAtiva : {}) }}>
-              📋 Solicitações de Acesso
+               Solicitações de Acesso
               {solicitacoes.length > 0 && <span style={s.badge}>{solicitacoes.length}</span>}
             </button>
           </div>
 
           {carregando ? (
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"5rem", gap:14, color:"#94A3B8" }}>
-              <div style={{ width:32, height:32, border:"3px solid #E1EAF5", borderTop:"3px solid #3B82F6", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
-              <span style={{ fontSize:13 }}>Carregando...</span>
-            </div>
+            <SkeletonGrade itens={6} />
           ) : (
             <>
               {/* Aba Usuários */}
               {aba === "usuarios" && (
                 lista.length === 0 ? (
-                  <div style={s.vazio}><div style={{ fontSize:48, marginBottom:12 }}>👤</div><div>Nenhum usuário cadastrado</div></div>
+                  <EstadoVazio
+                    icone={<IcoPessoa tam={22} />}
+                    titulo="Nenhum usuário cadastrado"descricao="Use o botão “Novo Usuário” para cadastrar um servidor, ou aprove uma solicitação pendente na aba ao lado."/>
                 ) : (
                   <div style={s.grid}>
                     {lista.map(c => {
                       const initials = c.nome.split(" ").slice(0,2).map((n:string)=>n[0]).join("").toUpperCase();
-                      const PALETTES = [
-                        {bg:"#dbeafe",color:"#1e40af"},{bg:"#dcfce7",color:"#166534"},
-                        {bg:"#ede9fe",color:"#5b21b6"},{bg:"#fef9c3",color:"#854d0e"},
-                        {bg:"#fce7f3",color:"#9d174d"},{bg:"#e0f2fe",color:"#0369a1"},
-                      ];
-                      const pal = PALETTES[c.nome.charCodeAt(0) % PALETTES.length];
+                      // Avatar usa só tons do accent — antes eram 6 cores decorativas (rosa, ciano, roxo...)
+                      const pal = { bg: "#DBEAFE", color: "#1E40AF" };
                       return (
                       <div key={c.id} style={s.card}>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
-                          <div style={{ width:44, height:44, borderRadius:"50%", background:pal.bg, color:pal.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, fontWeight:700, letterSpacing:-0.5 }}>{initials}</div>
+                          <div style={{ width:44, height:44, borderRadius:"50%", background:pal.bg, color:pal.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:700, letterSpacing:-0.5 }}>{initials}</div>
                           <span style={{ ...s.badgeStatus, ...(c.ativo ? { background:"#dcfce7", color:"#166534" } : { background:"#fee2e2", color:"#991b1b" }) }}>{c.ativo ? "Ativo" : "Inativo"}</span>
                         </div>
                         <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-                          <div style={{ fontSize:16, fontWeight:700, color:"#0F172A" }}>{c.nome}</div>
-                          <span style={{ fontSize:10, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", borderRadius:99, padding:"1px 8px" }}>{PERFIL_LABEL[c.perfil] || c.perfil}</span>
+                          <div style={{ fontSize:15, fontWeight:700, color:"#0F172A" }}>{c.nome}</div>
+                          <span style={{ fontSize:11, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", borderRadius:99, padding:"1px 8px" }}>{PERFIL_LABEL[c.perfil] || c.perfil}</span>
                         </div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}>✉️ {c.email}</div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}>🏢 {c.setor}</div>
-                        {c.matricula && <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:4 }}>🆔 {c.matricula}</div>}
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}><IcoEmail tam={14}/> {c.email}</div>
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}><IcoPredio tam={14}/> {c.setor}</div>
+                        {c.matricula && <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:4 }}><IcoCredencial tam={14}/> {c.matricula}</div>}
                         {c.numeroCnh && (() => {
                           const st = statusCnh(c.vencimentoCnh);
                           return (
                             <div style={{ marginBottom:10 }}>
                               <div style={{ fontSize:12, color:"#7A95B2", marginBottom:3 }}>
-                                🪪 CNH {c.numeroCnh}
+                                <IcoCredencial tam={14}/> CNH {c.numeroCnh}
                               </div>
                               {st && (
                                 <span style={{ fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:99, color:st.cor, background:st.bg, border:`1px solid ${st.cor}40` }}>
@@ -253,7 +251,7 @@ export default function Usuarios() {
                         })()}
                         {c.anonimizado && (
                           <div style={{ fontSize:11, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", border:"1px solid #E1EAF5", borderRadius:8, padding:"6px 10px", marginBottom:8 }}>
-                            🔒 Dados pessoais anonimizados (LGPD)
+                            <IcoCadeado tam={14}/> Dados pessoais anonimizados (LGPD)
                           </div>
                         )}
                         {!c.anonimizado && (
@@ -262,8 +260,8 @@ export default function Usuarios() {
                           </button>
                         )}
                         {!c.ativo && !c.anonimizado && (
-                          <button onClick={() => setConfirmAnonimizar(c)} style={{ ...s.btnToggle, marginTop:6, color:"#7A95B2", borderColor:"#E1EAF5", background:"#F8FAFC" }}>
-                            🔒 Anonimizar dados (LGPD)
+                          <button onClick={() => setConfirmAnonimizar(c)} style={{ ...s.btnToggle, marginTop:6, color:"#7A95B2", borderColor:"#E1EAF5", background:"#F8FAFC", display:"inline-flex", alignItems:"center", gap:6 }}>
+                            <IcoCadeado tam={13} /> Anonimizar dados (LGPD)
                           </button>
                         )}
                       </div>
@@ -276,7 +274,9 @@ export default function Usuarios() {
               {/* Aba Solicitações */}
               {aba === "solicitacoes" && (
                 solicitacoes.length === 0 ? (
-                  <div style={s.vazio}><div style={{ fontSize:48, marginBottom:12 }}>📋</div><div>Nenhuma solicitação pendente</div></div>
+                  <EstadoVazio
+                    icone={<IcoPrancheta tam={22} />}
+                    titulo="Nenhuma solicitação pendente"descricao="Solicitações enviadas pelo formulário público de cadastro aparecem aqui para aprovação."/>
                 ) : (
                   <div style={s.grid}>
                     {solicitacoes.map(sol => {
@@ -284,14 +284,14 @@ export default function Usuarios() {
                       return (
                       <div key={sol.id} style={{ ...s.card, cursor:"pointer" }} onClick={() => abrirSolicitacao(sol)}>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
-                          <div style={{ width:44, height:44, borderRadius:"50%", background:"#fef9c3", color:"#854d0e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, fontWeight:700, letterSpacing:-0.5 }}>{initSol}</div>
+                          <div style={{ width:44, height:44, borderRadius:"50%", background:"#fef9c3", color:"#854d0e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:700, letterSpacing:-0.5 }}>{initSol}</div>
                           <span style={{ ...s.badgeStatus, background:"#fef9c3", color:"#854d0e" }}>Pendente</span>
                         </div>
-                        <div style={{ fontSize:16, fontWeight:700, color:"#0F172A", marginBottom:4 }}>{sol.nomeCompleto}</div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}>✉️ {sol.email}</div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}>🏢 {sol.setor}</div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}>🪪 Mat: {sol.matricula}</div>
-                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:12 }}>🚗 CNH: {sol.numeroCnh}</div>
+                        <div style={{ fontSize:15, fontWeight:700, color:"#0F172A", marginBottom:4 }}>{sol.nomeCompleto}</div>
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}><IcoEmail tam={14}/> {sol.email}</div>
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}> {sol.setor}</div>
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}> Mat: {sol.matricula}</div>
+                        <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:12 }}><IcoCarro tam={14}/> CNH: {sol.numeroCnh}</div>
                         <div style={{ fontSize:12, color:"#1E3A8A", fontWeight:600 }}>Clique para analisar →</div>
                       </div>
                       );
@@ -337,11 +337,11 @@ export default function Usuarios() {
               </div>
             </div>
             <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#1e40af", margin:"1rem 0" }}>
-              ✉️ O usuário receberá um e-mail para definir a própria senha de acesso. O gestor não define a senha.
+              <IcoEmail tam={14}/> O usuário receberá um e-mail para definir a própria senha de acesso. O gestor não define a senha.
             </div>
             {erroModal && (
               <div role="alert" style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#DC2626", marginBottom:"1rem", fontWeight:500 }}>
-                ⚠️ {erroModal}
+                <IcoAlerta tam={14}/> {erroModal}
               </div>
             )}
             <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
@@ -358,7 +358,7 @@ export default function Usuarios() {
           <div style={{ ...s.modal, maxWidth:560 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem" }}>
               <h2 id="modal-analise-titulo" style={{ fontSize:18, fontWeight:700, color:"#0F172A", margin:0 }}>Analisar Solicitação</h2>
-              <button onClick={() => setSolSelecionada(null)} aria-label="Fechar modal" style={{ background:"none", border:"none", fontSize:20, cursor:"pointer", color:"#7A95B2" }}>✕</button>
+              <button onClick={() => setSolSelecionada(null)} aria-label="Fechar modal" style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"#7A95B2" }}><IcoX tam={14}/></button>
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem", marginBottom:"1.25rem" }}>
@@ -386,7 +386,7 @@ export default function Usuarios() {
             </div>
 
               <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"12px 14px", marginBottom:"1.25rem" }}>
-                <div style={{ fontSize:13, fontWeight:600, color:"#1e40af", marginBottom:8 }}>📰 Publicação no Diário Oficial do Estado de MS</div>
+                <div style={{ fontSize:13, fontWeight:600, color:"#1e40af", marginBottom:8 }}><IcoJornal tam={14}/> Publicação no Diário Oficial do Estado de MS</div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, fontSize:13 }}>
                   <div><span style={{ color:"#7A95B2" }}>Nº do Diário:</span><br/><strong style={{ color:"#0F172A" }}>{solSelecionada.numeroDiario}</strong></div>
                   <div><span style={{ color:"#7A95B2" }}>Data de Publicação:</span><br/><strong style={{ color:"#0F172A" }}>{solSelecionada.dataPublicacao}</strong></div>
@@ -395,19 +395,19 @@ export default function Usuarios() {
               </div>
 
             <div style={{ background:"#fef9c3", border:"1px solid #fde68a", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#854d0e", marginBottom:"1rem" }}>
-              ⚠️ Ao aprovar, o usuário receberá um e-mail para definir sua senha de acesso.
+              <IcoAlerta tam={14}/> Ao aprovar, o usuário receberá um e-mail para definir sua senha de acesso.
             </div>
 
             {erroSol && (
               <div role="alert" style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#DC2626", marginBottom:"1rem", fontWeight:500 }}>
-                ⚠️ {erroSol}
+                <IcoAlerta tam={14}/> {erroSol}
               </div>
             )}
 
             <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
-              <button onClick={() => setConfirmRecusar(true)} style={{ ...s.btn, background:"#EF4444" }}>✕ Recusar</button>
+              <button onClick={() => setConfirmRecusar(true)} style={{ ...s.btn, background:"#EF4444" }}><IcoX tam={14}/> Recusar</button>
               <button onClick={aprovar} disabled={aprovando} style={{ ...s.btn, background:"#22C55E" }}>
-                {aprovando ? "Aprovando..." : "✓ Aprovar e Enviar Acesso"}
+                {aprovando ? "Aprovando..." : " Aprovar e Enviar Acesso"}
               </button>
             </div>
           </div>
@@ -416,24 +416,16 @@ export default function Usuarios() {
 
       {confirmRecusar && solSelecionada && (
         <ModalConfirm
-          titulo="Recusar Solicitação"
-          mensagem={`Deseja recusar a solicitação de acesso de ${solSelecionada.nomeCompleto}? O solicitante não receberá acesso ao sistema.`}
-          labelConfirmar="Sim, recusar"
-          labelCancelar="Voltar"
-          corConfirmar="#EF4444"
-          onConfirmar={recusar}
+          titulo="Recusar Solicitação"mensagem={`Deseja recusar a solicitação de acesso de ${solSelecionada.nomeCompleto}? O solicitante não receberá acesso ao sistema.`}
+          labelConfirmar="Sim, recusar"labelCancelar="Voltar"corConfirmar="#EF4444"onConfirmar={recusar}
           onCancelar={() => setConfirmRecusar(false)}
         />
       )}
 
       {confirmAnonimizar && (
         <ModalConfirm
-          titulo="Anonimizar dados (LGPD)"
-          mensagem={`Deseja anonimizar os dados pessoais de ${confirmAnonimizar.nome}? Nome, e-mail, matrícula, CNH e setor serão apagados. O registro é mantido (sem dado pessoal) para a trilha de auditoria. Esta ação não pode ser desfeita.`}
-          labelConfirmar="Sim, anonimizar"
-          labelCancelar="Voltar"
-          corConfirmar="#334155"
-          onConfirmar={() => anonimizar(confirmAnonimizar)}
+          titulo="Anonimizar dados (LGPD)"mensagem={`Deseja anonimizar os dados pessoais de ${confirmAnonimizar.nome}? Nome, e-mail, matrícula, CNH e setor serão apagados. O registro é mantido (sem dado pessoal) para a trilha de auditoria. Esta ação não pode ser desfeita.`}
+          labelConfirmar="Sim, anonimizar"labelCancelar="Voltar"corConfirmar="#334155"onConfirmar={() => anonimizar(confirmAnonimizar)}
           onCancelar={() => setConfirmAnonimizar(null)}
         />
       )}
@@ -458,7 +450,7 @@ const s: Record<string, React.CSSProperties> = {
   abaBtn:     { padding:"8px 16px", border:"none", borderRadius:8, background:"transparent", color:"#7A95B2", fontSize:13, fontWeight:500, cursor:"pointer", display:"flex", alignItems:"center" },
   abaAtiva:   { background:"#ffffff", color:"#0F172A", fontWeight:700, boxShadow:"0 1px 3px rgba(0,0,0,0.08)" },
   overlay:    { position:"fixed", inset:0, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(2px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 },
-  modal:      { background:"#ffffff", borderRadius:16, padding:"2rem", width:"100%", maxWidth:460, maxHeight:"90vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,0.3)" },
+  modal:      { background:"#ffffff", borderRadius:12, padding:"2rem", width:"100%", maxWidth:460, maxHeight:"90vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,0.3)" },
   label:      { display:"block", fontSize:12, color:"#5A7A9A", marginBottom:4, fontWeight:600 },
   input:      { width:"100%", padding:"9px 12px", border:"1px solid #E1EAF5", borderRadius:8, fontSize:13, boxSizing:"border-box", background:"#fff", color:"#0F172A", fontFamily:"inherit" },
   btn:        { padding:"10px 20px", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" },

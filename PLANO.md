@@ -2,6 +2,41 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
+## ✅ Revisão de design aplicada — sistema de design criado (2026-08-06)
+
+Revisão feita com a skill `advanced-design-systems` apontou 11 problemas; **todos aplicados**.
+Antes de mexer em qualquer tela foi gerado um **baseline visual** (marco HubCGE 1.0, 30 telas
+em `C:\Users\barbarah\Documents\HubCGE`), e depois um marco 1.1 para comparação — se algo
+regredir visualmente, o 1.0 é o ponto de retorno.
+
+**Arquivos novos (a fundação):**
+- `src/design/tokens.ts` — cor, raio, tipografia, espaço, elevação, layout. **Nenhum hex novo deve ser escrito solto em componente daqui pra frente.**
+- `src/design/estilos.ts` — estilos compartilhados (`base`), `badgeEstado`, `gridAuto()`
+- `src/components/Icone.tsx` — ~30 ícones SVG estilo Lucide
+- `src/components/Skeleton.tsx` — `Skeleton`, `SkeletonLista`, `SkeletonTabela`, `SkeletonGrade`
+- `src/components/EstadoVazio.tsx` — estado vazio padronizado
+
+**Os 11 itens:**
+1. **Tokens centralizados** — 82 cores hex soltas em 16 arquivos → 70, todas derivadas dos tokens.
+2. **Regra Lila** — roxo decorativo (`#7C3AED`/`#5b21b6`/`#ede9fe`) em 12 pontos → zero; accent único é o azul institucional `#1E3A8A`.
+3. **Shape Consistency Lock** — 7 escalas de `border-radius` (6/8/10/12/14/16/99) → 4 (6, 8, 12, pill).
+4. **Feedback tátil** — de 130 botões só 6 reagiam ao mouse. **Causa raiz: estilo inline não suporta pseudo-classe.** Resolvido com ~15 linhas de CSS global em `index.css` (`button:hover`, `:active` com `scale(.985)`, `:focus-visible`, `:disabled`) — cobre os 130 de uma vez, sem reescrever componente.
+5. **Loading** — 21 telas com "Carregando..." em texto puro → skeletons que imitam o formato do conteúdo final.
+6. **Empty states** — 3 padrões convivendo (texto seco / emoji 48px / composição) e nenhum explicava como popular a tela → `<EstadoVazio>` único, com descrição orientando o próximo passo.
+7. **Duplicação** — 16 arquivos repetiam `page`/`topbar`/`card`/`input`/`btnPrimario` com valores divergentes → `src/design/estilos.ts`.
+8. **Emoji como ícone** — 114 emojis substituídos por SVG. Dois deles (🛻 e 🪪) são emojis recentes que **viram quadradinho no Windows 10** — problema que este projeto já tinha documentado.
+9. **Código morto** — `src/App.css` (boilerplate do Vite, nunca importado) removido. **Efeito colateral importante:** todas as media queries do projeto estavam nesse arquivo morto, ou seja, o app tinha **zero responsividade ativa**.
+10. **Responsividade** — tabelas passaram a rolar dentro do próprio card (`.tabela-rolavel`), topbar empilha em telas estreitas, e `prefers-reduced-motion` respeitado.
+11. **Escala tipográfica** — tamanhos ad-hoc (9, 11.5, 12.5, 17, 19, 22, 26...) → escala de 7 níveis.
+
+**Decisão de escopo:** as cores de estado (verde/vermelho/âmbar/azul/neutro) foram **mantidas** — são semânticas (comunicam situação do dado), não decorativas. O que foi eliminado foi a variedade sem significado: sidebar arco-íris (cada ícone com uma cor), avatares sorteando entre 6 cores, e uma cor por tipo de ação na trilha de auditoria (agora a cor vem da *natureza* da ação: aprovação, recusa, criação, alteração, devolução).
+
+**Verificado:** `tsc -b` limpo, **141/141 Vitest**, **190/190 e2e**, `vite build` OK, lint 0 erros.
+Um teste e2e precisou de ajuste (`indenizacao.spec.ts`) — ele localizava a aba pelo emoji `💰`,
+que deixou de existir; passou a escopar por `main` (o texto "Indenizações" também é item da Sidebar).
+
+- [ ] **Pendente:** deploy — o CI/CD dispara sozinho no push para `main`.
+
 ## ✅ Valor do km da indenização parametrizado (dívida técnica fechada) — 2026-08-06
 
 Item de "evolução futura" identificado na auditoria de homologação (custo/benefício não compensava até então — reajustes do Decreto 10.154/2000 são raros) — implementado a pedido do usuário.

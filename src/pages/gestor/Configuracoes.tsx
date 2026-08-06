@@ -5,6 +5,8 @@ import { db } from "../../firebase/config";
 import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { VALOR_KM_PADRAO } from "../../utils/pdfIndenizacao";
+import { IcoCheckCirculo } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 export default function Configuracoes() {
   const { usuario } = useAuth();
@@ -72,14 +74,13 @@ export default function Configuracoes() {
             </div>
 
             {carregando ? (
-              <div style={s.vazio}>Carregando...</div>
+              <SkeletonLista itens={3} />
             ) : (
               <form onSubmit={salvar} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 14 }}>
                 <div style={{ flex: 1, maxWidth: 220 }}>
                   <label htmlFor="cfg-valor-km" style={s.label}>Valor por km rodado (R$)</label>
                   <input
-                    id="cfg-valor-km" type="text" inputMode="decimal"
-                    value={valorInput} onChange={e => setValorInput(e.target.value)}
+                    id="cfg-valor-km" type="text" inputMode="decimal"value={valorInput} onChange={e => setValorInput(e.target.value)}
                     style={s.input}
                   />
                 </div>
@@ -88,7 +89,7 @@ export default function Configuracoes() {
             )}
 
             {erro && <div role="alert" style={{ ...s.erro, marginTop: 12 }}>{erro}</div>}
-            {ok && <div style={{ ...s.ok, marginTop: 12 }}>✅ Valor atualizado — novas indenizações já usam R$ {valorAtual.toFixed(2).replace(".", ",")}/km.</div>}
+            {ok && <div style={{ ...s.ok, marginTop: 12 }}><IcoCheckCirculo tam={14}/> Valor atualizado — novas indenizações já usam R$ {valorAtual.toFixed(2).replace(".", ",")}/km.</div>}
 
             <div style={s.nota}>
               Boletins já enviados não são recalculados — mantêm o valor por km vigente no momento em
@@ -107,14 +108,14 @@ const s: Record<string, React.CSSProperties> = {
   topbar:  { background: "#ffffff", borderBottom: "1.5px solid #E1EAF5", padding: "14px 24px", flexShrink: 0 },
   title:   { fontSize: 18, fontWeight: 700, color: "#0F172A" },
   sub:     { color: "#7A95B2", fontSize: 12, marginTop: 2 },
-  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   tituloCard: { fontSize: 15, fontWeight: 700, color: "#0F172A" },
-  descCard:   { fontSize: 12.5, color: "#5A7A9A", marginTop: 4, lineHeight: 1.5 },
+  descCard:   { fontSize: 13, color: "#5A7A9A", marginTop: 4, lineHeight: 1.5 },
   vazio:   { fontSize: 13, color: "#94A3B8", marginTop: 14 },
   label:   { display: "block", fontSize: 12, color: "#5A7A9A", marginBottom: 4, fontWeight: 600 },
   input:   { width: "100%", padding: "9px 12px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", color: "#0F172A", fontFamily: "inherit" },
   erro:    { background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#DC2626", fontWeight: 500 },
   ok:      { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#166534", fontWeight: 500 },
   btnPrimario: { padding: "9px 18px", border: "none", borderRadius: 8, background: "#1E3A8A", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" },
-  nota:    { fontSize: 11.5, color: "#94A3B8", marginTop: 16, borderTop: "1px solid #F1F5F9", paddingTop: 10 },
+  nota:    { fontSize: 12, color: "#94A3B8", marginTop: 16, borderTop: "1px solid #F1F5F9", paddingTop: 10 },
 };

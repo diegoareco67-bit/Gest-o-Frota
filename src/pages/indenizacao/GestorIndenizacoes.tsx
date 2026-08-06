@@ -6,6 +6,8 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useConfiguracaoIndenizacao } from "../../hooks/useConfiguracaoIndenizacao";
 import { calcularValor } from "../../utils/pdfIndenizacao";
+import { IcoCarro, IcoCheck, IcoDinheiro, IcoDocumento, IcoX } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface VeiculoProprio {
   id: string; servidorNome: string; categoriaFuncional: string;
@@ -71,17 +73,17 @@ export default function GestorIndenizacoes() {
         </div>
 
         <div style={{ padding: "20px 24px", flex: 1, overflowY: "auto" }}>
-          <div style={{ display: "flex", gap: 4, marginBottom: "1.5rem", background: "#F1F5F9", borderRadius: 10, padding: 4, width: "fit-content", border: "1px solid #E1EAF5" }}>
+          <div style={{ display: "flex", gap: 4, marginBottom: "1.5rem", background: "#F1F5F9", borderRadius: 8, padding: 4, width: "fit-content", border: "1px solid #E1EAF5" }}>
             <button onClick={() => setAba("veiculos")} style={{ ...s.abaBtn, ...(aba === "veiculos" ? s.abaAtiva : {}) }}>
-              🚗 Veículos Próprios {pendentes.length > 0 && <span style={s.badgeAba}>{pendentes.length}</span>}
+              <IcoCarro tam={14}/> Veículos Próprios {pendentes.length > 0 && <span style={s.badgeAba}>{pendentes.length}</span>}
             </button>
             <button onClick={() => setAba("indenizacoes")} style={{ ...s.abaBtn, ...(aba === "indenizacoes" ? s.abaAtiva : {}) }}>
-              💰 Indenizações ({indenizacoes.length})
+              <IcoDinheiro tam={14}/> Indenizações ({indenizacoes.length})
             </button>
           </div>
 
           {carregando ? (
-            <div style={s.vazio}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : aba === "veiculos" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {pendentes.length > 0 && (
@@ -92,11 +94,11 @@ export default function GestorIndenizacoes() {
                       <div key={v.id} style={s.card}>
                         <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{v.servidorNome}</div>
                         <div style={{ fontSize: 12, color: "#5A7A9A", marginTop: 2 }}>{v.categoriaFuncional}</div>
-                        <div style={{ fontSize: 13, color: "#334155", marginTop: 8 }}>🚗 {v.marca} {v.modelo} — {v.placa}</div>
-                        <a href={v.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}>📄 Ver termo assinado</a>
+                        <div style={{ fontSize: 13, color: "#334155", marginTop: 8 }}><IcoCarro tam={14}/> {v.marca} {v.modelo} — {v.placa}</div>
+                        <a href={v.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}><IcoDocumento tam={14}/> Ver termo assinado</a>
                         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                          <button onClick={() => decidir(v.id, "recusado")} style={s.btnRecusar}>✕ Recusar</button>
-                          <button onClick={() => decidir(v.id, "aprovado")} style={s.btnAprovar}>✓ Aprovar</button>
+                          <button onClick={() => decidir(v.id, "recusado")} style={s.btnRecusar}><IcoX tam={14}/> Recusar</button>
+                          <button onClick={() => decidir(v.id, "aprovado")} style={s.btnAprovar}><IcoCheck tam={14}/> Aprovar</button>
                         </div>
                       </div>
                     ))}
@@ -112,7 +114,7 @@ export default function GestorIndenizacoes() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                           <div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{v.servidorNome}</div>
-                            <div style={{ fontSize: 12, color: "#5A7A9A", marginTop: 2 }}>🚗 {v.marca} {v.modelo} — {v.placa}</div>
+                            <div style={{ fontSize: 12, color: "#5A7A9A", marginTop: 2 }}><IcoCarro tam={14}/> {v.marca} {v.modelo} — {v.placa}</div>
                           </div>
                           <span style={{ ...s.badge, background: v.status === "aprovado" ? "#dcfce7" : "#fee2e2", color: v.status === "aprovado" ? "#166534" : "#991b1b" }}>
                             {v.status === "aprovado" ? "Aprovado" : "Recusado"}
@@ -134,13 +136,13 @@ export default function GestorIndenizacoes() {
                         <div style={{ fontSize: 12, color: "#7A95B2", fontWeight: 600 }}>#{i.protocolo}</div>
                         <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{i.servidorNome} · {i.servidorSetor}</div>
                         <div style={{ fontSize: 13, color: "#334155", marginTop: 4 }}>{i.localidadesServico} — {i.servicoARealizar}</div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>🚗 {i.veiculoPlaca} · {i.totalKmRodados} km · R$ {(i.valorTotal ?? calcularValor(i.totalKmRodados, valorPorKm)).toFixed(2).replace(".", ",")}</div>
+                        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}><IcoCarro tam={14}/> {i.veiculoPlaca} · {i.totalKmRodados} km · R$ {(i.valorTotal ?? calcularValor(i.totalKmRodados, valorPorKm)).toFixed(2).replace(".", ",")}</div>
                       </div>
                       <span style={{ ...s.badge, background: STATUS_LABEL[i.status]?.bg, color: STATUS_LABEL[i.status]?.cor }}>
                         {STATUS_LABEL[i.status]?.label || i.status}
                       </span>
                     </div>
-                    {i.pdfUrl && <a href={i.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}>📄 Ver boletim assinado</a>}
+                    {i.pdfUrl && <a href={i.pdfUrl} target="_blank" rel="noreferrer" style={{ ...s.link, display: "inline-block", marginTop: 8 }}><IcoDocumento tam={14}/> Ver boletim assinado</a>}
                   </div>
                 ))}
               </div>

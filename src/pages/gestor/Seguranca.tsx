@@ -4,6 +4,7 @@ import { multiFactor, TotpMultiFactorGenerator, sendEmailVerification } from "fi
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
+import { IcoAlerta, IcoCadeado, IcoCheckCirculo, IcoEmail } from "../../components/Icone";
 
 interface SegredoTotp {
   secretKey: string;
@@ -49,9 +50,7 @@ export default function Seguranca() {
       setEtapa("codigo");
     } catch (e: unknown) {
       const c = (e as { code?: string }).code ?? "";
-      setErro(c === "auth/requires-recent-login"
-        ? "Por segurança, saia e faça login de novo antes de ativar o 2FA."
-        : "Não foi possível iniciar a ativação. Tente novamente.");
+      setErro(c === "auth/requires-recent-login"? "Por segurança, saia e faça login de novo antes de ativar o 2FA.": "Não foi possível iniciar a ativação. Tente novamente.");
     } finally { setProcessando(false); }
   }
 
@@ -65,9 +64,7 @@ export default function Seguranca() {
       setSucesso("Verificação em duas etapas ativada! No próximo login o código será solicitado.");
     } catch (e: unknown) {
       const c = (e as { code?: string }).code ?? "";
-      setErro(c === "auth/invalid-verification-code"
-        ? "Código incorreto. Confira no aplicativo e tente de novo."
-        : "Não foi possível ativar. Tente novamente.");
+      setErro(c === "auth/invalid-verification-code"? "Código incorreto. Confira no aplicativo e tente de novo.": "Não foi possível ativar. Tente novamente.");
     } finally { setProcessando(false); }
   }
 
@@ -95,14 +92,14 @@ export default function Seguranca() {
         </div>
 
         <div style={{ padding: "20px 24px", flex: 1, maxWidth: 560 }}>
-          {sucesso && <div style={s.ok} role="status">✅ {sucesso}</div>}
-          {erro && <div style={s.erro} role="alert">⚠️ {erro}</div>}
+          {sucesso && <div style={s.ok} role="status"><IcoCheckCirculo tam={14}/> {sucesso}</div>}
+          {erro && <div style={s.erro} role="alert"><IcoAlerta tam={14}/> {erro}</div>}
 
           <div style={s.card}>
             {jaAtivo ? (
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                  <span style={{ ...s.badge, background: "#dcfce7", color: "#166534" }}>🔒 2FA Ativo</span>
+                  <span style={{ ...s.badge, background: "#dcfce7", color: "#166534" }}><IcoCadeado tam={14}/> 2FA Ativo</span>
                 </div>
                 <p style={s.texto}>Sua conta ({usuario?.email}) exige um código do aplicativo autenticador a cada login. Isso protege o acesso de gestor mesmo que a senha vaze.</p>
                 <button onClick={remover} disabled={processando} style={s.btnSecundario}>{processando ? "Processando..." : "Desativar 2FA"}</button>
@@ -114,7 +111,7 @@ export default function Seguranca() {
                   <button onClick={iniciar} disabled={processando} style={s.btnPrimario}>{processando ? "Preparando..." : "Ativar verificação em duas etapas"}</button>
                 ) : verifEnviado ? (
                   <div style={{ ...s.texto, background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: "12px 14px", color: "#1e40af", marginBottom: 0 }}>
-                    📧 E-mail de verificação enviado para <strong>{usuario?.email}</strong>. Clique no link do e-mail e depois <strong>recarregue esta página</strong> para ativar o 2FA.
+                    <IcoEmail tam={14}/> E-mail de verificação enviado para <strong>{usuario?.email}</strong>. Clique no link do e-mail e depois <strong>recarregue esta página</strong> para ativar o 2FA.
                   </div>
                 ) : (
                   <div>
@@ -137,8 +134,7 @@ export default function Seguranca() {
                 <div style={{ ...s.chave, marginTop: 6 }}>{segredo?.secretKey}</div>
                 <p style={{ ...s.texto, marginTop: 14 }}><strong>2.</strong> Digite o código de 6 dígitos que o aplicativo mostrar:</p>
                 <input value={codigo} onChange={e => { setCodigo(e.target.value.replace(/\D/g, "").slice(0, 6)); setErro(""); }}
-                  inputMode="numeric" placeholder="000000" aria-label="Código de verificação"
-                  style={{ ...s.input, letterSpacing: 6, fontSize: 20, textAlign: "center", maxWidth: 180 }} />
+                  inputMode="numeric" placeholder="000000" aria-label="Código de verificação"style={{ ...s.input, letterSpacing: 6, fontSize: 18, textAlign: "center", maxWidth: 180 }} />
                 <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
                   <button onClick={() => { setEtapa("inicio"); setSegredo(null); setCodigo(""); setErro(""); }} style={s.btnSecundario}>Cancelar</button>
                   <button onClick={confirmar} disabled={processando} style={s.btnPrimario}>{processando ? "Ativando..." : "Confirmar e ativar"}</button>
@@ -158,11 +154,11 @@ const s: Record<string, React.CSSProperties> = {
   topbar: { background: "#ffffff", borderBottom: "1.5px solid #E1EAF5", padding: "14px 24px", flexShrink: 0 },
   title:  { fontSize: 18, fontWeight: 700, color: "#0F172A" },
   sub:    { color: "#7A95B2", fontSize: 12, marginTop: 2 },
-  card:   { background: "#fff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  texto:  { fontSize: 13.5, color: "#334155", lineHeight: 1.6, marginTop: 0, marginBottom: 16 },
+  card:   { background: "#fff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  texto:  { fontSize: 14, color: "#334155", lineHeight: 1.6, marginTop: 0, marginBottom: 16 },
   textoPequeno: { fontSize: 12, color: "#7A95B2", marginTop: 8, marginBottom: 0 },
   vazio:  { fontSize: 13, color: "#94A3B8" },
-  chave:  { fontFamily: "ui-monospace, monospace", fontSize: 16, fontWeight: 700, letterSpacing: 2, color: "#0F172A", background: "#F1F5F9", border: "1px solid #E1EAF5", borderRadius: 8, padding: "12px 14px", wordBreak: "break-all" },
+  chave:  { fontFamily: "ui-monospace, monospace", fontSize: 15, fontWeight: 700, letterSpacing: 2, color: "#0F172A", background: "#F1F5F9", border: "1px solid #E1EAF5", borderRadius: 8, padding: "12px 14px", wordBreak: "break-all" },
   badge:  { padding: "4px 10px", borderRadius: 99, fontSize: 12, fontWeight: 700 },
   input:  { width: "100%", padding: "10px 12px", border: "1px solid #E1EAF5", borderRadius: 8, boxSizing: "border-box", background: "#fff", color: "#0F172A", fontFamily: "inherit" },
   ok:     { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#166534", fontWeight: 500, marginBottom: 12 },

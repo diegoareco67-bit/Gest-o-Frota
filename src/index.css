@@ -35,14 +35,72 @@ input, select, textarea, button {
   font-family: inherit;
 }
 
+/* ─── Feedback tátil global ─────────────────────────────────────────────────
+   Os estilos das telas são inline (não suportam pseudo-classes), então hover,
+   active e focus vivem aqui. Isso cobre os ~130 botões do sistema de uma vez —
+   antes só 6 tinham qualquer reação ao mouse. */
 button {
   cursor: pointer;
+  transition: filter 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+button:hover:not(:disabled):not([aria-selected="true"]) {
+  filter: brightness(0.94);
+}
+
+/* Clique físico: o elemento afunda levemente */
+button:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Foco visível por teclado, sem poluir o clique de mouse */
+button:focus-visible,
+a:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Linhas de tabela e itens de lista clicáveis reagem ao mouse */
+tbody tr:hover {
+  background: #F8FAFC;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: 2px solid #3B82F6;
   outline-offset: 0;
   transition: outline 0.15s;
+}
+
+/* ─── Responsividade ────────────────────────────────────────────────────────
+   O projeto não tinha nenhuma media query ativa (as que existiam estavam no
+   App.css, que nunca era importado). */
+
+/* Tabelas nunca devem estourar a largura da tela — rolam dentro do próprio card */
+.tabela-rolavel {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  /* Cabeçalhos de página empilham em vez de espremer o botão de ação */
+  .topbar-responsiva {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ─── Scrollbar customizado ─────────────────────────────── */
@@ -105,4 +163,10 @@ aside ::-webkit-scrollbar-thumb:hover {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.5; }
+}
+
+/* Brilho que percorre os skeletons de carregamento */
+@keyframes skeletonBrilho {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
 }

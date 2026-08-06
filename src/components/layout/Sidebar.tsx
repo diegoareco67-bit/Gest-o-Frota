@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { collection, query, where, onSnapshot, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { IcoMenu, IcoX } from "../../components/Icone";
 
 const IcoMap = {
   dashboard: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
@@ -79,25 +80,33 @@ function getSections(perfil:"gestor"|"usuario"|"consulta"|"auditor", pendentes=0
   ];
 }
 
+/**
+ * Todos os ícones usam o mesmo azul claro — antes cada item tinha uma cor própria
+ * (amarelo, verde, ciano, roxo, coral...), transformando a barra lateral num
+ * arco-íris. A cor não carregava informação: era variedade decorativa. Quem
+ * comunica seleção agora é o estado ativo do item, não o matiz do ícone.
+ */
+const ICO_COR_PADRAO = "#7EB8F7";
+
 const ICO_COLORS: Record<IcoKey, string> = {
-  dashboard: "#7EB8F7",
-  check:     "#FACC15",
-  truck:     "#7EB8F7",
-  wrench:    "#FCA5A5",
-  users:     "#6DCF92",
-  chart:     "#67E8F9",
-  home:      "#7EB8F7",
-  plus:      "#6DCF92",
-  list:      "#7EB8F7",
-  logout:    "#5A8AB8",
-  door:      "#C4A6F7",
-  cash:      "#6DCF92",
-  laptop:    "#67E8F9",
-  building:  "#7EB8F7",
-  manual:    "#FCD34D",
-  shield:    "#6DCF92",
-  lock:      "#FCA5A5",
-  gear:      "#94A3B8",
+  dashboard: ICO_COR_PADRAO,
+  check: ICO_COR_PADRAO,
+  truck: ICO_COR_PADRAO,
+  wrench: ICO_COR_PADRAO,
+  users: ICO_COR_PADRAO,
+  chart: ICO_COR_PADRAO,
+  home: ICO_COR_PADRAO,
+  plus: ICO_COR_PADRAO,
+  list: ICO_COR_PADRAO,
+  logout: "#5A8AB8",
+  door: ICO_COR_PADRAO,
+  cash: ICO_COR_PADRAO,
+  laptop: ICO_COR_PADRAO,
+  building: ICO_COR_PADRAO,
+  manual: ICO_COR_PADRAO,
+  shield: ICO_COR_PADRAO,
+  lock: ICO_COR_PADRAO,
+  gear: ICO_COR_PADRAO,
 };
 
 interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; }
@@ -151,14 +160,13 @@ export function Sidebar({perfil}: SidebarProps) {
       {isMobile && !aberta && (
         <button
           onClick={() => setAberta(true)}
-          aria-label="Abrir menu"
-          style={{ position:"fixed", top:10, right:10, zIndex:700,
+          aria-label="Abrir menu"style={{ position:"fixed", top:10, right:10, zIndex:700,
             width:38, height:38, borderRadius:8, border:"none",
-            background:"#0B1F3A", color:"#fff", fontSize:20, cursor:"pointer",
+            background:"#0B1F3A", color:"#fff", fontSize:18, cursor:"pointer",
             display:"flex", alignItems:"center", justifyContent:"center",
             boxShadow:"0 2px 8px rgba(0,0,0,0.3)" }}
         >
-          ☰
+          <IcoMenu tam={14}/>
         </button>
       )}
 
@@ -166,8 +174,7 @@ export function Sidebar({perfil}: SidebarProps) {
       {isMobile && aberta && (
         <div
           onClick={() => setAberta(false)}
-          aria-hidden="true"
-          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)",
+          aria-hidden="true"style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)",
             zIndex:599, backdropFilter:"blur(2px)" }}
         />
       )}
@@ -189,12 +196,11 @@ export function Sidebar({perfil}: SidebarProps) {
         {isMobile && (
           <button
             onClick={() => setAberta(false)}
-            aria-label="Fechar menu"
-            style={{ background:"none", border:"none", color:"#5A8AB8",
+            aria-label="Fechar menu"style={{ background:"none", border:"none", color:"#5A8AB8",
               cursor:"pointer", padding:4, display:"flex", alignItems:"center",
               fontSize:18, flexShrink:0 }}
           >
-            ✕
+            <IcoX tam={14}/>
           </button>
         )}
       </div>
@@ -223,10 +229,8 @@ export function Sidebar({perfil}: SidebarProps) {
                   <span style={{
                     ...s.ico,
                     background: active
-                      ? "rgba(255,255,255,0.15)"
-                      : isHov
-                      ? "rgba(255,255,255,0.09)"
-                      : "rgba(255,255,255,0.06)",
+                      ? "rgba(255,255,255,0.15)": isHov
+                      ? "rgba(255,255,255,0.09)": "rgba(255,255,255,0.06)",
                     color: active ? "#fff" : ICO_COLORS[item.icon],
                     transition: "background 0.15s",
                   }} aria-hidden="true">
@@ -268,9 +272,7 @@ export function Sidebar({perfil}: SidebarProps) {
               background: logoutHovered ? "rgba(255,255,255,0.08)" : "transparent",
               color: logoutHovered ? "#a8cbf0" : "#5A8AB8",
             }}
-            title="Sair do sistema"
-            aria-label="Sair do sistema"
-          >
+            title="Sair do sistema"aria-label="Sair do sistema">
             <span aria-hidden="true">{IcoMap.logout}</span>
           </button>
         </div>
@@ -285,22 +287,22 @@ const s: Record<string,React.CSSProperties> = {
   texture:   {position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,0.012) 3px,rgba(255,255,255,0.012) 6px)",pointerEvents:"none"},
   shine:     {position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)"},
   brand:     {display:"flex",alignItems:"center",gap:10,padding:"18px 14px 16px",borderBottom:"1px solid rgba(255,255,255,0.07)",position:"relative",zIndex:1,flexShrink:0},
-  logoBox:   {width:36,height:36,background:"linear-gradient(135deg,#1E6FD4,#1450A3)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",flexShrink:0,boxShadow:"0 2px 12px rgba(30,111,212,0.45)"},
+  logoBox:   {width:36,height:36,background:"linear-gradient(135deg,#1E6FD4,#1450A3)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",flexShrink:0,boxShadow:"0 2px 12px rgba(30,111,212,0.45)"},
   logoTitle: {color:"#fff",fontWeight:800,fontSize:14,letterSpacing:-0.3},
-  logoSub:   {color:"#A8CBF0",fontSize:9.5,fontWeight:600,letterSpacing:"0.8px",textTransform:"uppercase" as const},
+  logoSub:   {color:"#A8CBF0",fontSize:11,fontWeight:600,letterSpacing:"0.8px",textTransform:"uppercase" as const},
   nav:       {flex:1,overflowY:"auto" as const,padding:"6px 0"},
   section:   {padding:"10px 8px 4px",position:"relative",zIndex:1},
   secLabel:  {fontSize:9,fontWeight:700,color:"#3D6A9E",textTransform:"uppercase" as const,letterSpacing:"1.2px",padding:"0 8px",marginBottom:4},
-  navItem:   {display:"flex",alignItems:"center",gap:9,padding:"8px 8px",borderRadius:9,border:"1px solid transparent",background:"transparent",fontSize:13,cursor:"pointer",textAlign:"left" as const,width:"100%",marginBottom:2,position:"relative" as const,transition:"background 0.15s, border-color 0.15s"},
+  navItem:   {display:"flex",alignItems:"center",gap:9,padding:"8px 8px",borderRadius:8,border:"1px solid transparent",background:"transparent",fontSize:13,cursor:"pointer",textAlign:"left" as const,width:"100%",marginBottom:2,position:"relative" as const,transition:"background 0.15s, border-color 0.15s"},
   navActive: {background:"linear-gradient(135deg,rgba(30,111,212,0.38),rgba(20,80,163,0.22))",border:"1px solid rgba(56,130,246,0.28)",fontWeight:700},
   navHover:  {background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.06)"},
-  activeBar: {position:"absolute" as const,left:0,top:"50%",transform:"translateY(-50%)",width:3,height:"56%",background:"linear-gradient(180deg,#FACC15,#D4A80F)",borderRadius:"0 3px 3px 0"},
-  ico:       {width:28,height:28,borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0},
+  activeBar: {position:"absolute" as const,left:0,top:"50%",transform:"translateY(-50%)",width:3,height:"56%",background:"linear-gradient(180deg,#F59E0B,#D4A80F)",borderRadius:"0 3px 3px 0"},
+  ico:       {width:28,height:28,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0},
   badge:     {background:"#E53E3E",color:"#fff",borderRadius:99,fontSize:9,fontWeight:700,padding:"1px 5px",lineHeight:1.4},
   bottom:    {padding:"8px 8px 14px",borderTop:"1px solid rgba(255,255,255,0.07)",flexShrink:0,position:"relative" as const,zIndex:1},
-  userCard:  {display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:9,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"},
-  avatar:    {width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#1E6FD4,#1A6B3A)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0,letterSpacing:-0.5},
+  userCard:  {display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"},
+  avatar:    {width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#1E6FD4,#1A6B3A)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,letterSpacing:-0.5},
   userName:  {color:"#fff",fontSize:11,fontWeight:700,lineHeight:"1.2"},
-  userRole:  {color:"#7EB8F7",fontSize:9.5,lineHeight:"1.2"},
+  userRole:  {color:"#7EB8F7",fontSize:11,lineHeight:"1.2"},
   logoutBtn: {border:"none",cursor:"pointer",padding:5,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:6,flexShrink:0,transition:"background 0.15s, color 0.15s"},
 };

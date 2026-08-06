@@ -5,6 +5,8 @@ import { collection, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, 
 import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { IcoCalendario, IcoCarro, IcoVoltar, IcoXCirculo } from "../../components/Icone";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface Solicitacao {
   id: string; protocolo: string; veiculoPlaca: string;
@@ -14,16 +16,16 @@ interface Solicitacao {
 }
 
 const STATUS: Record<string, { label:string; color:string; bg:string }> = {
-  pendente:  { label:"Pendente",  color:"#854d0e", bg:"#fef9c3"  },
-  aprovada:  { label:"Aprovada",  color:"#166534", bg:"#dcfce7"  },
-  recusada:  { label:"Recusada",  color:"#991b1b", bg:"#fee2e2"  },
-  em_uso:    { label:"Em Uso",    color:"#1e40af", bg:"#dbeafe"  },
-  concluida: { label:"Concluída", color:"#475569", bg:"#f1f5f9"  },
-  cancelada: { label:"Cancelada", color:"#475569", bg:"#f1f5f9"  },
+  pendente:  { label:"Pendente",  color:"#854d0e", bg:"#fef9c3"},
+  aprovada:  { label:"Aprovada",  color:"#166534", bg:"#dcfce7"},
+  recusada:  { label:"Recusada",  color:"#991b1b", bg:"#fee2e2"},
+  em_uso:    { label:"Em Uso",    color:"#1e40af", bg:"#dbeafe"},
+  concluida: { label:"Concluída", color:"#475569", bg:"#f1f5f9"},
+  cancelada: { label:"Cancelada", color:"#475569", bg:"#f1f5f9"},
 };
 
 const card: React.CSSProperties = {
-  background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:14,
+  background:"#ffffff", border:"1px solid #E1EAF5", borderRadius:12,
   boxShadow:"0 1px 3px rgba(0,0,0,0.05)",
 };
 
@@ -78,10 +80,10 @@ export default function MinhasSolicitacoes() {
 
         <div style={{ padding:"24px 28px", flex:1, overflowY:"auto" }}>
           {carregando ? (
-            <div style={{ textAlign:"center", padding:"5rem", color:"#7A95B2", fontSize:15 }}>Carregando...</div>
+            <SkeletonLista itens={3} />
           ) : solicitacoes.length === 0 ? (
             <div style={{ ...card, textAlign:"center", padding:"3rem 2rem", maxWidth:420 }}>
-              <div style={{ fontSize:48, marginBottom:12 }}>📋</div>
+              <div style={{ fontSize:48, marginBottom:12 }}></div>
               <p style={{ color:"#7A95B2", marginBottom:20, fontSize:14 }}>Você ainda não fez nenhuma solicitação.</p>
               <button onClick={() => navigate("/usuario/solicitar")} style={{ padding:"10px 22px", background:"#1E3A8A", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:700, cursor:"pointer" }}>
                 + Nova Solicitação
@@ -104,7 +106,7 @@ export default function MinhasSolicitacoes() {
                         </div>
                         <div style={{ fontSize:15, fontWeight:700, color:"#0F172A" }}>{sol.destino}</div>
                         <div style={{ fontSize:12, color:"#5A7A9A", marginTop:3 }}>
-                          🚗 {sol.veiculoPlaca} &nbsp;|&nbsp; 📅 {formatarData(sol.dataSaida)}
+                          <IcoCarro tam={14}/> {sol.veiculoPlaca} &nbsp;|&nbsp; <IcoCalendario tam={14}/> {formatarData(sol.dataSaida)}
                         </div>
                       </div>
                       <span style={{ color:"#CBD5E1", fontSize:14 }}>{aberto ? "▲" : "▼"}</span>
@@ -113,7 +115,7 @@ export default function MinhasSolicitacoes() {
                     {/* Motivo de recusa */}
                     {sol.status === "recusada" && (
                       <div style={{ margin:"0 20px 14px", background:"#fff5f5", border:"1px solid #fecaca", borderRadius:8, padding:"10px 14px" }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:"#DC2626", marginBottom:4 }}>❌ Motivo da Recusa</div>
+                        <div style={{ fontSize:12, fontWeight:700, color:"#DC2626", marginBottom:4 }}><IcoXCirculo tam={14}/> Motivo da Recusa</div>
                         <div style={{ fontSize:13, color:"#991b1b" }}>{sol.motivoRecusa || "Nenhum motivo informado pelo gestor."}</div>
                       </div>
                     )}
@@ -121,7 +123,7 @@ export default function MinhasSolicitacoes() {
                     {/* Detalhes expandidos */}
                     {aberto && (
                       <div style={{ padding:"0 20px 20px" }}>
-                        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:10, background:"#F8FAFC", borderRadius:10, padding:"14px", marginBottom:12, border:"1px solid #F1F5F9" }}>
+                        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:10, background:"#F8FAFC", borderRadius:8, padding:"14px", marginBottom:12, border:"1px solid #F1F5F9" }}>
                           <DetalheItem label="Motivo da Viagem" valor={sol.motivo} />
                           <DetalheItem label="Retorno Previsto" valor={formatarData(sol.dataRetorno)} />
                           {sol.descricao && (
@@ -135,19 +137,19 @@ export default function MinhasSolicitacoes() {
                             onClick={() => setConfirmCancelar(sol.id)}
                             disabled={cancelando === sol.id}
                             style={{ width:"100%", padding:"9px", background:"#fff", border:"1px solid #fca5a5", borderRadius:8, color:"#dc2626", fontSize:12, fontWeight:600, cursor:"pointer" }}>
-                            {cancelando === sol.id ? "Cancelando..." : "✕ Cancelar solicitação"}
+                            {cancelando === sol.id ? "Cancelando..." : " Cancelar solicitação"}
                           </button>
                         )}
                         {sol.status === "aprovada" && (
                           <button onClick={() => navigate(`/usuario/checkout/${sol.id}`)}
                             style={{ width:"100%", padding:"10px", background:"#22C55E", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-                            🚗 Iniciar Uso do Veículo
+                            <IcoCarro tam={14}/> Iniciar Uso do Veículo
                           </button>
                         )}
                         {sol.status === "em_uso" && (
                           <button onClick={() => navigate(`/usuario/checkin/${sol.id}`)}
                             style={{ width:"100%", padding:"10px", background:"#1E3A8A", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-                            🔙 Registrar Devolução
+                            <IcoVoltar tam={14}/> Registrar Devolução
                           </button>
                         )}
                       </div>
@@ -162,12 +164,7 @@ export default function MinhasSolicitacoes() {
 
       {confirmCancelar && (
         <ModalConfirm
-          titulo="Cancelar Solicitação"
-          mensagem="Tem certeza que deseja cancelar esta solicitação? Esta ação não pode ser desfeita."
-          labelConfirmar="Sim, cancelar"
-          labelCancelar="Voltar"
-          corConfirmar="#EF4444"
-          onConfirmar={() => { cancelarSolicitacao(confirmCancelar); setConfirmCancelar(null); }}
+          titulo="Cancelar Solicitação"mensagem="Tem certeza que deseja cancelar esta solicitação? Esta ação não pode ser desfeita."labelConfirmar="Sim, cancelar"labelCancelar="Voltar"corConfirmar="#EF4444"onConfirmar={() => { cancelarSolicitacao(confirmCancelar); setConfirmCancelar(null); }}
           onCancelar={() => setConfirmCancelar(null)}
         />
       )}
@@ -178,7 +175,7 @@ export default function MinhasSolicitacoes() {
 function DetalheItem({ label, valor }: { label:string; valor:string }) {
   return (
     <div>
-      <div style={{ fontSize:10, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
+      <div style={{ fontSize:11, color:"#7A95B2", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>{label}</div>
       <div style={{ fontSize:13, color:"#334155" }}>{valor || "—"}</div>
     </div>
   );

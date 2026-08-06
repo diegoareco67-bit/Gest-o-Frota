@@ -2,6 +2,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { SkeletonLista } from "../../components/Skeleton";
 
 interface Setor { id: string; nome: string; ativo: boolean; }
 
@@ -61,7 +62,7 @@ export default function Setores() {
             {erro && <div role="alert" style={{ ...s.erro, marginBottom: 16 }}>{erro}</div>}
 
             {carregando ? (
-              <div style={s.vazio}>Carregando...</div>
+              <SkeletonLista itens={3} />
             ) : setores.length === 0 ? (
               <div style={s.vazio}>Nenhum setor cadastrado ainda.</div>
             ) : (
@@ -89,7 +90,7 @@ const s: Record<string, React.CSSProperties> = {
   topbar:  { background: "#ffffff", borderBottom: "1.5px solid #E1EAF5", padding: "14px 24px", flexShrink: 0 },
   title:   { fontSize: 18, fontWeight: 700, color: "#0F172A" },
   sub:     { color: "#7A95B2", fontSize: 12, marginTop: 2 },
-  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 14, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  card:    { background: "#ffffff", border: "1px solid #E1EAF5", borderRadius: 12, padding: "1.25rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   vazio:   { fontSize: 13, color: "#94A3B8" },
   input:   { padding: "9px 12px", border: "1px solid #E1EAF5", borderRadius: 8, fontSize: 13, boxSizing: "border-box", background: "#fff", color: "#0F172A", fontFamily: "inherit" },
   erro:    { background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#DC2626", fontWeight: 500 },

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Calendario from "../../components/Calendario";
 import { CalendarioGrade } from "../../components/CalendarioGrade";
 import { Sidebar } from "../../components/layout/Sidebar";
+import { IcoCarro, IcoPessoa, IcoSirene } from "../../components/Icone";
 
 const STATUS_SALAS = {
   confirmada: { cor:"#3B82F6", label:"Reservada" },
@@ -99,7 +100,7 @@ export default function DashboardGestor() {
               {atrasadas.length > 0 && (
                 <div style={s.alertBox}>
                   <div style={s.alertHeader}>
-                    <span style={{ fontSize:14 }}>🚨</span>
+                    <span style={{ fontSize:14 }}><IcoSirene tam={14}/></span>
                     <span style={{ fontSize:13, fontWeight:700, color:"#991b1b" }}>
                       {atrasadas.length} veículo{atrasadas.length>1?"s":""} não devolvido{atrasadas.length>1?"s":""} no prazo
                     </span>
@@ -109,9 +110,9 @@ export default function DashboardGestor() {
                     const atrasoStr = h>0 ? `${h}h${m>0?` ${m}min`:""}` : `${m}min`;
                     return (
                       <div key={a.id} style={s.alertRow}>
-                        <span style={{ fontSize:12, fontWeight:700, color:"#DC2626", minWidth:90 }}>🚗 {a.veiculoPlaca}</span>
-                        <span style={{ fontSize:12, color:"#64748b", flex:1 }}>👤 {a.condutorNome}</span>
-                        <span style={{ fontSize:11, color:"#991b1b", fontWeight:700, background:"#fee2e2", padding:"2px 10px", borderRadius:20 }}>+{atrasoStr} atraso</span>
+                        <span style={{ fontSize:12, fontWeight:700, color:"#DC2626", minWidth:90 }}><IcoCarro tam={14}/> {a.veiculoPlaca}</span>
+                        <span style={{ fontSize:12, color:"#64748b", flex:1 }}><IcoPessoa tam={14}/> {a.condutorNome}</span>
+                        <span style={{ fontSize:11, color:"#991b1b", fontWeight:700, background:"#fee2e2", padding:"2px 10px", borderRadius:99 }}>+{atrasoStr} atraso</span>
                       </div>
                     );
                   })}
@@ -120,12 +121,12 @@ export default function DashboardGestor() {
 
               {/* KPI Cards — grid 3 colunas × 2 linhas */}
               <div style={s.kpiGrid}>
-                <StatCard accent="#1E3A8A" iconBg="#dbeafe" icon={<IcoCheck  color="#1E3A8A"/>} label="Disponíveis"  valor={stats.veiculosDisponiveis}  sub="prontos para uso"     onClick={() => navigate("/gestor/veiculos")} />
-                <StatCard accent="#3B82F6" iconBg="#eff6ff" icon={<IcoTruck  color="#1563D5"/>} label="Em Uso"       valor={stats.veiculosEmUso}         sub="circulando agora"    onClick={() => navigate("/gestor/veiculos")} />
-                <StatCard accent="#F59E0B" iconBg="#fef9c3" icon={<IcoWrench color="#B45309"/>} label="Manutenção"  valor={stats.veiculosManutencao}    sub="em reparo"           onClick={() => navigate("/gestor/manutencao")} />
-                <StatCard accent="#EF4444" iconBg="#fee2e2" icon={<IcoAlert  color="#DC2626"/>} label="Pendentes"   valor={stats.solicitacoesPendentes} sub="aguardando aprovação" onClick={() => navigate("/gestor/aprovacoes")} />
-                <StatCard accent="#1E3A8A" iconBg="#dbeafe" icon={<IcoList   color="#1E3A8A"/>} label="Hoje"        valor={stats.solicitacoesHoje}      sub="solicitações"        onClick={() => navigate("/gestor/aprovacoes")} />
-                <StatCard accent="#22C55E" iconBg="#dcfce7" icon={<IcoUsers  color="#166534"/>} label="Usuários"    valor={stats.totalUsuarios}         sub="ativos"              onClick={() => navigate("/gestor/usuarios")} />
+                <StatCard accent="#1E3A8A" iconBg="#dbeafe" icon={<IcoCheck  color="#1E3A8A"/>} label="Disponíveis"valor={stats.veiculosDisponiveis}  sub="prontos para uso"onClick={() => navigate("/gestor/veiculos")} />
+                <StatCard accent="#3B82F6" iconBg="#eff6ff" icon={<IcoTruck  color="#1563D5"/>} label="Em Uso"valor={stats.veiculosEmUso}         sub="circulando agora"onClick={() => navigate("/gestor/veiculos")} />
+                <StatCard accent="#F59E0B" iconBg="#fef9c3" icon={<IcoWrench color="#B45309"/>} label="Manutenção"valor={stats.veiculosManutencao}    sub="em reparo"onClick={() => navigate("/gestor/manutencao")} />
+                <StatCard accent="#EF4444" iconBg="#fee2e2" icon={<IcoAlert  color="#DC2626"/>} label="Pendentes"valor={stats.solicitacoesPendentes} sub="aguardando aprovação" onClick={() => navigate("/gestor/aprovacoes")} />
+                <StatCard accent="#1E3A8A" iconBg="#dbeafe" icon={<IcoList   color="#1E3A8A"/>} label="Hoje"valor={stats.solicitacoesHoje}      sub="solicitações"onClick={() => navigate("/gestor/aprovacoes")} />
+                <StatCard accent="#22C55E" iconBg="#dcfce7" icon={<IcoUsers  color="#166534"/>} label="Usuários"valor={stats.totalUsuarios}         sub="ativos"onClick={() => navigate("/gestor/usuarios")} />
               </div>
 
               {/* Bento inferior: calendário + ações rápidas */}
@@ -139,14 +140,7 @@ export default function DashboardGestor() {
 
                   <div style={s.card}>
                     <CalendarioGrade
-                      colecao="reservasSalas"
-                      titulo="Salas"
-                      subtitulo="Disponibilidade das salas de reunião"
-                      tema="claro"
-                      campoTitulo="salaNome"
-                      campoDataInicio="dataInicio"
-                      campoDataFim="dataFim"
-                      statusMap={STATUS_SALAS}
+                      colecao="reservasSalas"titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
                       statusFiltro={["confirmada"]}
                     />
                   </div>
@@ -159,10 +153,10 @@ export default function DashboardGestor() {
                     {[
                       {label:"Aprovar Solicitações", desc:"Gerencie pedidos pendentes",      path:"/gestor/aprovacoes",   cor:"#1E3A8A", Ico:IcoCheck},
                       {label:"Cadastrar Veículo",    desc:"Adicionar novo veículo à frota",  path:"/gestor/veiculos",     cor:"#22C55E", Ico:IcoTruck},
-                      {label:"Salas",                desc:"Calendário e reservas",           path:"/salas",               cor:"#7C3AED", Ico:IcoDoor},
-                      {label:"Equipamentos",         desc:"Notebooks, projetores...",        path:"/equipamentos",        cor:"#0891B2", Ico:IcoLaptop},
-                      {label:"Indenizações",         desc:"Termos e boletins de viagem",     path:"/gestor/indenizacoes", cor:"#059669", Ico:IcoCash},
-                      {label:"Agendar Manutenção",   desc:"Programar revisões e reparos",    path:"/gestor/manutencao",   cor:"#D97706", Ico:IcoWrench},
+                      {label:"Salas",                desc:"Calendário e reservas",           path:"/salas",               cor:"#1E3A8A", Ico:IcoDoor},
+                      {label:"Equipamentos",         desc:"Notebooks, projetores...",        path:"/equipamentos",        cor:"#1E3A8A", Ico:IcoLaptop},
+                      {label:"Indenizações",         desc:"Termos e boletins de viagem",     path:"/gestor/indenizacoes", cor:"#1E3A8A", Ico:IcoCash},
+                      {label:"Agendar Manutenção",   desc:"Programar revisões e reparos",    path:"/gestor/manutencao",   cor:"#1E3A8A", Ico:IcoWrench},
                       {label:"Ver Relatórios",       desc:"Análise de uso da frota",         path:"/gestor/relatorios",   cor:"#3B82F6", Ico:IcoChart},
                     ].map(a => (
                       <button key={a.path} onClick={() => navigate(a.path)} style={s.acaoCard}>
@@ -234,9 +228,9 @@ const IcoAlert  = ({color="#DC2626"}) => <svg width="17" height="17" viewBox="0 
 const IcoList   = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>;
 const IcoUsers  = ({color="#166534"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const IcoChart  = ({color="#3B82F6"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
-const IcoDoor   = ({color="#7C3AED"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill={color}/></svg>;
-const IcoLaptop = ({color="#0891B2"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg>;
-const IcoCash   = ({color="#059669"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg>;
+const IcoDoor   = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15" cy="12" r="1" fill={color}/></svg>;
+const IcoLaptop = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/></svg>;
+const IcoCash   = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6v12M18 6v12"/></svg>;
 
 const s: Record<string,React.CSSProperties> = {
   page:       {display:"flex",minHeight:"100vh",background:"#F1F5F9",fontFamily:"'Sora',system-ui,sans-serif"},
@@ -256,7 +250,7 @@ const s: Record<string,React.CSSProperties> = {
   kpiGrid:    {display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:24},
   statCard:   {background:"#ffffff",border:"1px solid #E1EAF5",borderRadius:12,padding:"16px 18px",cursor:"pointer",textAlign:"left",display:"flex",flexDirection:"column",gap:6,position:"relative",overflow:"hidden"},
   statIconWrap:{width:38,height:38,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:2},
-  statVal:    {fontSize:28,fontWeight:800,color:"#0F172A",lineHeight:"1"},
+  statVal:    {fontSize:24,fontWeight:800,color:"#0F172A",lineHeight:"1"},
   statLabel:  {fontSize:13,fontWeight:700,color:"#334155"},
   statSub:    {fontSize:11,color:"#7A95B2"},
 
@@ -264,12 +258,12 @@ const s: Record<string,React.CSSProperties> = {
   bento:      {display:"grid",gridTemplateColumns:"1fr 300px",gap:16,alignItems:"start"},
   bentoLeft:  {},
   bentoRight: {},
-  card:       {background:"#ffffff",border:"1px solid #E1EAF5",borderRadius:14,padding:"1.25rem",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"},
+  card:       {background:"#ffffff",border:"1px solid #E1EAF5",borderRadius:12,padding:"1.25rem",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"},
 
   /* Ações rápidas */
   acaoCard:   {background:"#ffffff",border:"1px solid #E1EAF5",borderRadius:12,padding:"13px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",transition:"box-shadow 0.15s, transform 0.15s"},
-  acaoIcon:   {width:38,height:38,borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0},
+  acaoIcon:   {width:38,height:38,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0},
   acaoLabel:  {fontSize:13,fontWeight:700,color:"#0F172A"},
   acaoDesc:   {fontSize:11,color:"#7A95B2",marginTop:2},
-  acaoArrow:  {marginLeft:"auto",fontSize:20,color:"#CBD5E1"},
+  acaoArrow:  {marginLeft:"auto",fontSize:18,color:"#CBD5E1"},
 };

@@ -28,10 +28,10 @@ export function ModalConfirm({
         justifyContent:"center", zIndex:1000 }}
       onClick={e => { if (e.target === e.currentTarget) onCancelar(); }}
     >
-      <div style={{ background:"#fff", borderRadius:14, padding:"1.75rem",
+      <div style={{ background:"#fff", borderRadius:12, padding:"1.75rem",
         width:"100%", maxWidth:400, boxShadow:"0 20px 60px rgba(0,0,0,0.3)",
         fontFamily:"'Sora',system-ui,sans-serif" }}>
-        <h2 id="modal-confirm-titulo" style={{ fontSize:17, fontWeight:700,
+        <h2 id="modal-confirm-titulo" style={{ fontSize:18, fontWeight:700,
           color:"#0F172A", marginBottom:8, marginTop:0 }}>
           {titulo}
         </h2>

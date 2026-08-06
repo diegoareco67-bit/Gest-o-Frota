@@ -90,7 +90,7 @@ export default function Login() {
         <div style={{background:"#1E3A8A",borderRadius:6,padding:"6px 16px",marginBottom:6}}>
           <span style={{fontWeight:900,fontSize:18,color:"#fff",letterSpacing:1}}>CGE</span>
         </div>
-        <div style={{fontSize:10,fontWeight:700,color:"#1E3A8A",textAlign:"center",letterSpacing:0.5,marginBottom:16,lineHeight:1.4}}>CONTROLADORIA-GERAL<br/>DO ESTADO DE MS</div>
+        <div style={{fontSize:11,fontWeight:700,color:"#1E3A8A",textAlign:"center",letterSpacing:0.5,marginBottom:16,lineHeight:1.4}}>CONTROLADORIA-GERAL<br/>DO ESTADO DE MS</div>
 
         {/* Ícone */}
         <div style={{width:68,height:68,borderRadius:"50%",background:"#EFF6FF",border:"2px solid #BFDBFE",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:10}}>
@@ -104,7 +104,7 @@ export default function Login() {
           {resetOk ? (
             /* ── Sucesso ── */
             <div style={{textAlign:"center",padding:"8px 0"}}>
-              <div style={{fontSize:44,marginBottom:12}}>📧</div>
+              <div style={{fontSize:44,marginBottom:12}}></div>
               <div style={{fontSize:15,fontWeight:700,color:"#0F172A",marginBottom:8}}>E-mail enviado!</div>
               <p style={{fontSize:13,color:"#64748B",marginBottom:20,lineHeight:1.5}}>
                 Um link de redefinição foi enviado para <strong>{emailReset}</strong>.<br/>Verifique sua caixa de entrada.
@@ -122,11 +122,10 @@ export default function Login() {
               <form onSubmit={resolverMfa} noValidate>
                 <div style={{marginBottom:14}}>
                   <label htmlFor="mfa-code" style={{display:"block",fontSize:12,fontWeight:600,color:"#374151",marginBottom:5}}>Código de verificação</label>
-                  <input id="mfa-code" value={mfaCode} required inputMode="numeric" autoFocus placeholder="000000"
-                    onChange={e=>{setMfaCode(e.target.value.replace(/\D/g,"").slice(0,6));setErro("");}}
-                    style={{width:"100%",padding:"10px 12px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:20,letterSpacing:6,textAlign:"center",boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}/>
+                  <input id="mfa-code" value={mfaCode} required inputMode="numeric" autoFocus placeholder="000000"onChange={e=>{setMfaCode(e.target.value.replace(/\D/g,"").slice(0,6));setErro("");}}
+                    style={{width:"100%",padding:"10px 12px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:18,letterSpacing:6,textAlign:"center",boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}/>
                 </div>
-                {erro&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:7,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erro}</div>}
+                {erro&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:8,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erro}</div>}
                 <button type="submit" disabled={load}
                   style={{width:"100%",padding:"12px",background:load?"#94A3B8":"#1E3A8A",color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:700,cursor:load?"not-allowed":"pointer",marginBottom:8}}>
                   {load?"Verificando...":"Verificar e entrar"}
@@ -145,12 +144,11 @@ export default function Login() {
               <form onSubmit={handleReset} noValidate>
                 <div style={{marginBottom:14}}>
                   <label htmlFor="reset-email" style={{display:"block",fontSize:12,fontWeight:600,color:"#374151",marginBottom:5}}>E-mail institucional</label>
-                  <input id="reset-email" type="email" value={emailReset} required placeholder="gestor@frota.ms.gov.br"
-                    autoFocus
+                  <input id="reset-email" type="email" value={emailReset} required placeholder="gestor@frota.ms.gov.br"autoFocus
                     onChange={e=>{setEmailReset(e.target.value);setErroReset("");}}
                     style={{width:"100%",padding:"9px 12px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:13,boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}/>
                 </div>
-                {erroReset&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:7,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erroReset}</div>}
+                {erroReset&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:8,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erroReset}</div>}
                 <button type="submit" disabled={resetLoad}
                   style={{width:"100%",padding:"12px",background:resetLoad?"#94A3B8":"#1E3A8A",color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:700,cursor:resetLoad?"not-allowed":"pointer",marginBottom:8}}>
                   {resetLoad?"Enviando...":"Enviar link de redefinição"}
@@ -172,8 +170,7 @@ export default function Login() {
                   <label htmlFor="login-email" style={{display:"block",fontSize:12,fontWeight:600,color:"#374151",marginBottom:5}}>E-mail institucional</label>
                   <div style={{position:"relative"}}>
                     <svg aria-hidden="true" style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)"}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    <input id="login-email" type="email" value={email} required placeholder="gestor@frota.ms.gov.br"
-                      aria-required="true" aria-describedby={erro ? "login-erro" : undefined}
+                    <input id="login-email" type="email" value={email} required placeholder="gestor@frota.ms.gov.br"aria-required="true" aria-describedby={erro ? "login-erro" : undefined}
                       onChange={e=>{setEmail(e.target.value);setErro("");}}
                       style={{width:"100%",padding:"9px 12px 9px 32px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:13,boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}/>
                   </div>
@@ -184,8 +181,7 @@ export default function Login() {
                   <label htmlFor="login-senha" style={{display:"block",fontSize:12,fontWeight:600,color:"#374151",marginBottom:5}}>Senha</label>
                   <div style={{position:"relative"}}>
                     <svg aria-hidden="true" style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)"}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <input id="login-senha" type={show?"text":"password"} value={senha} required placeholder="••••••••"
-                      aria-required="true" aria-describedby={erro ? "login-erro" : undefined}
+                    <input id="login-senha" type={show?"text":"password"} value={senha} required placeholder="••••••••"aria-required="true" aria-describedby={erro ? "login-erro" : undefined}
                       onChange={e=>{setSenha(e.target.value);setErro("");}}
                       style={{width:"100%",padding:"9px 36px 9px 32px",border:"1.5px solid #E2E8F0",borderRadius:8,fontSize:13,boxSizing:"border-box",background:"#FAFAFA",fontFamily:"inherit",color:"#0F172A"}}
                       autoComplete="current-password"/>
@@ -208,7 +204,7 @@ export default function Login() {
                     style={{background:"none",border:"none",fontSize:12,color:"#3B82F6",cursor:"pointer",fontFamily:"inherit"}}>Esqueceu sua senha?</button>
                 </div>
 
-                {erro&&<div id="login-erro" role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:7,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erro}</div>}
+                {erro&&<div id="login-erro" role="alert" style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:8,padding:"8px 12px",fontSize:12,color:"#DC2626",marginBottom:10,textAlign:"center"}}>{erro}</div>}
 
                 <button type="submit" disabled={load}
                   style={{width:"100%",padding:"12px",background:load?"#94A3B8":"#1E3A8A",color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:700,cursor:load?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"background 0.15s, transform 0.1s"}}>
@@ -242,8 +238,8 @@ export default function Login() {
           <ellipse cx="38" cy="93" rx="42" ry="28" fill="#22c55e" opacity="0.9"/>
           <ellipse cx="30" cy="93" rx="28" ry="20" fill="#FACC15" opacity="0.95"/>
           <text x="118" y="67" textAnchor="middle" fill="white" fontSize="52" fontWeight="900" fontFamily="Arial Black, Arial, sans-serif" letterSpacing="-1">CGE</text>
-          <rect x="5"   y="96" width="70" height="5" fill="#16A34A"/>
-          <rect x="75"  y="96" width="70" height="5" fill="#FACC15"/>
+          <rect x="5"y="96" width="70" height="5" fill="#16A34A"/>
+          <rect x="75"y="96" width="70" height="5" fill="#FACC15"/>
           <rect x="145" y="96" width="70" height="5" fill="#1D4ED8"/>
           <text x="110" y="114" textAnchor="middle" fill="white" fontSize="11.5" fontFamily="Arial, sans-serif" fontWeight="400">Controladoria-Geral do Estado</text>
           <text x="110" y="129" textAnchor="middle" fill="white" fontSize="11.5" fontFamily="Arial, sans-serif" fontWeight="400">de Mato Grosso do Sul</text>
@@ -255,14 +251,14 @@ export default function Login() {
                 onClick={()=>setAbaCalendario(aba)}
                 style={{
                   display:"flex",alignItems:"center",gap:8,
-                  padding:"12px 22px",borderRadius:14,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                  padding:"12px 22px",borderRadius:12,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
                   border: abaCalendario===aba ? "1px solid #fff" : "1px solid rgba(255,255,255,0.14)",
                   background: abaCalendario===aba ? "#fff" : "rgba(255,255,255,0.07)",
                   color: abaCalendario===aba ? "#0F172A" : "rgba(255,255,255,0.65)",
                   transition:"background 0.15s, color 0.15s",
                 }}>
                 <span style={{display:"flex"}}>{IcoCalendarioAba}</span>
-                <span aria-hidden="true" style={{fontSize:19,lineHeight:1}}>{aba==="veiculos" ? "🚗" : "🚪"}</span>
+                <span aria-hidden="true" style={{fontSize:18,lineHeight:1}}>{aba==="veiculos" ? "" : ""}</span>
                 {aba==="veiculos" ? "Veículos" : "Salas"}
               </button>
             ))}
@@ -271,14 +267,7 @@ export default function Login() {
             <CalendarioGrade tema="escuro" campoTitulo="veiculoLabel"/>
           ) : (
             <CalendarioGrade
-              tema="escuro"
-              colecao="calendarioPublicoSalas"
-              titulo="SALAS DE REUNIÃO"
-              subtitulo="Consulte a disponibilidade pública das salas"
-              campoTitulo="salaNome"
-              campoDataInicio="dataInicio"
-              campoDataFim="dataFim"
-              statusMap={STATUS_SALAS_PUBLICO}
+              tema="escuro"colecao="calendarioPublicoSalas"titulo="SALAS DE REUNIÃO"subtitulo="Consulte a disponibilidade pública das salas"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS_PUBLICO}
               statusFiltro={["confirmada"]}
             />
           )}

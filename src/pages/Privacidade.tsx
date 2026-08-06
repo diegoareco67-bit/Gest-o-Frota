@@ -84,10 +84,10 @@ function Secao({ titulo, children }: { titulo: string; children: React.ReactNode
 
 const s: Record<string, React.CSSProperties> = {
   page:        { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F1F5F9", padding: "2rem 1rem", fontFamily: "'Sora', system-ui, sans-serif" },
-  card:        { background: "#ffffff", borderRadius: 16, border: "1px solid #E1EAF5", padding: "2rem", width: "100%", maxWidth: 640, boxShadow: "0 4px 24px rgba(0,0,0,0.08)" },
-  titulo:      { fontSize: 22, fontWeight: 700, color: "#0F172A", margin: "0 0 6px" },
-  secao:       { background: "#F8FAFC", border: "1px solid #E1EAF5", borderRadius: 10, padding: "1rem 1.15rem", marginBottom: "0.85rem" },
+  card:        { background: "#ffffff", borderRadius: 12, border: "1px solid #E1EAF5", padding: "2rem", width: "100%", maxWidth: 640, boxShadow: "0 4px 24px rgba(0,0,0,0.08)" },
+  titulo:      { fontSize: 24, fontWeight: 700, color: "#0F172A", margin: "0 0 6px" },
+  secao:       { background: "#F8FAFC", border: "1px solid #E1EAF5", borderRadius: 8, padding: "1rem 1.15rem", marginBottom: "0.85rem" },
   secaoTitulo: { fontSize: 13, fontWeight: 700, color: "#1E3A8A", marginBottom: 6 },
-  secaoTexto:  { fontSize: 13.5, color: "#334155", lineHeight: 1.6, margin: 0 },
+  secaoTexto:  { fontSize: 14, color: "#334155", lineHeight: 1.6, margin: 0 },
   btn:         { padding: "10px 24px", background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
 };

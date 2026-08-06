@@ -5,13 +5,14 @@ import { db } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
 import { useNavigate } from "react-router-dom";
+import { IcoAlerta, IcoCheckCirculo } from "../../components/Icone";
 
 interface Veiculo { id:string; placa:string; modelo:string; marca:string; tipo:string; categoriaUso?:string; }
 
 const card: React.CSSProperties = {
   background: "#ffffff",
   border: "1px solid #E1EAF5",
-  borderRadius: 14,
+  borderRadius: 12,
   boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
 };
 const inputStyle: React.CSSProperties = {
@@ -73,7 +74,7 @@ export default function Solicitar() {
       }
       const diasRestantes = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000*60*60*24));
       if (diasRestantes <= 30) {
-        setErroCon(`⚠️ Atenção: sua CNH vence em ${diasRestantes} dia(s) (${new Date(usuario.vencimentoCnh + "T00:00:00").toLocaleDateString("pt-BR")}). Providencie a renovação.`);
+        setErroCon(`<IcoAlerta tam={14}/> Atenção: sua CNH vence em ${diasRestantes} dia(s) (${new Date(usuario.vencimentoCnh + "T00:00:00").toLocaleDateString("pt-BR")}). Providencie a renovação.`);
         // Aviso, não bloqueia
       }
     }
@@ -114,8 +115,8 @@ export default function Solicitar() {
       <Sidebar perfil="usuario" />
       <main style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center" }}>
         <div style={{ ...card, padding:"3rem 2.5rem", textAlign:"center", maxWidth:420 }}>
-          <div style={{ fontSize:56, marginBottom:16 }}>✅</div>
-          <h2 style={{ fontSize:22, fontWeight:800, color:"#0F172A", marginBottom:8 }}>Solicitação Enviada!</h2>
+          <div style={{ fontSize:56, marginBottom:16 }}><IcoCheckCirculo tam={14}/></div>
+          <h2 style={{ fontSize:24, fontWeight:800, color:"#0F172A", marginBottom:8 }}>Solicitação Enviada!</h2>
           {protocoloGerado && (
             <div style={{ display:"inline-block", background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:8, padding:"6px 16px", fontSize:13, fontWeight:700, color:"#1E3A8A", marginBottom:12, letterSpacing:1 }}>
               Protocolo #{protocoloGerado}
@@ -154,7 +155,7 @@ export default function Solicitar() {
                   <option value="">Selecione um veículo</option>
                   {veiculos.map(v => <option key={v.id} value={v.id}>{v.placa} — {v.marca} {v.modelo} ({v.tipo})</option>)}
                 </select>
-                {veiculos.length === 0 && <p style={{ fontSize:12, color:"#D97706", marginTop:6 }}>⚠️ Nenhum veículo disponível no momento.</p>}
+                {veiculos.length === 0 && <p style={{ fontSize:12, color:"#D97706", marginTop:6 }}><IcoAlerta tam={14}/> Nenhum veículo disponível no momento.</p>}
               </div>
             </div>
 
@@ -186,12 +187,12 @@ export default function Solicitar() {
             </div>
 
             {erroCon && (
-              <div role="alert" style={{ background:"#fff5f5", border:"1px solid #fecaca", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#991b1b", fontWeight:500 }}>
-                ⚠️ {erroCon}
+              <div role="alert" style={{ background:"#fff5f5", border:"1px solid #fecaca", borderRadius:8, padding:"12px 16px", fontSize:13, color:"#991b1b", fontWeight:500 }}>
+                <IcoAlerta tam={14}/> {erroCon}
               </div>
             )}
 
-            <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#1e40af" }}>
+            <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"12px 16px", fontSize:13, color:"#1e40af" }}>
               ℹ️ Sua solicitação será analisada pelo gestor. Você receberá a aprovação ou recusa em breve.
             </div>
 
