@@ -7,6 +7,7 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { useConfiguracaoIndenizacao } from "../../hooks/useConfiguracaoIndenizacao";
+import { validarPeriodo } from "../../utils/periodo";
 import { gerarPdfAnexoII, calcularHashSHA256, calcularValor, type TrajetoLinha } from "../../utils/pdfIndenizacao";
 import { IcoCheckCirculo, IcoDocumento, IcoX } from "../../components/Icone";
 import { SkeletonLista } from "../../components/Skeleton";
@@ -80,6 +81,12 @@ export default function Indenizacoes() {
       setErro("Preencha todos os campos obrigatórios."); return;
     }
     if (totalKmRodados <= 0) { setErro("Informe pelo menos um trajeto com km rodados."); return; }
+    // O Anexo II é preenchido DEPOIS da viagem, então o passado é permitido — mas
+    // a duração ainda precisa ser plausível (30 dias) para barrar erro de digitação no ano.
+    const erroPeriodo = validarPeriodo(form.inicioAutorizado, form.retornoPrevisto, {
+      maxDias: 30, permitePassado: true, rotulo: "O período da viagem",
+    });
+    if (erroPeriodo) { setErro(erroPeriodo); return; }
     setErro("");
     const protocolo = gerarProtocolo();
     setProtocoloAtual(protocolo);

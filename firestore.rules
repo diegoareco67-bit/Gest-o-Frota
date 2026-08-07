@@ -29,6 +29,28 @@ service cloud.firestore {
       return isAuth() && perfil() == "auditor";
     }
 
+    // ─── período de reserva ────────────────────────────────────────────────
+    // Guarda contra período absurdo. Em teste de uso real um usuário conseguiu
+    // reservar um veículo por ~100 anos — os dois campos de data eram independentes
+    // e nada limitava a duração.
+    //
+    // A duração exata (7 dias) é validada no cliente (src/utils/periodo.ts): as datas
+    // são gravadas como texto ISO e a regra não faz aritmética de data sobre string.
+    // O que a regra garante é o limite ABSOLUTO — nenhuma data mais de 2 anos à frente.
+    // Isso mata o caso do ano digitado errado (2026 → 2126), que foi a falha real.
+    //
+    // A comparação de texto funciona porque o formato ISO ("AAAA-MM-DDTHH:MM") ordena
+    // lexicograficamente na mesma ordem cronológica.
+    function dataDentroDoHorizonte(valor) {
+      return valor is string
+        && valor.size() >= 16
+        && valor < string(request.time.year() + 2) + "-01-01T00:00";
+    }
+
+    function periodoSao(inicio, fim) {
+      return dataDentroDoHorizonte(inicio) && dataDentroDoHorizonte(fim) && fim > inicio;
+    }
+
     // ─── solicitacoesAcesso ────────────────────────────────────────────────
     // Qualquer pessoa pode submeter o formulário público de pré-cadastro.
     // Somente gestores gerenciam (leem/atualizam).
@@ -120,9 +142,10 @@ service cloud.firestore {
     match /solicitacoes/{id} {
       allow read: if isGestor() || isAuditor() || (isUsuario() && resource.data.condutorId == request.auth.uid);
 
-      // Usuário cria apenas as próprias solicitações
+      // Usuário cria apenas as próprias solicitações, com período dentro do horizonte
       allow create: if isUsuario()
-        && request.resource.data.condutorId == request.auth.uid;
+        && request.resource.data.condutorId == request.auth.uid
+        && periodoSao(request.resource.data.dataSaida, request.resource.data.dataRetorno);
 
       // Gestor aprova/recusa; usuário cancela a própria solicitação pendente
       allow update: if isGestor()
@@ -202,7 +225,8 @@ service cloud.firestore {
 
       // Gestor e usuário reservam para si mesmos (sala é recurso compartilhado por todo mundo, não só condutores)
       allow create: if (isGestor() || isUsuario())
-        && request.resource.data.responsavelId == request.auth.uid;
+        && request.resource.data.responsavelId == request.auth.uid
+        && periodoSao(request.resource.data.dataInicio, request.resource.data.dataFim);
 
       // Qualquer um dos dois cancela a própria reserva; gestor cancela qualquer uma
       allow update: if isGestor()
@@ -261,7 +285,8 @@ service cloud.firestore {
       allow read: if isGestor() || isUsuario() || isConsulta();
 
       allow create: if (isGestor() || isUsuario())
-        && request.resource.data.responsavelId == request.auth.uid;
+        && request.resource.data.responsavelId == request.auth.uid
+        && periodoSao(request.resource.data.dataInicio, request.resource.data.dataFim);
 
       // Dono do empréstimo avança o próprio status (retirar/devolver/cancelar); gestor mexe em qualquer um
       allow update: if isGestor()

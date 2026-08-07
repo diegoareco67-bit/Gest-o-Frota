@@ -134,10 +134,10 @@ export default function Checkin() {
                   <label style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:8, fontWeight:600 }}>Tipo de Ocorrência</label>
                   <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                     {[
-                      { val:"normal",  label:"<IcoCheckCirculo tam={14}/> Normal",   cor:"#22C55E", bg:"#dcfce7" },
-                      { val:"avaria",  label:" Avaria",   cor:"#D97706", bg:"#fef9c3" },
-                      { val:"sinistro",label:" Sinistro", cor:"#EF4444", bg:"#fee2e2" },
-                      { val:"multa",   label:"<IcoSemaforo tam={14}/> Multa",    cor:"#1E3A8A", bg:"#DBEAFE" },
+                      { val:"normal",  label:"Normal",   cor:"#22C55E", bg:"#dcfce7" },
+                      { val:"avaria",  label:"Avaria",   cor:"#D97706", bg:"#fef9c3" },
+                      { val:"sinistro",label:"Sinistro", cor:"#EF4444", bg:"#fee2e2" },
+                      { val:"multa",   label:"Multa",    cor:"#1E3A8A", bg:"#DBEAFE" },
                     ].map(o=>(
                       <button key={o.val} type="button" onClick={()=>setForm(p=>({...p,tipoOcorrencia:o.val}))}
                         style={{ padding:"8px 14px", borderRadius:8, fontSize:13, cursor:"pointer", fontWeight:600,

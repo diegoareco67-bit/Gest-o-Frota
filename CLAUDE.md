@@ -99,6 +99,25 @@ Nome **Hub**, subtítulo "Central de Recursos Compartilhados". Visual minimalist
 
 Lei Federal nº 13.709/2018 (LGPD) · Lei nº 12.527/2011 (Lei de Acesso à Informação) · Decreto Estadual nº 10.154/2000 (Indenização de Transporte) · Decreto Estadual nº 15.572/2020 (LGPD no Poder Executivo de MS) · Política Estadual de Segurança da Informação · Decreto Estadual nº 15.721/2021 (Plano de Classificação e Tabela de Temporalidade de Documentos das Atividades-Meio do Executivo — base dos prazos de retenção/anonimização usados no Hub) · Resolução CGE/MS nº 133, de 4/9/2025 (Política de Privacidade e Proteção de Dados Pessoais da própria CGE/MS — existência e texto integral confirmados em 2026-08-06 via PDF oficial do Anexo Único; aplica-se diretamente ao Hub por ser um sistema da própria CGE/MS, mas seu Art. 6º — mapeamento de tratamento por área — ainda não lista a gestão de frota/salas/equipamentos/indenização entre as 8 aplicabilidades previstas, e seu Art. 12 aponta genericamente para a Tabela de Temporalidade de atividades-fim, não a de atividades-meio de fato usada pelo Hub — ver lacuna documentada em PLANO.md).
 
+## Período de reserva — regras de negócio
+
+Toda entrada de início/fim passa por `src/utils/periodo.ts` (`validarPeriodo`). Não escreva
+validação de data solta na tela.
+
+| Recurso | Duração máxima | Passado permitido? |
+|---|---|---|
+| Veículo (solicitação) | 7 dias | não |
+| Sala / Equipamento | 1 dia | não |
+| Anexo II (boletim de viagem) | 30 dias | sim — é preenchido depois da viagem |
+
+Agendamento no máximo 12 meses à frente. A regra do Firestore (`periodoSao`) reforça um limite
+absoluto de 2 anos — a duração exata fica no cliente porque as datas são texto ISO e a regra não
+faz aritmética de data sobre string. Motivo de tudo isso: um usuário conseguiu reservar um
+veículo por ~100 anos em teste real.
+
+Para a UI, use `<CampoPeriodo>` (`src/components/CampoPeriodo.tsx`) — já traz validação enquanto
+digita, resumo de duração, atalhos e formato pt-BR independente do locale do sistema.
+
 ## Idioma da interface e das comunicações
 
 Todo texto visível ao servidor é **português do Brasil** — inclusive o que não é escrito pelo Hub.

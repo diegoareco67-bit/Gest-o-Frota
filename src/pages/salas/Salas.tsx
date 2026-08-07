@@ -8,6 +8,7 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
+import { validarPeriodo } from "../../utils/periodo";
 import { IcoMonitor, IcoPorta } from "../../components/Icone";
 import { SkeletonLista } from "../../components/Skeleton";
 
@@ -59,7 +60,11 @@ export default function Salas() {
     }
     const dataInicio = `${form.data}T${form.horaInicio}`;
     const dataFim = `${form.data}T${form.horaFim}`;
-    if (dataFim <= dataInicio) { setErro("O horário final deve ser depois do inicial."); return; }
+    // Validação compartilhada: intervalo, duração e data no passado (ver utils/periodo.ts).
+
+    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "A reserva" });
+
+    if (erroPeriodo) { setErro(erroPeriodo); return; }
     if (verificarConflito(form.salaId, dataInicio, dataFim)) {
       setErro("Esta sala já está reservada nesse horário. Escolha outro horário ou outra sala."); return;
     }

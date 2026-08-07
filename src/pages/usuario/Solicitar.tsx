@@ -1,4 +1,6 @@
 import { Sidebar } from "../../components/layout/Sidebar";
+import { CampoPeriodo } from "../../components/CampoPeriodo";
+import { validarPeriodo } from "../../utils/periodo";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, setDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
@@ -61,9 +63,9 @@ export default function Solicitar() {
     if (!form.veiculoId || !form.destino || !form.motivo || !form.dataSaida || !form.dataRetorno) {
       setErroCon("Preencha todos os campos obrigatórios."); return;
     }
-    if (new Date(form.dataRetorno) <= new Date(form.dataSaida)) {
-      setErroCon("A data de retorno deve ser posterior à data de saída."); return;
-    }
+    // Bloqueia período inválido ou absurdo (um teste real chegou a reservar ~100 anos).
+    const erroPeriodo = validarPeriodo(form.dataSaida, form.dataRetorno, { rotulo: "A solicitação" });
+    if (erroPeriodo) { setErroCon(erroPeriodo); return; }
     // Validação de CNH
     if (usuario?.vencimentoCnh) {
       const hoje = new Date(); hoje.setHours(0,0,0,0);
@@ -74,7 +76,7 @@ export default function Solicitar() {
       }
       const diasRestantes = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000*60*60*24));
       if (diasRestantes <= 30) {
-        setErroCon(`<IcoAlerta tam={14}/> Atenção: sua CNH vence em ${diasRestantes} dia(s) (${new Date(usuario.vencimentoCnh + "T00:00:00").toLocaleDateString("pt-BR")}). Providencie a renovação.`);
+        setErroCon(`Atenção: sua CNH vence em ${diasRestantes} dia(s) (${new Date(usuario.vencimentoCnh + "T00:00:00").toLocaleDateString("pt-BR")}). Providencie a renovação.`);
         // Aviso, não bloqueia
       }
     }
@@ -171,13 +173,16 @@ export default function Solicitar() {
                   <label htmlFor="sol-motivo" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Motivo *</label>
                   <input id="sol-motivo" value={form.motivo} onChange={e=>setForm(p=>({...p,motivo:e.target.value}))} style={inputStyle} placeholder="Ex: Transporte de pacientes" required />
                 </div>
-                <div>
-                  <label htmlFor="sol-saida" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Saída *</label>
-                  <input id="sol-saida" type="datetime-local" value={form.dataSaida} onChange={e=>{ setForm(p=>({...p,dataSaida:e.target.value})); setErroCon(""); }} style={inputStyle} required />
-                </div>
-                <div>
-                  <label htmlFor="sol-retorno" style={{ display:"block", fontSize:12, color:"#5A7A9A", marginBottom:6, fontWeight:600 }}>Data/Hora de Retorno *</label>
-                  <input id="sol-retorno" type="datetime-local" value={form.dataRetorno} onChange={e=>{ setForm(p=>({...p,dataRetorno:e.target.value})); setErroCon(""); }} style={inputStyle} required />
+                <div style={{ gridColumn:"1 / -1" }}>
+                  <CampoPeriodo
+                    idBase="sol"
+                    rotuloInicio="Data/Hora de Saída *"
+                    rotuloFim="Data/Hora de Retorno *"
+                    inicio={form.dataSaida}
+                    fim={form.dataRetorno}
+                    aoMudar={(dataSaida, dataRetorno) => { setForm(p => ({ ...p, dataSaida, dataRetorno })); setErroCon(""); }}
+                    opcoes={{ rotulo: "A solicitação" }}
+                  />
                 </div>
               </div>
               <div>

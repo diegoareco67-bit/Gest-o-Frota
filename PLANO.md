@@ -2,7 +2,131 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
-## ⏳ PENDÊNCIAS ABERTAS — levantadas em 2026-08-06, ainda não implementadas
+## ✅ Correções 1 a 3 — APLICADAS em 2026-08-07
+
+Os três problemas abaixo foram levantados em 2026-08-06 e **corrigidos**. O texto original
+do diagnóstico foi mantido para registro; a solução de cada um está marcada como ✅.
+
+### ✅ 1. E-mail de definição de senha vinha em INGLÊS — CORRIGIDO
+
+**Solução:** `auth.languageCode = "pt-BR"` em `src/firebase/config.ts`, logo após o `getAuth()`.
+Passa a servir a versão pt-BR do template do Firebase nos **três** pontos que disparam e-mail
+(aprovação de solicitação, cadastro manual e "esqueci minha senha").
+
+**Ainda vale fazer (não bloqueia):** customizar o texto em Firebase Console → Authentication →
+Templates, para assinar como CGE-MS/Hub em vez do texto genérico do Firebase. O `languageCode`
+resolve o idioma, não a identidade institucional.
+
+### ✅ 2. Entrada de data/hora ruim e inconsistente — CORRIGIDO
+
+**Solução em duas peças:**
+- **`src/utils/periodo.ts`** — validação compartilhada: intervalo, duração máxima, início no
+  passado e horizonte futuro. Uma função só (`validarPeriodo`), usada por todos os módulos.
+- **`src/components/CampoPeriodo.tsx`** — componente único de início/fim, com:
+  - validação **enquanto digita** (o erro aparece antes de tentar salvar, não depois)
+  - resumo da duração em texto ("Duração: 2 dias e 4h · máximo permitido: 7 dias")
+  - atalhos de duração (1h/2h/4h/8h) que preenchem os dois campos de uma vez
+  - `min`/`max` nos inputs, o que impede o seletor nativo de aceitar ano absurdo
+  - formatação pt-BR garantida via `formatarDataHoraBR`, independente do locale do SO
+
+Aplicado em **Solicitar (veículos)**. Salas, Equipamentos e Indenizações passaram a usar a
+mesma função de validação (mantendo os campos atuais, que já são adequados: data única +
+hora início/fim limita a um dia por construção).
+
+### ✅ 3. Reserva sem limite de duração — CORRIGIDO
+
+**O problema real:** em teste de uso, um usuário reservou um veículo por **~100 anos**. A causa
+estava em `Solicitar.tsx`: dois `datetime-local` independentes, e a única checagem era
+"retorno > saída" — nada limitava a duração nem o horizonte.
+
+**Solução em três camadas:**
+1. **Limite de duração** — `MAX_DIAS_RESERVA = 7` para veículos; 1 dia para salas e
+   equipamentos; 30 dias para o Anexo II (que é retroativo, registro de viagem já ocorrida).
+2. **Horizonte futuro** — no máximo 12 meses de antecedência, o que pega o erro de digitação
+   no ano (2026 → 2126) mesmo quando a duração calculada "parece" válida.
+3. **Regra do Firestore** (`periodoSao`) — barreira real, não só cliente, seguindo o princípio
+   já registrado no `CLAUDE.md`. Como as datas são texto ISO e a regra não faz aritmética de
+   data sobre string, a regra garante o limite **absoluto** (nada além de 2 anos à frente),
+   que é exatamente o caso que aconteceu. A duração exata fica no cliente.
+
+**Cobertura:** `src/__tests__/periodo.test.ts` — 20 testes, incluindo o caso reportado
+(reserva até 2126) e os limites de borda (exatamente 7 dias passa, 8 dias não).
+
+**Efeito colateral encontrado ao rodar a suíte:** três testes usavam datas fixas de 2025 e um
+usava "hoje às 14h" — todos passaram a falhar corretamente, já que a validação agora rejeita
+o passado. O de "hoje às 14h" era pior: só quebrava se a suíte rodasse depois das 14h. Todos
+migrados para datas futuras calculadas em tempo de execução, que não apodrecem.
+
+**Bug meu, corrigido junto:** o refactor de emojis (commit `bd9a0ec`) tinha inserido JSX dentro
+de literais de string em três pontos — `Solicitar.tsx` (aviso de CNH vencendo) e `Checkin.tsx`
+(rótulos "Normal"/"Multa"). Apareceria para o usuário como o texto cru `<IcoAlerta tam={14}/>`.
+O script tratava aspas mas não crase; nenhum teste pegou porque nenhum exercitava esses textos.
+
+---
+
+## ⏳ PENDÊNCIAS ABERTAS
+
+### 4. Termo de Opção (Anexo I) diverge do modelo do decreto e não é digital
+
+**Problema de texto** — o PDF gerado (`src/utils/pdfIndenizacao.ts`, `gerarPdfAnexoI`) traz:
+
+> `Assinatura da Autoridade Concedente (Secretário de Estado, Procurador-Geral ou Diretor-Presidente)`
+
+O Anexo I do Decreto nº 10.154/2000 não tem esse parêntese explicativo. O modelo oficial é:
+
+```
+(Assinatura do Servidor)
+______________________________
+Nome do Servidor
+
+APROVADO EM ____/_____/_______
+
+(Assinatura da Autoridade Concedente)
+_____________________________________
+Nome/Cargo da Autoridade Concedente
+```
+
+**Divergências a corrigir:**
+- Tirar o parêntese explicativo do rótulo da autoridade concedente
+- O rótulo `(Assinatura do Servidor)` / `(Assinatura da Autoridade Concedente)` vai **acima** da
+  linha; **abaixo** dela vai o nome (`Nome do Servidor`, `Nome/Cargo da Autoridade Concedente`).
+  Hoje o código põe o rótulo abaixo e não imprime nome nenhum.
+- `Aprovado em:` → `APROVADO EM` (caixa alta, como no decreto)
+
+**Problema de fluxo — precisa ser 100% digital.** Hoje o servidor baixa o PDF, assina fora do
+sistema e faz upload do arquivo assinado. Precisa ficar fácil de preencher e assinável
+digitalmente por **duas** vias:
+- **gov.br** — assinador digital federal (fluxo já citado no `CLAUDE.md`, seção 4.4)
+- **E-MS** — o sistema estadual, que também tem assinador digital próprio
+
+A definir: se o Hub apenas orienta/linka os dois assinadores mantendo o upload, ou se integra
+de fato. Vale checar se o E-MS expõe API de assinatura ou só interface web — isso decide o
+tamanho do trabalho.
+
+### 5. Recusa sem justificativa em 2 dos 3 fluxos
+
+O usuário precisa saber **por que** foi recusado para poder corrigir e reenviar. Situação atual:
+
+| Fluxo | Onde | Campo de justificativa | Usuário vê? |
+|---|---|---|---|
+| Solicitação de **veículo** | `gestor/Aprovacoes.tsx` | ✅ tem, e é obrigatório | ✅ sim, em `MinhasSolicitacoes.tsx` |
+| Solicitação de **acesso** | `gestor/Usuarios.tsx` (~124) | ❌ não tem — só um `ModalConfirm` | ❌ não há tela onde ver |
+| **Anexo I** (veículo próprio) | `indenizacao/GestorIndenizacoes.tsx` (~54) | ❌ não tem — só troca o status | ❌ não |
+
+**A fazer:** replicar nos dois fluxos faltantes o padrão que já funciona em Aprovações —
+campo obrigatório de motivo, gravado no documento, exibido para o solicitante.
+
+Dois pontos a decidir:
+- **Solicitação de acesso** é feita por quem **ainda não tem conta** — não existe tela logada
+  onde ele veria o motivo. Provavelmente precisa ir por e-mail (o Apps Script já é usado para
+  notificação de aprovação/recusa de veículo; dá para reaproveitar).
+- **Reenvio após correção:** hoje o formulário público tem cooldown de 24h por navegador. Se a
+  pessoa foi recusada e precisa corrigir, o cooldown atrapalha — vale liberar o reenvio quando
+  a solicitação anterior estiver `recusada`.
+
+---
+
+## ⏳ Diagnóstico original (mantido para registro)
 
 ### 1. E-mail de definição de senha vem em INGLÊS (prioridade alta)
 

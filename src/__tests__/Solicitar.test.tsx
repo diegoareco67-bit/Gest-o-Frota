@@ -136,9 +136,15 @@ describe("Solicitar — envio do formulário", () => {
     await userEvent.type(screen.getByPlaceholderText(/hospital cge-ms/i), "UPA Central");
     await userEvent.type(screen.getByPlaceholderText(/transporte de pacientes/i), "Exame médico");
 
+    // Datas futuras: a validação de período rejeita início no passado.
+    const emDias = (d: number, hora: string) => {
+      const dt = new Date(Date.now() + d * 24 * 3600 * 1000);
+      const p = (n: number) => String(n).padStart(2, "0");
+      return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}T${hora}`;
+    };
     const dateInputs = document.querySelectorAll('input[type="datetime-local"]');
-    await userEvent.type(dateInputs[0] as HTMLElement, "2025-02-01T08:00");
-    await userEvent.type(dateInputs[1] as HTMLElement, "2025-02-01T17:00");
+    await userEvent.type(dateInputs[0] as HTMLElement, emDias(2, "08:00"));
+    await userEvent.type(dateInputs[1] as HTMLElement, emDias(2, "17:00"));
 
     await userEvent.click(screen.getByRole("button", { name: /enviar solicitação/i }));
 

@@ -3,6 +3,16 @@ import { gerarDados, fazerLogin } from "./fixtures/firebase";
 
 const usuario = gerarDados({ perfil: "usuario" });
 
+/**
+ * Data ISO local daqui a N dias. Datas fixas não servem mais: a validação de período
+ * (utils/periodo.ts) rejeita início no passado, então uma data escrita à mão vence.
+ */
+function futuro(dias: number, hora = "08:00"): string {
+  const d = new Date(Date.now() + dias * 24 * 3600 * 1000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${hora}`;
+}
+
 test.describe("Usuario — Solicitar Veículo", () => {
   test.beforeEach(async ({ page }) => {
     await fazerLogin(page, usuario);
@@ -53,8 +63,8 @@ test.describe("Usuario — Solicitar Veículo", () => {
     await page.getByPlaceholder(/transporte de pacientes/i).fill("Transporte de material");
 
     const dtInputs = page.locator('input[type="datetime-local"]');
-    await dtInputs.nth(0).fill("2025-06-01T08:00");
-    await dtInputs.nth(1).fill("2025-06-01T17:00");
+    await dtInputs.nth(0).fill(futuro(2, "08:00"));
+    await dtInputs.nth(1).fill(futuro(2, "17:00"));
 
     await page.click('button[type="submit"]');
     await expect(page.getByText(/solicitação enviada/i)).toBeVisible({ timeout: 5000 });
@@ -65,8 +75,8 @@ test.describe("Usuario — Solicitar Veículo", () => {
     await page.getByPlaceholder(/hospital cge-ms/i).fill("Destino Teste");
     await page.getByPlaceholder(/transporte de pacientes/i).fill("Motivo Teste");
     const dtInputs = page.locator('input[type="datetime-local"]');
-    await dtInputs.nth(0).fill("2025-06-02T09:00");
-    await dtInputs.nth(1).fill("2025-06-02T18:00");
+    await dtInputs.nth(0).fill(futuro(3, "09:00"));
+    await dtInputs.nth(1).fill(futuro(3, "18:00"));
     await page.click('button[type="submit"]');
     await expect(page.getByRole("button", { name: /ver minhas solicitações/i })).toBeVisible({ timeout: 5000 });
   });

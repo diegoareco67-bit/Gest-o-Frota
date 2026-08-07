@@ -32,3 +32,11 @@ if (import.meta.env.PROD && recaptchaSiteKey) {
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
+// Idioma dos e-mails automáticos do Firebase Auth (definir senha, recuperar senha,
+// verificar e-mail). SEM isto o Firebase serve o template padrão EM INGLÊS — era o
+// primeiro contato do servidor com o sistema, num órgão público estadual, chegando
+// em outra língua. `languageCode` faz o Firebase usar a versão pt-BR do template.
+// Para trocar o TEXTO em si (assinatura institucional, remetente), é preciso editar
+// o template em Firebase Console → Authentication → Templates.
+auth.languageCode = "pt-BR";

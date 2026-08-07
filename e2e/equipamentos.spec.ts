@@ -52,8 +52,10 @@ test.describe("Usuario — Equipamentos — Ciclo de empréstimo", () => {
 
     await page.getByRole("button", { name: /reservar equipamento/i }).click();
     await page.locator('[role="dialog"] select').selectOption({ index: 1 });
-    const hoje = new Date().toISOString().slice(0, 10);
-    await page.locator('input[type="date"]').fill(hoje);
+    // Amanhã, não hoje: a validação de período rejeita início no passado, e "hoje 14h"
+    // já estaria vencido sempre que a suíte rodasse depois das 14h.
+    const amanha = new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10);
+    await page.locator('input[type="date"]').fill(amanha);
     const horas = page.locator('input[type="time"]');
     await horas.nth(0).fill("14:00");
     await horas.nth(1).fill("15:00");

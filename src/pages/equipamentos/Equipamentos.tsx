@@ -8,6 +8,7 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
+import { validarPeriodo } from "../../utils/periodo";
 import { SkeletonLista } from "../../components/Skeleton";
 
 interface Equipamento { id: string; nome: string; tipo: string; patrimonio: string; status: string; ativo: boolean; }
@@ -71,7 +72,11 @@ export default function Equipamentos() {
     }
     const dataInicio = `${form.data}T${form.horaInicio}`;
     const dataFim = `${form.data}T${form.horaFim}`;
-    if (dataFim <= dataInicio) { setErro("O horário final deve ser depois do inicial."); return; }
+    // Validação compartilhada: intervalo, duração e data no passado (ver utils/periodo.ts).
+
+    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "O empréstimo" });
+
+    if (erroPeriodo) { setErro(erroPeriodo); return; }
     if (verificarConflito(form.equipamentoId, dataInicio, dataFim)) {
       setErro("Este equipamento já está reservado nesse horário. Escolha outro horário ou outro equipamento."); return;
     }
