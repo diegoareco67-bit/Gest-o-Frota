@@ -198,6 +198,56 @@ anterior, que o deploy novo já havia apagado.
 
 ## ⏳ PENDÊNCIAS ABERTAS
 
+### 14. E-mails não estão chegando — investigação parada, falta identificar QUAL
+
+Relatado em 2026-08-07: "os e-mails não estão chegando". A investigação **descartou as causas
+mais prováveis** — anotado aqui para não refazer o mesmo trabalho depois.
+
+**Já verificado e OK (não perder tempo de novo):**
+
+| Verificação | Resultado |
+|---|---|
+| `VITE_APPS_SCRIPT_URL` presente no bundle de produção | ✅ está no chunk `Indenizacoes-*.js` |
+| Secret chega no build | ✅ `env` global no `deploy.yml`, aplica a todos os jobs |
+| Endpoint do Apps Script responde | ✅ HTTP 200 |
+| Web App acessível anonimamente | ✅ o erro `Função de script não encontrada: doGet` é **benigno** — o script só implementa `doPost`. Se fosse problema de permissão viria tela de login, não esse erro |
+| Campo `uid` nos docs de `usuarios` (usado para indexar e-mail em `Aprovacoes.tsx:61`) | ✅ presente nos 3 usuários |
+| E-mail de definição de senha (Firebase) | ✅ **está chegando** — dois usuários (`mreis@`, `dareco@`) se cadastraram com sucesso |
+
+**Achado relevante:** a coleção `indenizacoes` tem **0 documentos**. Nenhum Anexo II foi enviado
+com sucesso até agora, ou seja, **o e-mail para `suad@cge.ms.gov.br` nunca chegou a ser
+disparado**. Se houve tentativa de envio que falhou, o problema está no upload para o Storage ou
+na gravação no Firestore — antes da chamada ao Apps Script, não nela.
+
+**Falta definir com o usuário qual e-mail é o que não chega:**
+1. Notificação de **aprovação/recusa de solicitação de veículo** ao condutor (`notificarCondutor`)?
+2. O **boletim do Anexo II para o RH**? (nesse caso, capturar a mensagem de erro que aparece na tela)
+
+**Diagnóstico definitivo (precisa ser feito pelo usuário, exige acesso à conta):**
+[script.google.com](https://script.google.com) → projeto → **Execuções**. Mostra cada chamada ao
+`doPost`, se rodou e o erro exato. Os três cenários e o que cada um significa:
+- **Nenhuma execução listada** → a chamada não sai do navegador (CORS, rede, ou a condição
+  `if (urlAppsScript)` / `if (!import.meta.env.PROD)` barrando).
+- **Execução com erro no `MailApp`** → cota de envio estourada (100/dia em conta comum,
+  1.500/dia em Workspace).
+- **Execução com erro no `UrlFetchApp`** → o script não consegue baixar o PDF do Firebase
+  Storage (URL com token expirado ou sem permissão).
+
+### 15. Autenticador (2FA) pedido a cada login — comportamento do Firebase, sem solução simples
+
+Relatado como incômodo: toda vez que faz login, precisa digitar o código do autenticador.
+
+**Não é bug.** O Firebase Auth exige o segundo fator em **todo sign-in** quando o MFA está ativo —
+não existe "confiar neste dispositivo" para TOTP na API dele. O que reduzia o incômodo era o erro
+de chunk (correção 13) forçando recarga/relogin constante; com ele resolvido, a sessão persiste
+(`browserLocalPersistence`, padrão do Firebase) e o login passa a ser raro.
+
+**Se ainda assim incomodar, as opções são:**
+- Desativar o MFA do gestor em `/gestor/seguranca` (perde a proteção — foi habilitado justamente
+  por recomendação da auditoria de homologação).
+- Investigar se algo está encerrando a sessão antes da hora (não investigado ainda).
+- Confiança de dispositivo exigiria backend próprio — inviável hoje sem Cloud Functions dedicadas.
+
 ### 4. Termo de Opção (Anexo I) diverge do modelo do decreto e não é digital
 
 **Problema de texto** — o PDF gerado (`src/utils/pdfIndenizacao.ts`, `gerarPdfAnexoI`) traz:
