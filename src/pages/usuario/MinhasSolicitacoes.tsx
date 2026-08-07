@@ -43,7 +43,7 @@ export default function MinhasSolicitacoes() {
     try {
       await updateDoc(doc(db, "solicitacoes", id), { status: "cancelada" });
       // Remove do calendário público (se existia entrada aprovada)
-      try { await deleteDoc(doc(db, "calendarioPublico", id)); } catch { /* pode não existir */ }
+      try { await deleteDoc(doc(db, "calendarioPublico", id)); } catch (e) { console.error("Falha ao remover o espelho público — o evento pode continuar visível na tela de login:", e); }
       setSolicitacoes(p => p.map(s => s.id === id ? { ...s, status: "cancelada" } : s));
       setExpandido(null);
     } catch(e) { console.error(e); }

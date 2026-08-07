@@ -40,8 +40,11 @@ test.describe("Gestor — Salas — Cadastro de sala", () => {
   });
 
   test("exibe as salas cadastradas", async ({ page }) => {
-    await expect(page.getByText("Sala de Reunião AGE")).toBeVisible();
+    // O nome da sala também aparece no calendário e em "Próximas reservas".
+    // "Sala de Treinamento" só existe no card de cadastro, então serve de âncora;
+    // para a outra, basta garantir que existe ao menos uma ocorrência.
     await expect(page.getByText("Sala de Treinamento")).toBeVisible();
+    await expect(page.getByText("Sala de Reunião AGE").first()).toBeVisible();
   });
 
   test("cadastra uma nova sala", async ({ page }) => {
@@ -71,7 +74,9 @@ test.describe("Usuario — Salas — Reserva", () => {
 
     await expect(page.getByText("Reunião de teste QA")).toBeVisible({ timeout: 5000 });
 
-    await page.getByRole("button", { name: /^cancelar$/i }).click();
+    // Há outras reservas na lista (seed do mock) — pegar o Cancelar DESTA reserva
+    const bloco = page.getByText("Reunião de teste QA").locator("xpath=ancestor::div[.//button][1]");
+    await bloco.getByRole("button", { name: /^cancelar$/i }).click();
     await page.getByRole("button", { name: /sim, cancelar/i }).click();
     await expect(page.getByText("Reunião de teste QA")).not.toBeVisible({ timeout: 5000 });
   });
@@ -85,5 +90,31 @@ test.describe("Usuario — Salas — Reserva", () => {
     await page.locator("#reserva-sala").selectOption({ index: 1 });
     await page.getByRole("button", { name: /confirmar reserva/i }).click();
     await expect(page.getByRole("alert")).toBeVisible({ timeout: 3000 });
+  });
+});
+
+test.describe("Salas — detalhes da reserva no calendário", () => {
+  test("tooltip mostra sala, horário, responsável, setor e tema (tela autenticada)", async ({ page }) => {
+    await fazerLogin(page, usuario);
+    await page.goto("/salas");
+    await page.waitForLoadState("networkidle");
+
+    // O tooltip é acionado na célula do dia. A reserva semeada no mock cai em D+3.
+    const dia = new Date(Date.now() + 3 * 24 * 3600 * 1000).getDate();
+    await page.locator("main").getByText(String(dia), { exact: true }).first().hover();
+
+    await expect(page.getByText("João Usuário · TI")).toBeVisible({ timeout: 4000 });
+    await expect(page.getByText("Alinhamento do plano de auditoria").last()).toBeVisible();
+  });
+
+  test("calendário público NÃO expõe responsável nem tema (LGPD)", async ({ page }) => {
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("tab", { name: /Salas/ }).first().click();
+    await page.waitForTimeout(800);
+
+    // O espelho público não carrega esses campos de propósito
+    await expect(page.getByText("Alinhamento do plano de auditoria")).not.toBeVisible();
+    await expect(page.getByText("João Usuário · TI")).not.toBeVisible();
   });
 });

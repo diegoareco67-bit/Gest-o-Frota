@@ -32,7 +32,7 @@ export default function DashboardConsulta() {
           </div>
           <div style={s.card}>
             <CalendarioGrade
-              colecao="reservasSalas"
+              colecao="reservasSalas" detalhado
               titulo="Salas"
               subtitulo="Disponibilidade das salas de reunião"
               tema="claro"

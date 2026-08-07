@@ -94,7 +94,7 @@ export default function Salas() {
 
   async function cancelar(r: ReservaSala) {
     await updateDoc(doc(db, "reservasSalas", r.id), { status: "cancelada" });
-    try { await deleteDoc(doc(db, "calendarioPublicoSalas", r.id)); } catch { /* pode não existir */ }
+    try { await deleteDoc(doc(db, "calendarioPublicoSalas", r.id)); } catch (e) { console.error("Falha ao remover o espelho público — o evento pode continuar visível na tela de login:", e); }
     await registrarAuditoria("cancelar_reserva_sala", usuario?.uid || "", usuario?.nome || "", {
       reservaId: r.id, salaNome: r.salaNome,
     });
@@ -136,7 +136,7 @@ export default function Salas() {
         <div style={s.grid}>
           <div style={s.card}>
             <CalendarioGrade
-              colecao="reservasSalas"titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
+              colecao="reservasSalas" detalhado titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
               statusFiltro={["confirmada"]}
             />
           </div>

@@ -33,6 +33,11 @@ interface CalendarioGradeProps {
   statusMap?: Record<string,StatusInfo>;
   /** Quais valores de status entram na query/exibição. */
   statusFiltro?: string[];
+  /**
+   * Mostra responsável, setor e tema ao passar o mouse. Só use em tela AUTENTICADA:
+   * o espelho público (tela de login) não carrega esses campos de propósito, por LGPD.
+   */
+  detalhado?: boolean;
 }
 
 export function CalendarioGrade({
@@ -45,6 +50,7 @@ export function CalendarioGrade({
   campoDataFim = "dataRetorno",
   statusMap = STATUS_VEICULOS,
   statusFiltro = STATUS_FILTRO_VEICULOS,
+  detalhado = false,
 }: CalendarioGradeProps) {
   const hoje = new Date();
   const [mes, setMes]     = useState(hoje.getMonth());
@@ -80,9 +86,44 @@ export function CalendarioGrade({
 
   function campoStr(ev:EventoGrade, campo:string):string { return String(ev[campo] ?? ""); }
 
+  /** "10/08 · 09:00 às 11:00" — ou com as duas datas quando o evento cruza dias. */
+  function faixaHoraria(ev:EventoGrade, cIni:string, cFim:string):string {
+    const ini = campoStr(ev,cIni), fim = campoStr(ev,cFim);
+    if (!ini || !fim) return "";
+    const dIni = new Date(ini), dFim = new Date(fim);
+    if (isNaN(dIni.getTime()) || isNaN(dFim.getTime())) return "";
+    const data = (d:Date) => d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+    const hora = (d:Date) => d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    const temHora = ini.includes("T");
+    if (!temHora) return `${data(dIni)} até ${data(dFim)}`;
+    return data(dIni) === data(dFim)
+      ? `${data(dIni)} · ${hora(dIni)} às ${hora(dFim)}`
+      : `${data(dIni)} ${hora(dIni)} até ${data(dFim)} ${hora(dFim)}`;
+  }
+
+  /**
+   * Um evento aparece em todos os dias entre início e fim — correto para reserva de
+   * vários dias. Mas se o dado estiver corrompido (aconteceu: alguém digitou o ano
+   * "202616" e a reserva passou a preencher o calendário inteiro, para sempre), isso
+   * vira poluição visual sem fim. O teto de 31 dias limita o estrago de dado ruim
+   * sem atrapalhar nenhuma reserva legítima — o máximo permitido hoje é 7 dias.
+   */
+  const MAX_DIAS_EXIBIDOS = 31;
+
+  function periodoPlausivel(e:EventoGrade):boolean {
+    const ini = new Date(campoStr(e,campoDataInicio));
+    const fim = new Date(campoStr(e,campoDataFim));
+    if (isNaN(ini.getTime()) || isNaN(fim.getTime())) return false;
+    const dias = (fim.getTime() - ini.getTime()) / 86400000;
+    return dias >= 0 && dias <= MAX_DIAS_EXIBIDOS;
+  }
+
   function eDia(dia:number){
     const d=`${ano}-${String(mes+1).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
-    return evts.filter(e=>campoStr(e,campoDataInicio).slice(0,10)<=d&&d<=campoStr(e,campoDataFim).slice(0,10));
+    return evts.filter(e=>
+      periodoPlausivel(e) &&
+      campoStr(e,campoDataInicio).slice(0,10)<=d && d<=campoStr(e,campoDataFim).slice(0,10)
+    );
   }
 
   const escuro = tema === "escuro";
@@ -173,12 +214,30 @@ export function CalendarioGrade({
 
       {/* Tooltip */}
       {tip&&(
-        <div style={{position:"fixed",top:tip.y,left:tip.x+8,background:"#0F172A",border:"1px solid #1E3A8A",borderRadius:8,padding:"10px 14px",zIndex:9999,boxShadow:"0 8px 24px rgba(0,0,0,0.5)"}}>
-          {tip.evs.map(ev=>{const s=statusMap[ev.status]||Object.values(statusMap)[0];return(
-            <div key={ev.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-              <div style={{width:8,height:8,borderRadius:"50%",background:s.cor}}/>
-              <span style={{color:"#fff",fontSize:12,fontWeight:700}}>{campoStr(ev,campoTitulo)}</span>
-              <span style={{color:"#64748B",fontSize:11}}>{s.label}</span>
+        <div style={{position:"fixed",top:tip.y,left:tip.x+8,background:"#0F172A",border:"1px solid #1E3A8A",borderRadius:8,padding:"12px 14px",zIndex:9999,boxShadow:"0 8px 24px rgba(0,0,0,0.5)",maxWidth:300}}>
+          {tip.evs.map((ev,i)=>{
+            const s=statusMap[ev.status]||Object.values(statusMap)[0];
+            // Detalhes só aparecem quando `detalhado` está ligado — nas telas autenticadas.
+            // Na tela de login (pública, sem controle de audiência) o mirror nem carrega
+            // esses campos: mostrar nome/setor/tema ali exporia dado pessoal de servidor
+            // à internet aberta, contrariando a decisão de LGPD registrada no PLANO.md.
+            const responsavel = detalhado ? campoStr(ev,"responsavelNome") : "";
+            const setor       = detalhado ? campoStr(ev,"responsavelSetor") : "";
+            const tema        = detalhado ? campoStr(ev,"motivo") : "";
+            return(
+            <div key={ev.id} style={{marginBottom: i<tip.evs.length-1?10:0, paddingBottom: i<tip.evs.length-1?10:0, borderBottom: i<tip.evs.length-1?"1px solid #1E293B":"none"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:8,height:8,borderRadius:"50%",background:s.cor,flexShrink:0}}/>
+                <span style={{color:"#fff",fontSize:12,fontWeight:700}}>{campoStr(ev,campoTitulo)}</span>
+                <span style={{color:"#64748B",fontSize:11}}>{s.label}</span>
+              </div>
+              {detalhado && (
+                <div style={{marginLeft:16,marginTop:6,display:"flex",flexDirection:"column",gap:3}}>
+                  <div style={{color:"#93C5FD",fontSize:11,fontWeight:600}}>{faixaHoraria(ev,campoDataInicio,campoDataFim)}</div>
+                  {responsavel && <div style={{color:"#E2E8F0",fontSize:11}}>{responsavel}{setor?` · ${setor}`:""}</div>}
+                  {tema && <div style={{color:"#94A3B8",fontSize:11,fontStyle:"italic"}}>{tema}</div>}
+                </div>
+              )}
             </div>
           );})}
         </div>

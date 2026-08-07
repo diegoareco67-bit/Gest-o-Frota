@@ -123,7 +123,7 @@ export default function Aprovacoes() {
         motivoRecusa: motivoRecusa.trim(),
       });
       // Remove do calendário público caso tenha sido aprovada anteriormente
-      try { await deleteDoc(doc(db, "calendarioPublico", modal.id)); } catch { /* pode não existir */ }
+      try { await deleteDoc(doc(db, "calendarioPublico", modal.id)); } catch (e) { console.error("Falha ao remover o espelho público — o evento pode continuar visível na tela de login:", e); }
       setSolicitacoes(p => p.map(s =>
         s.id === modal.id ? { ...s, status: "recusada", motivoRecusa: motivoRecusa.trim() } : s
       ));

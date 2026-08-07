@@ -143,7 +143,7 @@ export default function DashboardGestor() {
 
                   <div style={s.card}>
                     <CalendarioGrade
-                      colecao="reservasSalas"titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
+                      colecao="reservasSalas" detalhado titulo="Salas"subtitulo="Disponibilidade das salas de reunião"tema="claro"campoTitulo="salaNome"campoDataInicio="dataInicio"campoDataFim="dataFim"statusMap={STATUS_SALAS}
                       statusFiltro={["confirmada"]}
                     />
                   </div>

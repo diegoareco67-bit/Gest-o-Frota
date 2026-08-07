@@ -128,6 +128,50 @@ nenhum e-mail é disparado — mesma classe de confusão do "solicitar acesso n�
 - Aplicado em **Salas** e **Equipamentos**, com a regra escrita na tela: *"Expediente: das
   07:30 às 17:30, em intervalos de 15 minutos."*
 
+### ✅ 10. Calendário não mostrava detalhes da reserva — CORRIGIDO (com limite de LGPD)
+
+**Pedido:** ao passar o mouse sobre uma reserva, ver quem solicitou, o setor e o tema.
+
+**Solução:** o tooltip do `CalendarioGrade` passou a mostrar faixa horária, responsável ·
+setor e tema — mas **só quando a prop `detalhado` está ligada**.
+
+**Decisão de LGPD (confirmada com o usuário):** `detalhado` está ligado **apenas nas telas
+autenticadas** (`/salas`, dashboard do gestor, dashboard do perfil consulta). A tela de login
+é pública, visível na internet aberta — ali continua mostrando **só sala, horário e status**.
+O espelho `calendarioPublicoSalas` nem carrega `responsavelNome`/`motivo`, por decisão tomada
+em 2026-07-19. Há um teste e2e que trava essa fronteira (`calendário público NÃO expõe
+responsável nem tema`), para que a regressão não passe despercebida.
+
+### ✅ 11. Logo do Hub não levava à tela inicial — CORRIGIDO
+
+A marca na barra lateral virou botão e leva à tela inicial **do perfil** (`/gestor`,
+`/usuario`, `/consulta` ou `/auditor`), com `aria-label` e fechamento do menu no mobile.
+
+### ✅ 12. Calendário público mostrava reserva "fantasma" ocupando o mês inteiro — CORRIGIDO
+
+**Sintoma relatado:** a Trailblazer aparecia reservada em quase todos os dias no calendário
+público, mas o sistema interno mostrava só uma reserva.
+
+**Duas causas, ambas reais, encontradas no dado de produção:**
+
+1. **Ano digitado errado.** Um registro tinha `dataRetorno = "202616-08-06T16:00"` — ano
+   **202616**. O calendário pinta o evento em todos os dias entre início e fim, então uma
+   reserva que termina no ano 202616 preenche o calendário para sempre. A validação da
+   correção 3 já impede novos casos; o registro antigo foi removido da produção.
+2. **Espelho público fora de sincronia.** A solicitação estava `recusada` no sistema, mas o
+   documento em `calendarioPublico` continuava `aprovada` — por isso aparecia no público e
+   não no interno. O código de recusa *tenta* apagar o espelho, mas o `catch` era **vazio**:
+   qualquer falha na exclusão passava silenciosa.
+
+**Correções aplicadas:**
+- Os três `catch` silenciosos (`Aprovacoes`, `Salas`, `MinhasSolicitacoes`) passaram a
+  registrar o erro no console, explicando a consequência ("o evento pode continuar visível
+  na tela de login").
+- `CalendarioGrade` ganhou `periodoPlausivel()`: evento com duração acima de 31 dias não é
+  desenhado. É um limite defensivo — o máximo permitido hoje é 7 dias —, para que dado ruim
+  que escape não volte a poluir o calendário inteiro.
+- Dados corrompidos removidos da produção (1 solicitação + 1 espelho órfão).
+
 ---
 
 ## ⏳ PENDÊNCIAS ABERTAS

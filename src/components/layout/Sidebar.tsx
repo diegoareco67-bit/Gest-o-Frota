@@ -119,6 +119,8 @@ export function Sidebar({perfil}: SidebarProps) {
   const sections = getSections(perfil, countPendentes);
   const [hovered, setHovered] = useState<string|null>(null);
   const [logoutHovered, setLogoutHovered] = useState(false);
+  // Tela inicial de cada perfil — destino do clique na marca
+  const rotaInicial = perfil === "gestor" ? "/gestor" : perfil === "consulta" ? "/consulta" : perfil === "auditor" ? "/auditor" : "/usuario";
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [aberta, setAberta] = useState(false);
 
@@ -184,15 +186,25 @@ export function Sidebar({perfil}: SidebarProps) {
       <div style={s.texture} aria-hidden="true"/>
       <div style={s.shine} aria-hidden="true"/>
 
-      {/* Logo + botão fechar em mobile */}
+      {/* Logo + botão fechar em mobile.
+          A marca é clicável e leva à tela inicial do perfil — comportamento que o
+          usuário espera de qualquer logo de sistema, e que antes não existia. */}
       <div style={s.brand}>
-        <div style={s.logoBox}>
-          {IcoMap.dashboard}
-        </div>
-        <div style={{flex:1}}>
-          <div style={s.logoTitle}>Hub</div>
-          <div style={s.logoSub}>CGE · MS</div>
-        </div>
+        <button
+          type="button"
+          onClick={() => { navigate(rotaInicial); if (isMobile) setAberta(false); }}
+          aria-label="Ir para a tela inicial"
+          title="Ir para a tela inicial"
+          style={s.brandBtn}
+        >
+          <div style={s.logoBox}>
+            {IcoMap.dashboard}
+          </div>
+          <div style={{flex:1,textAlign:"left"}}>
+            <div style={s.logoTitle}>Hub</div>
+            <div style={s.logoSub}>CGE · MS</div>
+          </div>
+        </button>
         {isMobile && (
           <button
             onClick={() => setAberta(false)}
@@ -287,6 +299,7 @@ const s: Record<string,React.CSSProperties> = {
   texture:   {position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,0.012) 3px,rgba(255,255,255,0.012) 6px)",pointerEvents:"none"},
   shine:     {position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)"},
   brand:     {display:"flex",alignItems:"center",gap:10,padding:"18px 14px 16px",borderBottom:"1px solid rgba(255,255,255,0.07)",position:"relative",zIndex:1,flexShrink:0},
+  brandBtn:  {display:"flex",alignItems:"center",gap:10,background:"none",border:"none",padding:0,margin:0,flex:1,cursor:"pointer",font:"inherit",color:"inherit"},
   logoBox:   {width:36,height:36,background:"linear-gradient(135deg,#1E6FD4,#1450A3)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",flexShrink:0,boxShadow:"0 2px 12px rgba(30,111,212,0.45)"},
   logoTitle: {color:"#fff",fontWeight:800,fontSize:14,letterSpacing:-0.3},
   logoSub:   {color:"#A8CBF0",fontSize:11,fontWeight:600,letterSpacing:"0.8px",textTransform:"uppercase" as const},

@@ -2,6 +2,13 @@ type DocRef = { colecao: string; id: string };
 type FilterClause = { campo: string; op: string; valor: unknown };
 type MockDoc = { id: string; data: Record<string, unknown> };
 
+/** Data ISO local daqui a N dias — evita seed com data fixa que vence. */
+function dataFutura(dias: number, hora: string): string {
+  const d = new Date(Date.now() + dias * 24 * 3600 * 1000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${hora}`;
+}
+
 // Dados reinicializados a cada carregamento de módulo (cada page.goto reinicia o estado)
 const store: Record<string, MockDoc[]> = {
   usuarios: [
@@ -33,7 +40,19 @@ const store: Record<string, MockDoc[]> = {
     { id: "sala-001", data: { nome: "Sala de Reunião AGE", capacidade: 15, localizacao: "2º andar", equipamentos: "Projetor, TV Smart", ativo: true } },
     { id: "sala-002", data: { nome: "Sala de Treinamento", capacidade: 20, localizacao: "3º andar", equipamentos: "", ativo: true } },
   ],
-  reservasSalas: [],
+  // Reserva futura fixa: o calendário só enxerga o que já estava no store no
+  // carregamento (o mock reinicia a cada page.goto), então uma reserva criada
+  // durante o teste nunca apareceria na grade. Data calculada em runtime para
+  // não vencer.
+  reservasSalas: [
+    { id: "reserva-seed", data: {
+      salaId: "sala-001", salaNome: "Sala de Reunião AGE",
+      responsavelId: "uid-usuario-teste", responsavelNome: "João Usuário", responsavelSetor: "TI",
+      motivo: "Alinhamento do plano de auditoria",
+      dataInicio: dataFutura(3, "09:00"), dataFim: dataFutura(3, "11:00"),
+      status: "confirmada",
+    } },
+  ],
   equipamentos: [
     { id: "equip-001", data: { nome: "Notebook Dell Latitude", tipo: "Notebook", patrimonio: "100234", status: "disponivel", ativo: true } },
   ],
