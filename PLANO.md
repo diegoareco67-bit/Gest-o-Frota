@@ -2,6 +2,41 @@
 
 Lista de tarefas viva. Atualizar conforme o progresso — não é histórico congelado. Contexto estável (restrições, decisões de arquitetura) está em [`CLAUDE.md`](./CLAUDE.md).
 
+## ⏳ PENDÊNCIAS ABERTAS — levantadas em 2026-08-06, ainda não implementadas
+
+### 1. E-mail de definição de senha vem em INGLÊS (prioridade alta)
+
+**Sintoma:** quando o gestor aprova uma solicitação de acesso (ou cadastra alguém pelo botão "Novo Usuário"), o servidor recebe um e-mail para definir a senha — **em inglês**. É o primeiro contato do servidor com o sistema, num órgão público estadual; precisa estar em português do Brasil.
+
+**Causa confirmada:** o e-mail não é escrito pelo Hub — é o template padrão do Firebase Authentication, disparado por `sendPasswordResetEmail()` em `gestor/Usuarios.tsx` (linhas ~112 e ~147) e em `components/login.tsx` (~39, fluxo "Esqueci minha senha"). O Firebase serve esse template **em inglês por padrão**; só troca de idioma se `auth.languageCode` for definido. Uma busca por `languageCode` no projeto não retorna nada — ou seja, nunca foi configurado.
+
+**Duas frentes de correção (as duas valem):**
+- **No código (rápido):** definir `auth.languageCode = "pt-BR";` em `src/firebase/config.ts`, logo após o `getAuth()`. Faz o Firebase servir a versão em português do template padrão. Resolve o idioma, mas o texto continua genérico ("Follow this link to reset...") e assinado como o projeto Firebase.
+- **No Console (recomendado para produção):** Firebase Console → Authentication → Templates → *Password reset*. Permite reescrever o assunto e o corpo com a identidade do Hub/CGE-MS, ajustar o nome do remetente e o "responder para". Ideal para comunicação institucional.
+
+**Atenção ao testar:** o mesmo template é usado nos três pontos (aprovação de solicitação, cadastro manual e "esqueci minha senha") — conferir os três depois de mudar.
+
+### 2. Entrada de data e hora está ruim e inconsistente
+
+**Sintoma:** informar horário no sistema é desconfortável. Não é uma tela só — o problema está espalhado.
+
+**Diagnóstico — hoje convivem 3 padrões diferentes:**
+| Padrão | Onde | Problema |
+|---|---|---|
+| `datetime-local` (data+hora num campo) | Indenizações (Anexo II): início autorizado, retorno previsto | O seletor nativo muda muito de navegador para navegador; digitação é confusa |
+| `date` + `time` + `time` (3 campos) | Salas, Equipamentos | Obriga preencher três campos para marcar um intervalo simples |
+| só `date` | Manutenção (previsão), Solicitar Acesso (venc. CNH, publicação) | OK para data pura, mas o formato exibido depende do locale do SO |
+
+**Problemas concretos identificados:**
+- **Sem validação de intervalo na entrada:** dá para escolher hora de fim anterior à de início; o erro só aparece depois, na submissão.
+- **Sem atalhos:** para reservar "amanhã das 14h às 15h" o usuário digita tudo manualmente. Faltam blocos rápidos (30min/1h/manhã/tarde) e "próxima hora cheia".
+- **Depende do locale do sistema operacional:** o campo nativo pode exibir `mm/dd/aaaa` em máquina configurada em inglês, o que é grave num sistema em pt-BR.
+- **Inconsistência entre módulos:** reservar uma sala e pedir uma indenização usam mecânicas diferentes para a mesma tarefa (marcar um intervalo de tempo).
+
+**Direção sugerida (a decidir):** criar um componente único `<CampoPeriodo>` que encapsule data + hora início + hora fim, com validação de intervalo embutida, presets de duração e formato pt-BR garantido — e usá-lo em Salas, Equipamentos, Indenizações e Solicitar Veículo. Resolve os quatro problemas de uma vez e segue o mesmo princípio já aplicado no refactor de design (componente compartilhado em vez de repetição por tela).
+
+---
+
 ## ✅ Revisão de design aplicada — sistema de design criado (2026-08-06)
 
 Revisão feita com a skill `advanced-design-systems` apontou 11 problemas; **todos aplicados**.

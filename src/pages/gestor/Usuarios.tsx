@@ -1,4 +1,5 @@
 import { Sidebar } from "../../components/layout/Sidebar";
+import { useSearchParams } from "react-router-dom";
 import { ModalConfirm } from "../../components/ModalConfirm";
 import { useEffect, useState } from "react";
 import { collection, getDocs, setDoc, updateDoc, doc, serverTimestamp, query, where, limit } from "firebase/firestore";
@@ -36,7 +37,12 @@ interface SolicitacaoAcesso {
 
 export default function Usuarios() {
   const { usuario } = useAuth();
-  const [aba, setAba] = useState<"usuarios"|"solicitacoes">("usuarios");
+  // Permite abrir direto na aba de solicitações via /gestor/usuarios?aba=solicitacoes
+  // (usado pelo atalho "Solicitações de Acesso" das Ações Rápidas do dashboard).
+  const [params] = useSearchParams();
+  const [aba, setAba] = useState<"usuarios"|"solicitacoes">(
+    params.get("aba") === "solicitacoes" ? "solicitacoes" : "usuarios"
+  );
   const [lista, setLista] = useState<UsuarioConta[]>([]);
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoAcesso[]>([]);
   const [carregando, setCarregando] = useState(true);

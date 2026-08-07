@@ -36,16 +36,19 @@ export default function DashboardGestor() {
   const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({ veiculosDisponiveis:0, veiculosEmUso:0, veiculosManutencao:0, solicitacoesPendentes:0, solicitacoesHoje:0, totalUsuarios:0 });
   const [atrasadas, setAtrasadas] = useState<SolAtrasada[]>([]);
+  const [acessosPendentes, setAcessosPendentes] = useState(0);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     async function carregar() {
       try {
-        const [veiculos, solicitacoes, usuariosAtivos] = await Promise.all([
+        const [veiculos, solicitacoes, usuariosAtivos, acessosPendentes] = await Promise.all([
           getDocs(query(collection(db, "veiculos"), limit(200))),
           getDocs(query(collection(db, "solicitacoes"), limit(500))),
           getDocs(query(collection(db, "usuarios"), where("perfil","==","usuario"), where("ativo","==",true), limit(500))),
+          getDocs(query(collection(db, "solicitacoesAcesso"), where("status","==","pendente"), limit(200))),
         ]);
+        setAcessosPendentes(acessosPendentes.size);
         const hoje = new Date(); hoje.setHours(0,0,0,0);
         let disponiveis=0, emUso=0, manutencao=0;
         veiculos.forEach(d => { const st=d.data().status; if(st==="disponivel") disponiveis++; else if(st==="em_uso") emUso++; else if(st==="manutencao") manutencao++; });
@@ -151,19 +154,32 @@ export default function DashboardGestor() {
                   <SectionTitle>Ações Rápidas</SectionTitle>
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                     {[
-                      {label:"Aprovar Solicitações", desc:"Gerencie pedidos pendentes",      path:"/gestor/aprovacoes",   cor:"#1E3A8A", Ico:IcoCheck},
-                      {label:"Cadastrar Veículo",    desc:"Adicionar novo veículo à frota",  path:"/gestor/veiculos",     cor:"#22C55E", Ico:IcoTruck},
-                      {label:"Salas",                desc:"Calendário e reservas",           path:"/salas",               cor:"#1E3A8A", Ico:IcoDoor},
-                      {label:"Equipamentos",         desc:"Notebooks, projetores...",        path:"/equipamentos",        cor:"#1E3A8A", Ico:IcoLaptop},
-                      {label:"Indenizações",         desc:"Termos e boletins de viagem",     path:"/gestor/indenizacoes", cor:"#1E3A8A", Ico:IcoCash},
-                      {label:"Agendar Manutenção",   desc:"Programar revisões e reparos",    path:"/gestor/manutencao",   cor:"#1E3A8A", Ico:IcoWrench},
-                      {label:"Ver Relatórios",       desc:"Análise de uso da frota",         path:"/gestor/relatorios",   cor:"#3B82F6", Ico:IcoChart},
+                      {label:"Aprovar Solicitações",   desc:"Gerencie pedidos pendentes",      path:"/gestor/aprovacoes",   cor:"#1E3A8A", Ico:IcoCheck},
+                      {label:"Solicitações de Acesso", desc:"Novos cadastros aguardando",      path:"/gestor/usuarios?aba=solicitacoes", cor:"#1E3A8A", Ico:IcoUserPlus, badge:acessosPendentes},
+                      {label:"Cadastrar Veículo",      desc:"Adicionar novo veículo à frota",  path:"/gestor/veiculos",     cor:"#22C55E", Ico:IcoTruck},
+                      {label:"Salas",                  desc:"Calendário e reservas",           path:"/salas",               cor:"#1E3A8A", Ico:IcoDoor},
+                      {label:"Equipamentos",           desc:"Notebooks, projetores...",        path:"/equipamentos",        cor:"#1E3A8A", Ico:IcoLaptop},
+                      {label:"Indenizações",           desc:"Termos e boletins de viagem",     path:"/gestor/indenizacoes", cor:"#1E3A8A", Ico:IcoCash},
+                      {label:"Agendar Manutenção",     desc:"Programar revisões e reparos",    path:"/gestor/manutencao",   cor:"#1E3A8A", Ico:IcoWrench},
+                      {label:"Ver Relatórios",         desc:"Análise de uso da frota",         path:"/gestor/relatorios",   cor:"#3B82F6", Ico:IcoChart},
                     ].map(a => (
-                      <button key={a.path} onClick={() => navigate(a.path)} style={s.acaoCard}>
-                        <span style={{...s.acaoIcon, background:a.cor+"18"}}><a.Ico color={a.cor}/></span>
+                      <button
+                        key={a.path}
+                        onClick={() => navigate(a.path)}
+                        style={s.acaoCard}
+                        aria-label={a.badge ? `${a.label} — ${a.badge} pendente${a.badge > 1 ? "s" : ""}` : a.label}
+                      >
+                        <span style={{...s.acaoIcon, background:a.cor+"18", position:"relative"}}>
+                          <a.Ico color={a.cor}/>
+                          {!!a.badge && <span style={s.acaoBadge}>{a.badge > 9 ? "9+" : a.badge}</span>}
+                        </span>
                         <div style={{flex:1,textAlign:"left"}}>
                           <div style={s.acaoLabel}>{a.label}</div>
-                          <div style={s.acaoDesc}>{a.desc}</div>
+                          <div style={s.acaoDesc}>
+                            {a.badge
+                              ? `${a.badge} ${a.badge > 1 ? "pedidos aguardando" : "pedido aguardando"} aprovação`
+                              : a.desc}
+                          </div>
                         </div>
                         <span style={s.acaoArrow}>›</span>
                       </button>
@@ -221,6 +237,7 @@ function StatCard({accent,iconBg,icon,label,valor,sub,onClick}:{accent:string;ic
   );
 }
 
+const IcoUserPlus = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>;
 const IcoCheck  = ({color="#1E3A8A"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 const IcoTruck  = ({color="#1563D5"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>;
 const IcoWrench = ({color="#B45309"}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
@@ -266,4 +283,6 @@ const s: Record<string,React.CSSProperties> = {
   acaoLabel:  {fontSize:13,fontWeight:700,color:"#0F172A"},
   acaoDesc:   {fontSize:11,color:"#7A95B2",marginTop:2},
   acaoArrow:  {marginLeft:"auto",fontSize:18,color:"#CBD5E1"},
+  /* Contador de pendências sobre o ícone da ação — mesmo padrão do badge da Sidebar */
+  acaoBadge:  {position:"absolute" as const,top:-5,right:-5,minWidth:17,height:17,padding:"0 4px",borderRadius:99,background:"#E53E3E",color:"#fff",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1,border:"2px solid #ffffff",boxSizing:"border-box" as const},
 };

@@ -42,6 +42,9 @@ const store: Record<string, MockDoc[]> = {
     { id: "vp-001", data: { servidorId: "uid-usuario-teste", servidorNome: "João Usuário", categoriaFuncional: "Analista", marca: "Fiat", modelo: "Strada", placa: "TST-0001", localidade: "Campo Grande", data: "2025-01-01T00:00:00.000Z", status: "aprovado", pdfUrl: "https://example.com/termo.pdf", pdfHash: "hash-teste" } },
     { id: "vp-002", data: { servidorId: "uid-outro-servidor", servidorNome: "Pedro Motorista", categoriaFuncional: "Motorista", marca: "Volkswagen", modelo: "Gol", placa: "TST-0002", localidade: "Campo Grande", data: "2025-02-01T00:00:00.000Z", status: "pendente", pdfUrl: "https://example.com/termo2.pdf", pdfHash: "hash-teste-2" } },
   ],
+  solicitacoesAcesso: [
+    { id: "solacesso-001", data: { nomeCompleto: "Roberto Candidato", email: "rcandidato@cge.ms.gov.br", matricula: "55667", setor: "Auditoria-Geral do Estado", numeroCnh: "01234567890", vencimentoCnh: "2028-05-10", numeroDiario: "10555", dataPublicacao: "2026-07-01", numeroResolucao: "RES-2026-42", status: "pendente" } },
+  ],
   indenizacoes: [],
   configuracoes: [
     { id: "indenizacao", data: { valorPorKm: 0.8, atualizadoEm: mockTimestamp(new Date("2025-01-01T00:00:00")), atualizadoPor: "Maria Gestora" } },

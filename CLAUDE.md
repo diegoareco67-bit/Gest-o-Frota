@@ -99,6 +99,13 @@ Nome **Hub**, subtítulo "Central de Recursos Compartilhados". Visual minimalist
 
 Lei Federal nº 13.709/2018 (LGPD) · Lei nº 12.527/2011 (Lei de Acesso à Informação) · Decreto Estadual nº 10.154/2000 (Indenização de Transporte) · Decreto Estadual nº 15.572/2020 (LGPD no Poder Executivo de MS) · Política Estadual de Segurança da Informação · Decreto Estadual nº 15.721/2021 (Plano de Classificação e Tabela de Temporalidade de Documentos das Atividades-Meio do Executivo — base dos prazos de retenção/anonimização usados no Hub) · Resolução CGE/MS nº 133, de 4/9/2025 (Política de Privacidade e Proteção de Dados Pessoais da própria CGE/MS — existência e texto integral confirmados em 2026-08-06 via PDF oficial do Anexo Único; aplica-se diretamente ao Hub por ser um sistema da própria CGE/MS, mas seu Art. 6º — mapeamento de tratamento por área — ainda não lista a gestão de frota/salas/equipamentos/indenização entre as 8 aplicabilidades previstas, e seu Art. 12 aponta genericamente para a Tabela de Temporalidade de atividades-fim, não a de atividades-meio de fato usada pelo Hub — ver lacuna documentada em PLANO.md).
 
+## Idioma da interface e das comunicações
+
+Todo texto visível ao servidor é **português do Brasil** — inclusive o que não é escrito pelo Hub.
+Atenção especial aos e-mails do Firebase Authentication (definição de senha, recuperação): eles
+vêm do template do Firebase, **em inglês por padrão**, e só mudam se `auth.languageCode` for
+definido e/ou o template for customizado no Console. Ver pendência aberta em `PLANO.md`.
+
 ## Onde está o plano de fases
 
 O plano faseado (o que já foi auditado, o que falta, ordem de execução) fica em [`PLANO.md`](./PLANO.md), atualizado à mão conforme o progresso — não é conteúdo congelado aqui.
