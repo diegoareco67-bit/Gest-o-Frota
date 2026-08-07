@@ -172,6 +172,28 @@ público, mas o sistema interno mostrava só uma reserva.
   que escape não volte a poluir o calendário inteiro.
 - Dados corrompidos removidos da produção (1 solicitação + 1 espelho órfão).
 
+### ✅ 13. "Failed to fetch dynamically imported module" após deploy — CORRIGIDO
+
+**Sintoma:** navegar para Minhas Solicitações ou Manual de Uso quebrava com
+`TypeError: Failed to fetch dynamically imported module: .../MinhasSolicitacoes-XXXX.js`.
+Já tinha aparecido em 2026-08-02 e foi tratado como "cache do navegador, resolve com refresh" —
+mas voltou, porque a causa nunca foi atacada.
+
+**Causa raiz (medida, não suposta):** o Firebase Hosting servia o `index.html` com
+`Cache-Control: max-age=3600` — **cacheado por 1 hora**. Como o `index.html` é quem aponta
+para os chunks com hash no nome, o navegador ficava até uma hora pedindo arquivos de um deploy
+anterior, que o deploy novo já havia apagado.
+
+**Correção em duas camadas:**
+1. **`firebase.json`** ganhou `headers`: `index.html` com `no-cache, no-store, must-revalidate`
+   (é o índice, tem que ser sempre fresco) e `/assets/**` com `max-age=31536000, immutable`
+   (têm hash no nome — mudou o conteúdo, mudou o nome; podem ser cacheados para sempre).
+   Isso resolve para quem **abre** a página depois do deploy.
+2. **`src/utils/lazyComRetry.ts`** (novo) — quem já estava com o app **aberto** durante o deploy
+   continua com o mapa antigo em memória. O wrapper tenta o import uma segunda vez (cobre rede
+   instável) e, persistindo, recarrega a página uma única vez para pegar o índice novo. Trava em
+   `sessionStorage` impede laço infinito. Aplicado nas **24 rotas** de `App.tsx`.
+
 ---
 
 ## ⏳ PENDÊNCIAS ABERTAS

@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazyComRetry } from "./utils/lazyComRetry";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RotaProtegida } from "./components/layout/RotaProtegida";
@@ -8,30 +9,30 @@ import Login from "./pages/Login";
 // Rotas carregadas sob demanda (code-splitting) — tira as telas internas e o
 // gerador de PDF (jsPDF/html2canvas) do bundle inicial, que antes vinha inteiro
 // já na tela de login. O Login fica eager por ser a landing.
-const Privacidade = lazy(() => import("./pages/Privacidade"));
-const SolicitarAcesso = lazy(() => import("./pages/SolicitarAcesso"));
-const DashboardGestor = lazy(() => import("./pages/gestor/Dashboard"));
-const Aprovacoes = lazy(() => import("./pages/gestor/Aprovacoes"));
-const Veiculos = lazy(() => import("./pages/gestor/Veiculos"));
-const Manutencao = lazy(() => import("./pages/gestor/Manutencao"));
-const Relatorios = lazy(() => import("./pages/gestor/Relatorios"));
-const Usuarios = lazy(() => import("./pages/gestor/Usuarios"));
-const ManualUso = lazy(() => import("./pages/gestor/ManualUso"));
-const Auditoria = lazy(() => import("./pages/gestor/Auditoria"));
-const Seguranca = lazy(() => import("./pages/gestor/Seguranca"));
-const Setores = lazy(() => import("./pages/gestor/Setores"));
-const Configuracoes = lazy(() => import("./pages/gestor/Configuracoes"));
-const DashboardUsuario = lazy(() => import("./pages/usuario/Dashboard"));
-const Solicitar = lazy(() => import("./pages/usuario/Solicitar"));
-const MinhasSolicitacoes = lazy(() => import("./pages/usuario/MinhasSolicitacoes"));
-const Checkout = lazy(() => import("./pages/usuario/Checkout"));
-const Checkin = lazy(() => import("./pages/usuario/Checkin"));
-const DashboardConsulta = lazy(() => import("./pages/consulta/Dashboard"));
-const Salas = lazy(() => import("./pages/salas/Salas"));
-const VeiculoProprio = lazy(() => import("./pages/indenizacao/VeiculoProprio"));
-const Indenizacoes = lazy(() => import("./pages/indenizacao/Indenizacoes"));
-const GestorIndenizacoes = lazy(() => import("./pages/indenizacao/GestorIndenizacoes"));
-const Equipamentos = lazy(() => import("./pages/equipamentos/Equipamentos"));
+const Privacidade = lazyComRetry(() => import("./pages/Privacidade"));
+const SolicitarAcesso = lazyComRetry(() => import("./pages/SolicitarAcesso"));
+const DashboardGestor = lazyComRetry(() => import("./pages/gestor/Dashboard"));
+const Aprovacoes = lazyComRetry(() => import("./pages/gestor/Aprovacoes"));
+const Veiculos = lazyComRetry(() => import("./pages/gestor/Veiculos"));
+const Manutencao = lazyComRetry(() => import("./pages/gestor/Manutencao"));
+const Relatorios = lazyComRetry(() => import("./pages/gestor/Relatorios"));
+const Usuarios = lazyComRetry(() => import("./pages/gestor/Usuarios"));
+const ManualUso = lazyComRetry(() => import("./pages/gestor/ManualUso"));
+const Auditoria = lazyComRetry(() => import("./pages/gestor/Auditoria"));
+const Seguranca = lazyComRetry(() => import("./pages/gestor/Seguranca"));
+const Setores = lazyComRetry(() => import("./pages/gestor/Setores"));
+const Configuracoes = lazyComRetry(() => import("./pages/gestor/Configuracoes"));
+const DashboardUsuario = lazyComRetry(() => import("./pages/usuario/Dashboard"));
+const Solicitar = lazyComRetry(() => import("./pages/usuario/Solicitar"));
+const MinhasSolicitacoes = lazyComRetry(() => import("./pages/usuario/MinhasSolicitacoes"));
+const Checkout = lazyComRetry(() => import("./pages/usuario/Checkout"));
+const Checkin = lazyComRetry(() => import("./pages/usuario/Checkin"));
+const DashboardConsulta = lazyComRetry(() => import("./pages/consulta/Dashboard"));
+const Salas = lazyComRetry(() => import("./pages/salas/Salas"));
+const VeiculoProprio = lazyComRetry(() => import("./pages/indenizacao/VeiculoProprio"));
+const Indenizacoes = lazyComRetry(() => import("./pages/indenizacao/Indenizacoes"));
+const GestorIndenizacoes = lazyComRetry(() => import("./pages/indenizacao/GestorIndenizacoes"));
+const Equipamentos = lazyComRetry(() => import("./pages/equipamentos/Equipamentos"));
 
 function Carregando() {
   return (
