@@ -60,12 +60,12 @@ test.describe("Usuario — Salas — Reserva", () => {
     await page.waitForLoadState("networkidle");
 
     await page.getByRole("button", { name: /nova reserva/i }).click();
-    await page.locator('[role="dialog"] select').selectOption({ index: 1 });
+    await page.locator("#reserva-sala").selectOption({ index: 1 });
     const amanha = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     await page.locator('input[type="date"]').fill(amanha);
-    const horas = page.locator('input[type="time"]');
-    await horas.nth(0).fill("10:00");
-    await horas.nth(1).fill("11:00");
+    // Hora virou <select>: o seletor nativo não tinha confirmação, exigia clicar fora
+    await page.locator("#reserva-inicio").selectOption("10:00");
+    await page.locator("#reserva-fim").selectOption("11:00");
     await page.getByPlaceholder("Reunião de equipe").fill("Reunião de teste QA");
     await page.getByRole("button", { name: /confirmar reserva/i }).click();
 
@@ -82,7 +82,7 @@ test.describe("Usuario — Salas — Reserva", () => {
     await page.waitForLoadState("networkidle");
 
     await page.getByRole("button", { name: /nova reserva/i }).click();
-    await page.locator('[role="dialog"] select').selectOption({ index: 1 });
+    await page.locator("#reserva-sala").selectOption({ index: 1 });
     await page.getByRole("button", { name: /confirmar reserva/i }).click();
     await expect(page.getByRole("alert")).toBeVisible({ timeout: 3000 });
   });

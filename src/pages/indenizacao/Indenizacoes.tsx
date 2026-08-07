@@ -1,4 +1,6 @@
 import { Sidebar } from "../../components/layout/Sidebar";
+import { useNavigate } from "react-router-dom";
+import { EstadoVazio } from "../../components/EstadoVazio";
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, serverTimestamp, limit } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -33,6 +35,7 @@ const TRAJETO_VAZIO: TrajetoLinha = { data: "", odometroInicial: "", trajetoPerc
 export default function Indenizacoes() {
   const { usuario } = useAuth();
   const { valorPorKm } = useConfiguracaoIndenizacao();
+  const navigate = useNavigate();
   const [veiculo, setVeiculo] = useState<VeiculoProprio | null>(null);
   const [lista, setLista] = useState<Indenizacao[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -192,12 +195,43 @@ export default function Indenizacoes() {
           {carregando ? (
             <SkeletonLista itens={3} />
           ) : bloqueadoSemVeiculo ? (
+            /* O caminho para desbloquear precisa ser um botão, não um link no meio do
+               texto — o usuário não adivinha que a parte destacada é clicável. */
             <div style={s.aviso}>
-              Você precisa ter o <a href="/usuario/veiculo-proprio" style={s.link}>Termo de Opção (Anexo I)</a> aprovado pelo gestor antes de solicitar indenização.
-              {veiculo?.status === "pendente" && " O seu já está cadastrado, só falta a aprovação."}
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                {veiculo?.status === "pendente"
+                  ? "Seu Termo de Opção está aguardando aprovação"
+                  : veiculo?.status === "recusado"
+                    ? "Seu Termo de Opção foi recusado"
+                    : "Antes de solicitar indenização, cadastre seu veículo"}
+              </div>
+              <div style={{ marginBottom: 14, lineHeight: 1.5 }}>
+                {veiculo?.status === "pendente"
+                  ? "O gestor precisa aprovar o Termo de Opção (Anexo I) que você enviou. Assim que for aprovado, esta tela libera o pedido de indenização."
+                  : veiculo?.status === "recusado"
+                    ? "Revise os dados do Termo de Opção (Anexo I) e envie novamente para análise do gestor."
+                    : "O Termo de Opção e Cadastramento de Veículo (Anexo I) é feito uma única vez e precisa da aprovação do gestor. Depois disso, você poderá solicitar indenização quantas vezes precisar."}
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/usuario/veiculo-proprio")}
+                style={s.btnNovo}
+              >
+                {veiculo?.status === "pendente"
+                  ? "Ver meu requerimento"
+                  : veiculo?.status === "recusado"
+                    ? "Corrigir e reenviar requerimento"
+                    : "Iniciar preenchimento do requerimento"}
+              </button>
             </div>
           ) : lista.length === 0 ? (
-            <div style={s.vazio}>Nenhuma indenização solicitada ainda.</div>
+            /* Sem botão de ação aqui: o "+ Nova Indenização" da topbar já está visível
+               nesta situação — dois CTAs idênticos na mesma tela seriam redundantes. */
+            <EstadoVazio
+              icone={<IcoDocumento tam={22} />}
+              titulo="Nenhuma indenização solicitada ainda"
+              descricao="Use o botão “+ Nova Indenização”, acima, para preencher o Boletim de Viagem (Anexo II) de um deslocamento já realizado."
+            />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {lista.map(i => (
@@ -303,8 +337,20 @@ export default function Indenizacoes() {
               <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
                 <div style={s.passo}><strong>1.</strong> <a href={pdfUrlPreview} download={`boletim-${protocoloAtual}.pdf`} style={s.link}>Baixe o Boletim gerado (#{protocoloAtual})</a></div>
                 <div style={s.passo}><strong>2.</strong> Colete as assinaturas necessárias (responsável pela execução e pela homologação), inclusive pelo <a href="https://www.gov.br/governodigital/pt-br/assinatura-eletronica" target="_blank" rel="noreferrer" style={s.link}>Gov.br</a> quando aplicável</div>
-                <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo — ele vai automaticamente por e-mail para o RH:</div>
+                <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo:</div>
                 <input type="file" accept="application/pdf" onChange={e => setArquivoAssinado(e.target.files?.[0] || null)} style={s.input} />
+
+                {/* Aqui o destino é diferente do Anexo I: o boletim SAI do sistema por e-mail.
+                    O usuário precisa saber disso antes de clicar em enviar. */}
+                <div style={s.destino}>
+                  <div style={{ fontWeight: 700, color: "#334155", marginBottom: 6 }}>O que acontece ao enviar</div>
+                  <ul style={s.destinoLista}>
+                    <li>O boletim é <strong>enviado por e-mail, com o PDF anexado, para a SUAD/CGE-MS</strong> (<span style={{ fontWeight: 600 }}>suad@cge.ms.gov.br</span>) — o setor responsável pelo pagamento da indenização.</li>
+                    <li>Uma cópia fica <strong>guardada no sistema</strong>, com data, hora e código de verificação (SHA-256).</li>
+                    <li>O status passa para <strong>“Enviada ao RH”</strong> nesta tela assim que o envio é confirmado.</li>
+                    <li>O andamento do pagamento segue pelos canais do setor — o Hub não acompanha essa etapa.</li>
+                  </ul>
+                </div>
                 {erro && <div role="alert" style={s.erro}>{erro}</div>}
                 {sucesso && <div style={s.ok}><IcoCheckCirculo tam={14}/> Boletim enviado ao RH!</div>}
                 <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
@@ -342,6 +388,8 @@ const s: Record<string, React.CSSProperties> = {
   badge:   { padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" },
   link:    { color: "#1E3A8A", fontSize: 13, fontWeight: 600, textDecoration: "none" },
   passo:   { fontSize: 13, color: "#334155" },
+  destino:     { background: "#F8FAFC", border: "1px solid #E1EAF5", borderRadius: 8, padding: "14px 16px", fontSize: 13, color: "#5A7A9A" },
+  destinoLista:{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 7, lineHeight: 1.5 },
   overlay: { position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "2rem" },
   modal:   { background: "#ffffff", borderRadius: 12, padding: "1.75rem", width: "100%", maxWidth: 620, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
   modalTitulo: { fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 0, marginBottom: "1.25rem" },

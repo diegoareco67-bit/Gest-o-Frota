@@ -62,6 +62,72 @@ de literais de string em três pontos — `Solicitar.tsx` (aviso de CNH vencendo
 (rótulos "Normal"/"Multa"). Apareceria para o usuário como o texto cru `<IcoAlerta tam={14}/>`.
 O script tratava aspas mas não crase; nenhum teste pegou porque nenhum exercitava esses textos.
 
+### ✅ 6. Caminho para desbloquear Indenizações era um link escondido no texto — CORRIGIDO
+
+**Problema:** a tela de Indenizações, quando bloqueada, dizia *"Você precisa ter o **Termo de
+Opção (Anexo I)** aprovado…"* — e a única forma de agir era clicar no trecho em destaque.
+Dependendo do usuário, nem se percebe que aquilo é clicável.
+
+**Solução** (`indenizacao/Indenizacoes.tsx`): o aviso virou um bloco com título, explicação e um
+**botão** de verdade. O texto muda conforme a situação, em vez de ser sempre igual:
+
+| Situação | Título | Botão |
+|---|---|---|
+| Sem Anexo I | "Antes de solicitar indenização, cadastre seu veículo" | **Iniciar preenchimento do requerimento** |
+| Anexo I pendente | "Seu Termo de Opção está aguardando aprovação" | Ver meu requerimento |
+| Anexo I recusado | "Seu Termo de Opção foi recusado" | Corrigir e reenviar requerimento |
+
+A lista vazia (já desbloqueada) passou a usar `<EstadoVazio>`, sem botão próprio — o
+"+ Nova Indenização" da topbar já está visível ali, e dois CTAs idênticos seriam redundantes.
+
+### ✅ 7. Passos do Termo de Opção espremidos e sem botão de download — CORRIGIDO
+
+**Problema:** depois de gerar o PDF, os três passos apareciam como linhas coladas de texto
+corrido (`1.` `2.` `3.`), e "Baixe o Termo de Opção gerado" era outro link disfarçado de texto.
+
+**Solução** (`indenizacao/VeiculoProprio.tsx`):
+- Cada passo virou um bloco com **número em círculo**, título em destaque e uma linha de apoio
+  explicando o que fazer — com 22px de respiro entre eles.
+- Passo 1 ganhou um **botão "Baixar" com ícone de download** (`IcoDownload`, novo em `Icone.tsx`),
+  em vez do link no meio da frase.
+- Passo 2 passou a citar as **duas** vias de assinatura digital: Gov.br **e o assinador do E-MS**
+  (antes só mencionava o Gov.br).
+
+### ✅ 8. Envio de requerimento não dizia para onde ia — CORRIGIDO
+
+**Problema:** o usuário via um campo de upload e um botão "Enviar", sem saber o que aconteceria
+depois nem para onde o arquivo iria.
+
+**Ao investigar, o destino é diferente nos dois anexos** — e nenhuma das telas dizia isso:
+
+| | Anexo I (Termo de Opção) | Anexo II (Indenização) |
+|---|---|---|
+| Storage | ✅ sim, com hash SHA-256 | ✅ sim, com hash SHA-256 |
+| E-mail | ❌ **nenhum** | ✅ **PDF anexo para `suad@cge.ms.gov.br`** |
+| Próximo passo | fila de aprovação do gestor, no Hub | pagamento pela SUAD, fora do Hub |
+
+**Solução:** bloco "O que acontece ao enviar" em cada uma das duas telas, listando destino,
+o que fica guardado, o que muda de status e o que **não** acontece (no Anexo I é explícito que
+nenhum e-mail é disparado — mesma classe de confusão do "solicitar acesso não envia e-mail").
+
+### ✅ 9. Horário de reserva sem limite de expediente e minuto a minuto — CORRIGIDO
+
+**Dois problemas na seleção de hora:**
+1. Aceitava qualquer horário (madrugada, fim de semana), sem relação com o expediente.
+2. O seletor nativo listava os **60 minutos** um a um, e — pior — **não tem botão de
+   confirmação**: depois de escolher, era preciso clicar fora do campo para o valor ser aceito.
+
+**Solução:**
+- `EXPEDIENTE_INICIO = "07:30"` / `EXPEDIENTE_FIM = "17:30"` e `PASSO_MINUTOS = 15` em
+  `utils/periodo.ts`, com `validarHorarioExpediente()` e a opção `exigeExpediente` no
+  `validarPeriodo`.
+- **`src/components/CampoHora.tsx`** (novo) — troca o `<input type="time">` por um `<select>`
+  com a lista fechada de horários válidos (07:30 → 17:30, de 15 em 15 = 41 opções). Escolher
+  já confirma, que é o comportamento nativo do select; some o problema do "clicar fora".
+  O campo de fim desabilita (sem esconder) os horários anteriores ao início.
+- Aplicado em **Salas** e **Equipamentos**, com a regra escrita na tela: *"Expediente: das
+  07:30 às 17:30, em intervalos de 15 minutos."*
+
 ---
 
 ## ⏳ PENDÊNCIAS ABERTAS

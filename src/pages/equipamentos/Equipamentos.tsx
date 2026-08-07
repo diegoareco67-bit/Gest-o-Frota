@@ -8,7 +8,8 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
-import { validarPeriodo } from "../../utils/periodo";
+import { validarPeriodo, EXPEDIENTE_INICIO, EXPEDIENTE_FIM } from "../../utils/periodo";
+import { CampoHora } from "../../components/CampoHora";
 import { SkeletonLista } from "../../components/Skeleton";
 
 interface Equipamento { id: string; nome: string; tipo: string; patrimonio: string; status: string; ativo: boolean; }
@@ -74,7 +75,7 @@ export default function Equipamentos() {
     const dataFim = `${form.data}T${form.horaFim}`;
     // Validação compartilhada: intervalo, duração e data no passado (ver utils/periodo.ts).
 
-    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "O empréstimo" });
+    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "O empréstimo", exigeExpediente: true });
 
     if (erroPeriodo) { setErro(erroPeriodo); return; }
     if (verificarConflito(form.equipamentoId, dataInicio, dataFim)) {
@@ -248,12 +249,15 @@ export default function Equipamentos() {
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}>
                   <label htmlFor="emp-inicio" style={s.label}>Início</label>
-                  <input id="emp-inicio" type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio: e.target.value }))} style={s.input} />
+                  <CampoHora id="emp-inicio" valor={form.horaInicio} aoMudar={v => setForm(p => ({ ...p, horaInicio: v }))} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label htmlFor="emp-fim" style={s.label}>Fim</label>
-                  <input id="emp-fim" type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim: e.target.value }))} style={s.input} />
+                  <CampoHora id="emp-fim" valor={form.horaFim} aoMudar={v => setForm(p => ({ ...p, horaFim: v }))} minimo={form.horaInicio} />
                 </div>
+              </div>
+              <div style={{ fontSize:12, color:"#94A3B8", marginTop:-4 }}>
+                Expediente: das {EXPEDIENTE_INICIO} às {EXPEDIENTE_FIM}, em intervalos de 15 minutos.
               </div>
               <div>
                 <label htmlFor="emp-motivo" style={s.label}>Motivo</label>

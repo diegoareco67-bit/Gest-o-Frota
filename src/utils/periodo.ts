@@ -12,6 +12,39 @@ export const MAX_DIAS_RESERVA = 7;
 /** Quão longe no futuro se pode agendar. Barra erro de digitação no ano (2026 → 2126). */
 export const MAX_MESES_ANTECEDENCIA = 12;
 
+/** Expediente da CGE-MS. Reserva de recurso compartilhado só vale dentro desta janela. */
+export const EXPEDIENTE_INICIO = "07:30";
+export const EXPEDIENTE_FIM = "17:30";
+
+/**
+ * Granularidade dos campos de hora, em segundos (15 min).
+ * Vai no atributo `step` do input — faz o seletor nativo mostrar só 00/15/30/45
+ * em vez dos 60 minutos, que era o que deixava a lista enorme e difícil de acertar.
+ */
+export const PASSO_MINUTOS = 15;
+export const PASSO_SEGUNDOS = PASSO_MINUTOS * 60;
+
+/** "HH:MM" → minutos desde a meia-noite. */
+function emMinutos(hora: string): number {
+  const [h, m] = hora.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/** Valida se um horário "HH:MM" cai dentro do expediente e no passo de 15 min. */
+export function validarHorarioExpediente(hora: string): string | null {
+  if (!hora) return null;
+  const min = emMinutos(hora);
+  if (isNaN(min)) return "Horário inválido.";
+
+  if (min < emMinutos(EXPEDIENTE_INICIO) || min > emMinutos(EXPEDIENTE_FIM)) {
+    return `O horário deve estar dentro do expediente, das ${EXPEDIENTE_INICIO} às ${EXPEDIENTE_FIM}.`;
+  }
+  if (min % PASSO_MINUTOS !== 0) {
+    return `Use intervalos de ${PASSO_MINUTOS} minutos (00, 15, 30 ou 45).`;
+  }
+  return null;
+}
+
 const MS_DIA = 24 * 60 * 60 * 1000;
 
 export interface OpcoesPeriodo {
@@ -21,6 +54,8 @@ export interface OpcoesPeriodo {
   permitePassado?: boolean;
   /** Como chamar o período na mensagem de erro ("A reserva", "O empréstimo"...) */
   rotulo?: string;
+  /** Exige que início e fim caiam no expediente (07:30–17:30) e no passo de 15 min */
+  exigeExpediente?: boolean;
 }
 
 /**
@@ -56,6 +91,14 @@ export function validarPeriodo(inicio: string, fim: string, opcoes: OpcoesPeriod
   limite.setMonth(limite.getMonth() + MAX_MESES_ANTECEDENCIA);
   if (ini > limite) {
     return `Só é possível agendar com até ${MAX_MESES_ANTECEDENCIA} meses de antecedência. Confira o ano informado.`;
+  }
+
+  if (opcoes.exigeExpediente) {
+    const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    const erroInicio = validarHorarioExpediente(hhmm(ini));
+    if (erroInicio) return `Início: ${erroInicio}`;
+    const erroFim = validarHorarioExpediente(hhmm(f));
+    if (erroFim) return `Fim: ${erroFim}`;
   }
 
   return null;

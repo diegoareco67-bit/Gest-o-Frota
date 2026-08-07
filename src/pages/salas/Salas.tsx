@@ -8,7 +8,8 @@ import { registrarAuditoria } from "../../firebase/auditoria";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEscClose } from "../../hooks/useEscClose";
 import { intervalosSobrepoem } from "../../utils/conflitoHorario";
-import { validarPeriodo } from "../../utils/periodo";
+import { validarPeriodo, EXPEDIENTE_INICIO, EXPEDIENTE_FIM } from "../../utils/periodo";
+import { CampoHora } from "../../components/CampoHora";
 import { IcoMonitor, IcoPorta } from "../../components/Icone";
 import { SkeletonLista } from "../../components/Skeleton";
 
@@ -62,7 +63,7 @@ export default function Salas() {
     const dataFim = `${form.data}T${form.horaFim}`;
     // Validação compartilhada: intervalo, duração e data no passado (ver utils/periodo.ts).
 
-    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "A reserva" });
+    const erroPeriodo = validarPeriodo(dataInicio, dataFim, { maxDias: 1, rotulo: "A reserva", exigeExpediente: true });
 
     if (erroPeriodo) { setErro(erroPeriodo); return; }
     if (verificarConflito(form.salaId, dataInicio, dataFim)) {
@@ -209,12 +210,15 @@ export default function Salas() {
               <div style={{ display:"flex", gap:10 }}>
                 <div style={{ flex:1 }}>
                   <label htmlFor="reserva-inicio" style={s.label}>Início</label>
-                  <input id="reserva-inicio" type="time" value={form.horaInicio} onChange={e => setForm(p => ({ ...p, horaInicio:e.target.value }))} style={s.input} />
+                  <CampoHora id="reserva-inicio" valor={form.horaInicio} aoMudar={v => setForm(p => ({ ...p, horaInicio:v }))} />
                 </div>
                 <div style={{ flex:1 }}>
                   <label htmlFor="reserva-fim" style={s.label}>Fim</label>
-                  <input id="reserva-fim" type="time" value={form.horaFim} onChange={e => setForm(p => ({ ...p, horaFim:e.target.value }))} style={s.input} />
+                  <CampoHora id="reserva-fim" valor={form.horaFim} aoMudar={v => setForm(p => ({ ...p, horaFim:v }))} minimo={form.horaInicio} />
                 </div>
+              </div>
+              <div style={{ fontSize:12, color:"#94A3B8", marginTop:-4 }}>
+                Expediente: das {EXPEDIENTE_INICIO} às {EXPEDIENTE_FIM}, em intervalos de 15 minutos.
               </div>
               <div>
                 <label htmlFor="reserva-motivo" style={s.label}>Motivo</label>

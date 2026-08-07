@@ -105,3 +105,18 @@ test.describe("Gestor — Indenizações — aprovação do Anexo I", () => {
     await expect(page.getByText(/nenhuma indenização|#IND/i)).toBeVisible({ timeout: 5000 });
   });
 });
+
+test.describe("Usuario — Indenizações bloqueada — chamada para ação", () => {
+  test("mostra botão explícito de iniciar o requerimento, não só um link no texto", async ({ page }) => {
+    // "terceiro" é o servidor de teste sem Anexo I cadastrado
+    await fazerLogin(page, gerarDados({ perfil: "usuario", email: "terceiro@cge.ms.gov.br" }));
+    await page.goto("/usuario/indenizacoes");
+    await page.waitForLoadState("networkidle");
+
+    const botao = page.getByRole("button", { name: /iniciar preenchimento do requerimento/i });
+    await expect(botao).toBeVisible({ timeout: 5000 });
+
+    await botao.click();
+    await expect(page).toHaveURL(/\/usuario\/veiculo-proprio/, { timeout: 5000 });
+  });
+});

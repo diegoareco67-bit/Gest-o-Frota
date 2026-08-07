@@ -5,7 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/config";
 import { useAuth } from "../../contexts/AuthContext";
 import { gerarPdfAnexoI, calcularHashSHA256 } from "../../utils/pdfIndenizacao";
-import { IcoCheckCirculo, IcoDocumento } from "../../components/Icone";
+import { IcoCheckCirculo, IcoDocumento, IcoDownload } from "../../components/Icone";
 import { SkeletonLista } from "../../components/Skeleton";
 
 interface VeiculoProprio {
@@ -121,7 +121,7 @@ export default function VeiculoProprio() {
             </div>
           ) : (
             <div style={s.card}>
-              <p style={{ fontSize: 13, color: "#5A7A9A", marginTop: 0 }}>
+              <p style={{ fontSize: 13, color: "#5A7A9A", marginTop: 0, marginBottom: 22, lineHeight: 1.55 }}>
                 Antes de solicitar indenização de despesas de transporte, cadastre o veículo próprio que você vai usar nos deslocamentos a serviço.
               </p>
 
@@ -153,13 +153,44 @@ export default function VeiculoProprio() {
                   <button onClick={gerarPdf} style={s.btnPrimario}>Gerar Termo de Opção (PDF)</button>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                /* Três passos com respiro entre eles: antes ficavam espremidos e o
+                   usuário precisava adivinhar que o texto em destaque era clicável. */
+                <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
                   <div style={s.passo}>
-                    <strong>1.</strong> <a href={pdfUrlPreview} download="termo-opcao-veiculo.pdf" style={s.link}>Baixe o Termo de Opção gerado</a>
+                    <div style={s.passoTitulo}><span style={s.passoNumero}>1</span> Baixe o Termo de Opção gerado</div>
+                    <div style={s.passoTexto}>Confira os dados antes de assinar.</div>
+                    <a href={pdfUrlPreview} download="termo-opcao-veiculo.pdf" style={s.btnBaixar}>
+                      <IcoDownload tam={15} /> Baixar
+                    </a>
                   </div>
-                  <div style={s.passo}><strong>2.</strong> Assine eletronicamente pelo <a href="https://www.gov.br/governodigital/pt-br/assinatura-eletronica" target="_blank" rel="noreferrer" style={s.link}>Gov.br</a> (fora deste sistema)</div>
-                  <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo:</div>
+
+                  <div style={s.passo}>
+                    <div style={s.passoTitulo}><span style={s.passoNumero}>2</span> Assine eletronicamente</div>
+                    <div style={s.passoTexto}>
+                      A assinatura é feita fora deste sistema. Use o{" "}
+                      <a href="https://www.gov.br/governodigital/pt-br/assinatura-eletronica" target="_blank" rel="noreferrer" style={s.link}>assinador do Gov.br</a>
+                      {" "}ou o assinador digital do sistema E-MS.
+                    </div>
+                  </div>
+
+                  <div style={s.passo}>
+                    <div style={s.passoTitulo}><span style={s.passoNumero}>3</span> Envie o PDF assinado</div>
+                    <div style={s.passoTexto}>Selecione o arquivo que você assinou no passo anterior.</div>
+                  </div>
                   <input type="file" accept="application/pdf" onChange={e => setArquivoAssinado(e.target.files?.[0] || null)} style={s.input} />
+
+                  {/* O usuário precisa saber para onde o arquivo vai e o que acontece depois.
+                      Aqui, diferente do Anexo II, NENHUM e-mail é disparado — o termo fica na
+                      fila de aprovação do gestor dentro do próprio sistema. */}
+                  <div style={s.destino}>
+                    <div style={{ fontWeight: 700, color: "#334155", marginBottom: 6 }}>O que acontece ao enviar</div>
+                    <ul style={s.destinoLista}>
+                      <li>O arquivo fica <strong>guardado no sistema</strong>, com data, hora e um código de verificação (SHA-256) que comprova que ele não foi alterado depois do envio.</li>
+                      <li><strong>Nenhum e-mail é enviado agora.</strong> O termo entra na fila de aprovação do <strong>gestor da frota</strong>, aqui mesmo no Hub.</li>
+                      <li>Depois de aprovado, a tela de <strong>Indenizações</strong> é liberada para você. Este cadastro é feito <strong>uma única vez</strong>.</li>
+                      <li>Se for recusado, o status aparece nesta tela para você corrigir e reenviar.</li>
+                    </ul>
+                  </div>
                   {erro && <div role="alert" style={s.erro}>{erro}</div>}
                   {sucesso && <div style={s.ok}><IcoCheckCirculo tam={14}/> Termo enviado! Aguardando aprovação do gestor.</div>}
                   <div style={{ display: "flex", gap: 8 }}>
@@ -194,5 +225,11 @@ const s: Record<string, React.CSSProperties> = {
   btnSecundario:{ padding: "10px 20px", border: "1px solid #E1EAF5", borderRadius: 8, background: "#F1F5F9", color: "#5A7A9A", fontSize: 13, fontWeight: 600, cursor: "pointer" },
   badge:   { padding: "4px 10px", borderRadius: 99, fontSize: 12, fontWeight: 700 },
   link:    { color: "#1E3A8A", fontSize: 13, fontWeight: 600, textDecoration: "none" },
-  passo:   { fontSize: 13, color: "#334155" },
+  passo:       { fontSize: 13, color: "#334155", display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" },
+  passoTitulo: { fontSize: 14, fontWeight: 700, color: "#0F172A", display: "flex", alignItems: "center", gap: 10 },
+  passoTexto:  { fontSize: 13, color: "#5A7A9A", lineHeight: 1.5, paddingLeft: 32 },
+  passoNumero: { width: 22, height: 22, borderRadius: 99, background: "#1E3A8A", color: "#fff", fontSize: 12, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  btnBaixar:   { marginLeft: 32, marginTop: 2, display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 18px", borderRadius: 8, background: "#1E3A8A", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", cursor: "pointer" },
+  destino:     { background: "#F8FAFC", border: "1px solid #E1EAF5", borderRadius: 8, padding: "14px 16px", fontSize: 13, color: "#5A7A9A" },
+  destinoLista:{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 7, lineHeight: 1.5 },
 };
