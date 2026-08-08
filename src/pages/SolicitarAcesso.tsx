@@ -86,10 +86,21 @@ export default function SolicitarAcesso() {
             a caixa de spam/lixo eletrônico).
           </p>
           {!sucesso && cooldown.horasRestantes !== undefined && (
-            <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#1e40af", marginBottom:16 }}>
-              Você já enviou uma solicitação recentemente. Se precisar enviar outra, aguarde
-              cerca de {cooldown.horasRestantes}h ou entre em contato com o gestor diretamente.
-            </div>
+            <>
+              <div style={{ background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#1e40af", marginBottom:16 }}>
+                Você já enviou uma solicitação recentemente. Se precisar enviar outra, aguarde
+                cerca de {cooldown.horasRestantes}h ou entre em contato com o gestor diretamente.
+              </div>
+              {/* Escape do cooldown: quem foi RECUSADO precisa corrigir e reenviar antes das
+                  24h. Sem isso, a espera vira um beco sem saída — justamente para quem mais
+                  precisa reenviar. */}
+              <button
+                onClick={() => { localStorage.removeItem(CHAVE_COOLDOWN); window.location.reload(); }}
+                style={{ ...s.btnSecundario, marginBottom: 16, width: "100%" }}
+              >
+                Minha solicitação foi recusada — quero corrigir e reenviar
+              </button>
+            </>
           )}
           <button onClick={() => navigate("/login")} style={s.btnPrimario}>Voltar ao Login</button>
         </div>

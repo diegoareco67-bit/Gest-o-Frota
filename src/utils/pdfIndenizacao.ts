@@ -114,6 +114,26 @@ function secao(doc: jsPDF, titulo: string, y: number): number {
   return y + 13;
 }
 
+/**
+ * Bloco de assinatura no formato do decreto: rótulo acima da linha, nome/cargo abaixo.
+ *   (Assinatura do Servidor)
+ *   ______________________________
+ *   Nome do Servidor
+ */
+function blocoAssinatura(doc: jsPDF, rotulo: string, nome: string, x: number, y: number, largura = 110) {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9.5);
+  doc.setTextColor(90, 100, 120);
+  doc.text(rotulo, x, y);
+
+  doc.setDrawColor(0);
+  doc.line(x, y + 4, x + largura, y + 4);
+
+  doc.setFontSize(9.5);
+  doc.setTextColor(0, 0, 0);
+  doc.text(nome, x, y + 9);
+}
+
 function assinatura(doc: jsPDF, label: string, x: number, y: number, largura = 90) {
   doc.setDrawColor(0);
   doc.line(x, y, x + largura, y);
@@ -157,16 +177,22 @@ export function gerarPdfAnexoI(d: DadosAnexoI): Blob {
   y += linhas.length * 5.2 + 14;
 
   doc.text(`${d.localidade || "Campo Grande"}, ${formatarData(d.data)}.`, 14, y);
-  y += 22;
+  y += 24;
 
-  assinatura(doc, "Assinatura do Servidor", 14, y);
-  y += 30;
+  // Blocos de assinatura no formato do Anexo I do Decreto nº 10.154/2000:
+  // o rótulo "(Assinatura ...)" vem ACIMA da linha e o nome/cargo ABAIXO. O texto
+  // anterior invertia isso, não imprimia os nomes e ainda acrescentava um parêntese
+  // explicativo ("Secretário de Estado, Procurador-Geral ou Diretor-Presidente")
+  // que não existe no decreto.
+  blocoAssinatura(doc, "(Assinatura do Servidor)", d.nomeServidor || "Nome do Servidor", 14, y);
+  y += 34;
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9.5);
-  doc.text("Aprovado em: _____ / _____ / __________", 14, y);
-  y += 20;
-  assinatura(doc, "Assinatura da Autoridade Concedente (Secretário de Estado, Procurador-Geral ou Diretor-Presidente)", 14, y, 182);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("APROVADO EM ____ / ____ / ________", 14, y);
+  y += 26;
+
+  blocoAssinatura(doc, "(Assinatura da Autoridade Concedente)", "Nome/Cargo da Autoridade Concedente", 14, y);
 
   rodape(doc, d.protocolo);
   return doc.output("blob");

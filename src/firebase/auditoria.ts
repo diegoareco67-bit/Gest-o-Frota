@@ -22,7 +22,8 @@ export type AcaoAuditoria =
   | "recusar_veiculo_proprio"
   | "enviar_indenizacao"
   | "anonimizar_usuario"
-  | "alterar_configuracao";
+  | "alterar_configuracao"
+  | "recusar_solicitacao_acesso";
 
 /**
  * Grava um registro imutável na coleção `auditoria`.

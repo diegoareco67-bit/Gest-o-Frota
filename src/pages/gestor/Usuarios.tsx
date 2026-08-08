@@ -56,6 +56,8 @@ export default function Usuarios() {
   const [erroSol, setErroSol] = useState("");
   const [sucessoMsg, setSucessoMsg] = useState("");
   const [confirmRecusar, setConfirmRecusar] = useState(false);
+  const [motivoRecusaAcesso, setMotivoRecusaAcesso] = useState("");
+  const [erroRecusa, setErroRecusa] = useState("");
   const [confirmAnonimizar, setConfirmAnonimizar] = useState<UsuarioConta|null>(null);
   const setores = useSetores();
 
@@ -123,9 +125,20 @@ export default function Usuarios() {
 
   async function recusar() {
     if (!solSelecionada) return;
-    await updateDoc(doc(db, "solicitacoesAcesso", solSelecionada.id), { status:"recusada" });
+    // Justificativa obrigatória: sem ela o solicitante não sabe o que corrigir para reenviar.
+    if (!motivoRecusaAcesso.trim()) { setErroRecusa("Informe o motivo da recusa."); return; }
+    await updateDoc(doc(db, "solicitacoesAcesso", solSelecionada.id), {
+      status: "recusada",
+      motivoRecusa: motivoRecusaAcesso.trim(),
+      recusadoEm: serverTimestamp(),
+    });
+    await registrarAuditoria("recusar_solicitacao_acesso", usuario?.uid || "", usuario?.nome || "", {
+      solicitacaoId: solSelecionada.id, solicitante: solSelecionada.nomeCompleto, motivo: motivoRecusaAcesso.trim(),
+    });
     setSolSelecionada(null);
     setConfirmRecusar(false);
+    setMotivoRecusaAcesso("");
+    setErroRecusa("");
     await carregarTudo();
   }
 
@@ -420,12 +433,32 @@ export default function Usuarios() {
         </div>
       )}
 
+      {/* Modal próprio (o ModalConfirm não aceita campo de texto): a recusa precisa
+          de justificativa para o solicitante saber o que corrigir e reenviar. */}
       {confirmRecusar && solSelecionada && (
-        <ModalConfirm
-          titulo="Recusar Solicitação"mensagem={`Deseja recusar a solicitação de acesso de ${solSelecionada.nomeCompleto}? O solicitante não receberá acesso ao sistema.`}
-          labelConfirmar="Sim, recusar"labelCancelar="Voltar"corConfirmar="#EF4444"onConfirmar={recusar}
-          onCancelar={() => setConfirmRecusar(false)}
-        />
+        <div style={s.overlay} role="dialog" aria-modal="true" aria-labelledby="titulo-recusa">
+          <div style={{ ...s.modal, maxWidth: 460 }}>
+            <h2 id="titulo-recusa" style={s.modalTitulo}>Recusar Solicitação</h2>
+            <p style={{ fontSize: 13, color: "#5A7A9A", marginTop: 0, marginBottom: 14, lineHeight: 1.5 }}>
+              Recusar a solicitação de acesso de <strong style={{ color: "#0F172A" }}>{solSelecionada.nomeCompleto}</strong>.
+              O motivo abaixo fica registrado para que o solicitante saiba o que corrigir antes de reenviar.
+            </p>
+            <label htmlFor="motivo-recusa-acesso" style={s.label}>Motivo da recusa *</label>
+            <textarea
+              id="motivo-recusa-acesso"
+              value={motivoRecusaAcesso}
+              onChange={e => { setMotivoRecusaAcesso(e.target.value); setErroRecusa(""); }}
+              placeholder="Ex.: Matrícula não confere com o cadastro do RH. Confira e reenvie."
+              rows={3}
+              style={{ ...s.input, resize: "vertical", fontFamily: "inherit" }}
+            />
+            {erroRecusa && <div role="alert" style={{ ...s.erro, marginTop: 10 }}>{erroRecusa}</div>}
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
+              <button type="button" onClick={() => { setConfirmRecusar(false); setMotivoRecusaAcesso(""); setErroRecusa(""); }} style={s.btnSecundario}>Voltar</button>
+              <button type="button" onClick={recusar} style={{ ...s.btn, background: "#EF4444" }}>Confirmar recusa</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {confirmAnonimizar && (

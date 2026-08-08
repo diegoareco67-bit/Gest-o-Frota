@@ -196,6 +196,49 @@ anterior, que o deploy novo já havia apagado.
 
 ---
 
+### ✅ 5. Recusa sem justificativa — CORRIGIDO (nos 2 fluxos que faltavam)
+
+Antes só a recusa de **solicitação de veículo** exigia motivo. Os outros dois deixavam o
+solicitante sem saber o que corrigir.
+
+| Fluxo | Antes | Depois |
+|---|---|---|
+| Solicitação de veículo | ✅ já tinha | mantido |
+| Solicitação de **acesso** (`gestor/Usuarios.tsx`) | ❌ `ModalConfirm` sem campo | ✅ modal próprio com justificativa **obrigatória**, gravada em `motivoRecusa` + `recusadoEm`, com registro na auditoria (ação nova `recusar_solicitacao_acesso`) |
+| **Anexo I** (`indenizacao/GestorIndenizacoes.tsx`) | ❌ trocava o status direto | ✅ modal com justificativa obrigatória; `decidir()` passou a receber o motivo |
+
+**O servidor agora VÊ o motivo:** `VeiculoProprio.tsx` mostra o motivo da recusa e orienta a
+corrigir e reenviar (antes dizia só "fale com o gestor"). Registros recusados antes desta
+mudança exibem um texto explicando que não houve motivo registrado.
+
+**Cooldown deixou de ser beco sem saída:** o formulário público tem trava de 24h contra reenvio
+repetido. Quem foi recusado precisa reenviar **antes** disso — justamente quem mais precisa.
+Foi adicionado um botão "Minha solicitação foi recusada — quero corrigir e reenviar" que limpa
+a trava local.
+
+**Não implementado (depende da pendência 14):** avisar o solicitante de acesso **por e-mail**.
+Ele não tem conta no sistema, então não existe tela onde veria o motivo — o caminho seria o
+Apps Script, que é exatamente o que está sob investigação na pendência 14.
+
+### ✅ 4 (parcial). Termo de Opção agora segue o modelo do decreto — TEXTO CORRIGIDO
+
+O PDF do Anexo I divergia do Anexo I do Decreto nº 10.154/2000. Corrigido em
+`utils/pdfIndenizacao.ts` com um helper novo, `blocoAssinatura()`:
+
+| Item | Antes | Depois |
+|---|---|---|
+| Posição do rótulo | abaixo da linha | **acima** da linha, como no decreto |
+| Nome sob a linha | não imprimia | `Nome do Servidor` / `Nome/Cargo da Autoridade Concedente` |
+| Rótulo da autoridade | `Assinatura da Autoridade Concedente (Secretário de Estado, Procurador-Geral ou Diretor-Presidente)` | `(Assinatura da Autoridade Concedente)` — o parêntese explicativo não existe no decreto |
+| Aprovação | `Aprovado em: _____ / _____ / __________` | `APROVADO EM ____ / ____ / ________` (caixa alta) |
+
+**Continua pendente da pendência 4:** o fluxo **100% digital**. Hoje o servidor baixa, assina
+fora e faz upload. A tela já orienta as duas vias (gov.br e assinador do E-MS, correção 7), mas
+não há integração. Falta decidir se o Hub apenas orienta ou integra de fato — e para isso é
+preciso saber se o E-MS expõe API de assinatura ou só interface web.
+
+---
+
 ## ⏳ PENDÊNCIAS ABERTAS
 
 ### 14. E-mails não estão chegando — investigação parada, falta identificar QUAL

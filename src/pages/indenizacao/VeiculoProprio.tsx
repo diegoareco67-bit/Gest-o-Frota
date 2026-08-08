@@ -11,7 +11,7 @@ import { SkeletonLista } from "../../components/Skeleton";
 interface VeiculoProprio {
   id: string; servidorId: string; servidorNome: string; categoriaFuncional: string;
   marca: string; modelo: string; placa: string; localidade: string; data: string;
-  status: "pendente" | "aprovado" | "recusado"; pdfUrl: string; pdfHash: string; criadoEm?: { toDate: () => Date };
+  status: "pendente" | "aprovado" | "recusado"; motivoRecusa?: string; pdfUrl: string; pdfHash: string; criadoEm?: { toDate: () => Date };
 }
 
 const STATUS_LABEL: Record<string, { cor: string; bg: string; label: string }> = {
@@ -113,7 +113,13 @@ export default function VeiculoProprio() {
               </div>
               <a href={registro.pdfUrl} target="_blank" rel="noreferrer" style={s.link}><IcoDocumento tam={14}/> Ver termo assinado</a>
               {registro.status === "recusado" && (
-                <div style={{ ...s.aviso, marginTop: 12 }}>Seu termo foi recusado. Fale com o gestor para entender o motivo e reenviar.</div>
+                <div style={{ ...s.aviso, marginTop: 12 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 4 }}>Seu termo foi recusado</div>
+                  {registro.motivoRecusa
+                    ? <div style={{ marginBottom: 8 }}><strong>Motivo:</strong> {registro.motivoRecusa}</div>
+                    : <div style={{ marginBottom: 8 }}>Nenhum motivo foi registrado. Procure o gestor da frota.</div>}
+                  <div>Corrija o que foi apontado e envie o termo novamente.</div>
+                </div>
               )}
               {registro.status === "pendente" && (
                 <div style={{ ...s.aviso, marginTop: 12 }}>Aguardando aprovação do gestor. Você já pode solicitar indenizações — elas ficam liberadas para envio ao RH assim que este termo for aprovado.</div>
