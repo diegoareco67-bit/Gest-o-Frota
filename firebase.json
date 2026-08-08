@@ -26,17 +26,17 @@
       ],
       "headers": [
         {
-          "//": "index.html NUNCA pode ser cacheado: ele é quem aponta para os chunks com hash. Cacheado (o padrão era 1h), o navegador continua pedindo chunks de um deploy antigo, que já não existem — daí o erro 'Failed to fetch dynamically imported module'.",
-          "source": "/index.html",
-          "headers": [
-            { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-          ]
-        },
-        {
-          "//": "Os arquivos de /assets têm hash no nome: mudou o conteúdo, mudou o nome. Podem ser cacheados para sempre com segurança.",
+          "//": "PRIMEIRO os assets (regra mais específica): têm hash no nome, então mudou o conteúdo mudou o nome — podem ser cacheados para sempre com segurança.",
           "source": "/assets/**",
           "headers": [
             { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          ]
+        },
+        {
+          "//": "Todo o resto (incluindo '/' e as rotas do SPA, que são rewrites para o index.html) NÃO pode ser cacheado: é o index que aponta para os chunks com hash. Cacheado, o navegador continua pedindo chunks de um deploy antigo, que já foram apagados — daí 'Failed to fetch dynamically imported module'. Atenção: a regra casa no CAMINHO PEDIDO, não no destino do rewrite; por isso '/index.html' sozinho não bastava, já que o usuário acessa '/'.",
+          "source": "**",
+          "headers": [
+            { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
           ]
         }
       ]
@@ -57,17 +57,17 @@
       ],
       "headers": [
         {
-          "//": "index.html NUNCA pode ser cacheado: ele é quem aponta para os chunks com hash. Cacheado (o padrão era 1h), o navegador continua pedindo chunks de um deploy antigo, que já não existem — daí o erro 'Failed to fetch dynamically imported module'.",
-          "source": "/index.html",
-          "headers": [
-            { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-          ]
-        },
-        {
-          "//": "Os arquivos de /assets têm hash no nome: mudou o conteúdo, mudou o nome. Podem ser cacheados para sempre com segurança.",
+          "//": "PRIMEIRO os assets (regra mais específica): têm hash no nome, então mudou o conteúdo mudou o nome — podem ser cacheados para sempre com segurança.",
           "source": "/assets/**",
           "headers": [
             { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          ]
+        },
+        {
+          "//": "Todo o resto (incluindo '/' e as rotas do SPA, que são rewrites para o index.html) NÃO pode ser cacheado: é o index que aponta para os chunks com hash. Cacheado, o navegador continua pedindo chunks de um deploy antigo, que já foram apagados — daí 'Failed to fetch dynamically imported module'. Atenção: a regra casa no CAMINHO PEDIDO, não no destino do rewrite; por isso '/index.html' sozinho não bastava, já que o usuário acessa '/'.",
+          "source": "**",
+          "headers": [
+            { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
           ]
         }
       ]
