@@ -78,7 +78,7 @@ export default function GestorIndenizacoes() {
 
   return (
     <div style={s.page}>
-      <Sidebar perfil="gestor" />
+      <Sidebar perfil={usuario?.perfil ?? "gestor"} />
       <main style={s.main}>
         <div style={s.topbar}>
           <div>

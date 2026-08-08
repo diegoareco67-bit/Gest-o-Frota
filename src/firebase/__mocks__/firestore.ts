@@ -17,6 +17,7 @@ const store: Record<string, MockDoc[]> = {
     { id: "uid-consulta-teste", data: { nome: "Carlos Consulta", perfil: "consulta", setor: "Auditoria", matricula: "11223", ativo: true } },
     { id: "uid-outro-servidor", data: { nome: "Pedro Motorista",  perfil: "usuario",  setor: "Transportes", matricula: "22334", ativo: true } },
     { id: "uid-auditor-teste",  data: { nome: "Ana Auditora",     perfil: "auditor",  setor: "Controle Interno", matricula: "33445", ativo: true } },
+    { id: "uid-admin-teste",    data: { nome: "Sandra Administrativo", perfil: "administrativo", setor: "Superintendência de Administração", matricula: "55667", ativo: true } },
     { id: "uid-terceiro-servidor", data: { nome: "Lucia Servidora", perfil: "usuario", setor: "Transportes", matricula: "44556", ativo: true } },
   ],
   veiculos: [

@@ -22,7 +22,9 @@ const STATUS_SALAS = {
 };
 
 export default function Salas() {
-  const { usuario, ehGestor, ehConsulta } = useAuth();
+  const { usuario, ehGestor, ehConsulta, ehAdministrativo } = useAuth();
+  // Quem mantém o catálogo do recurso (cadastrar/editar item)
+  const podeGerenciar = ehGestor || ehAdministrativo;
   const [salas, setSalas] = useState<Sala[]>([]);
   const [reservas, setReservas] = useState<ReservaSala[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -114,7 +116,7 @@ export default function Salas() {
   }
 
   function podeCancelar(r: ReservaSala) {
-    return ehGestor || r.responsavelId === usuario?.uid;
+    return podeGerenciar || r.responsavelId === usuario?.uid;
   }
 
   const proximasReservas = reservas
@@ -142,7 +144,7 @@ export default function Salas() {
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-            {ehGestor && (
+            {podeGerenciar && (
               <div style={s.card}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:"#0F172A" }}>Salas cadastradas ({salas.length})</div>

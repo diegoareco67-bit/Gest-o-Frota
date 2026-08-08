@@ -17,7 +17,17 @@ import type { Perfil } from "../../types";
 
 interface UsuarioConta { id:string; nome:string; email:string; setor:string; matricula:string; numeroCnh?:string; vencimentoCnh?:string; ativo:boolean; perfil:Perfil; anonimizado?:boolean; }
 
-const PERFIL_LABEL: Record<string, string> = { usuario:"Usuário", consulta:"Consulta", auditor:"Auditor" };
+const PERFIL_LABEL: Record<string, string> = { administrativo:"Administrativo", usuario:"Usuário", consulta:"Consulta", auditor:"Auditor" };
+
+/** Níveis que o gestor pode conceder. O próprio "gestor" não entra: promover alguém
+ *  a gestor daria a ele o poder de gerenciar acessos, e isso deve ser decisão
+ *  deliberada fora da tela do dia a dia. */
+const PERFIS_CONCEDIVEIS: { valor: Perfil; titulo: string; descricao: string }[] = [
+  { valor:"administrativo", titulo:"Administrativo", descricao:"Cadastra e edita veículos, salas, equipamentos, manutenção e setores. Decide Termos de Opção e consulta indenizações." },
+  { valor:"usuario",        titulo:"Usuário",        descricao:"Reserva veículos, salas e equipamentos. Solicita indenização." },
+  { valor:"consulta",       titulo:"Consulta",       descricao:"Somente leitura dos calendários." },
+  { valor:"auditor",        titulo:"Auditor",        descricao:"Somente leitura da trilha de auditoria e dos relatórios." },
+];
 
 function statusCnh(vencimento?: string): { cor: string; bg: string; texto: string } | null {
   if (!vencimento) return null;
@@ -59,6 +69,7 @@ export default function Usuarios() {
   const [motivoRecusaAcesso, setMotivoRecusaAcesso] = useState("");
   const [erroRecusa, setErroRecusa] = useState("");
   const [confirmAnonimizar, setConfirmAnonimizar] = useState<UsuarioConta|null>(null);
+  const [perfilEditando, setPerfilEditando] = useState<string|null>(null);
   const setores = useSetores();
 
   useEscClose(() => setModal(false), modal);
@@ -69,7 +80,7 @@ export default function Usuarios() {
   async function carregarTudo() {
     setCarregando(true);
     const [condSnap, solSnap] = await Promise.all([
-      getDocs(query(collection(db, "usuarios"), where("perfil","in",["usuario","consulta","auditor"]), limit(500))),
+      getDocs(query(collection(db, "usuarios"), where("perfil","in",["administrativo","usuario","consulta","auditor"]), limit(500))),
       getDocs(query(collection(db, "solicitacoesAcesso"), where("status","==","pendente"), limit(200))),
     ]);
     setLista(condSnap.docs.map(d => ({ id:d.id, ...d.data() } as UsuarioConta)));
@@ -169,6 +180,22 @@ export default function Usuarios() {
     } finally { setSalvando(false); }
   }
 
+  /**
+   * Altera o nível de acesso de uma conta existente.
+   * Fica registrado na auditoria: mudança de permissão é ação sensível — é o tipo de
+   * coisa que precisa ter dono e data quando alguém perguntar depois.
+   */
+  async function alterarPerfil(c: UsuarioConta, novo: Perfil) {
+    if (novo === c.perfil) { setPerfilEditando(null); return; }
+    await updateDoc(doc(db, "usuarios", c.id), { perfil: novo });
+    await registrarAuditoria("alterar_perfil_usuario", usuario?.uid || "", usuario?.nome || "", {
+      usuarioAlvo: c.nome, email: c.email, perfilAnterior: c.perfil, perfilNovo: novo,
+    });
+    setPerfilEditando(null);
+    setSucessoMsg(`${c.nome} agora tem o perfil ${PERFIL_LABEL[novo] ?? novo}.`);
+    await carregarTudo();
+  }
+
   async function toggleAtivo(c: UsuarioConta) {
     await updateDoc(doc(db, "usuarios", c.id), { ativo: !c.ativo });
     carregarTudo();
@@ -246,9 +273,33 @@ export default function Usuarios() {
                           <div style={{ width:44, height:44, borderRadius:"50%", background:pal.bg, color:pal.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:700, letterSpacing:-0.5 }}>{initials}</div>
                           <span style={{ ...s.badgeStatus, ...(c.ativo ? { background:"#dcfce7", color:"#166534" } : { background:"#fee2e2", color:"#991b1b" }) }}>{c.ativo ? "Ativo" : "Inativo"}</span>
                         </div>
-                        <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4, flexWrap:"wrap" }}>
                           <div style={{ fontSize:15, fontWeight:700, color:"#0F172A" }}>{c.nome}</div>
-                          <span style={{ fontSize:11, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", borderRadius:99, padding:"1px 8px" }}>{PERFIL_LABEL[c.perfil] || c.perfil}</span>
+                          {/* O nível de acesso é editável no lugar onde ele aparece —
+                              o gestor não precisa procurar a ação em outra tela. */}
+                          {perfilEditando === c.id ? (
+                            <select
+                              autoFocus
+                              defaultValue={c.perfil}
+                              onChange={e => alterarPerfil(c, e.target.value as Perfil)}
+                              onBlur={() => setPerfilEditando(null)}
+                              aria-label={`Nível de acesso de ${c.nome}`}
+                              style={{ ...s.input, width:"auto", padding:"3px 8px", fontSize:12 }}
+                            >
+                              {PERFIS_CONCEDIVEIS.map(p => (
+                                <option key={p.valor} value={p.valor}>{p.titulo}</option>
+                              ))}
+                            </select>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setPerfilEditando(c.id)}
+                              title="Alterar nível de acesso"
+                              style={{ fontSize:11, fontWeight:700, color:"#5A7A9A", background:"#F1F5F9", border:"1px dashed #CBD5E1", borderRadius:99, padding:"1px 8px", cursor:"pointer" }}
+                            >
+                              {PERFIL_LABEL[c.perfil] || c.perfil} ▾
+                            </button>
+                          )}
                         </div>
                         <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}><IcoEmail tam={14}/> {c.email}</div>
                         <div style={{ fontSize:13, color:"#5A7A9A", marginBottom:2 }}><IcoPredio tam={14}/> {c.setor}</div>
@@ -349,9 +400,9 @@ export default function Usuarios() {
               <div>
                 <label htmlFor="novo-usuario-perfil" style={s.label}>Perfil</label>
                 <select id="novo-usuario-perfil" value={form.perfil} onChange={e => setForm(p => ({ ...p, perfil:e.target.value as Perfil }))} style={s.input}>
-                  <option value="usuario">Usuário — reserva veículos, salas e equipamentos</option>
-                  <option value="consulta">Consulta — só leitura, só calendários</option>
-                  <option value="auditor">Auditor — só leitura da auditoria e relatórios</option>
+                  {PERFIS_CONCEDIVEIS.map(p => (
+                    <option key={p.valor} value={p.valor}>{p.titulo} — {p.descricao}</option>
+                  ))}
                 </select>
               </div>
             </div>

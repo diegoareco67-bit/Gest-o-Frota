@@ -34,7 +34,9 @@ const STATUS_EMPRESTIMO: Record<string, { cor: string; label: string }> = {
 function gerarProtocolo() { return "EQP" + Date.now().toString().slice(-8); }
 
 export default function Equipamentos() {
-  const { usuario, ehGestor, ehConsulta } = useAuth();
+  const { usuario, ehGestor, ehConsulta, ehAdministrativo } = useAuth();
+  // Quem mantém o catálogo do recurso (cadastrar/editar item)
+  const podeGerenciar = ehGestor || ehAdministrativo;
   const [equipamentos, setEquipamentos] = useState<Equipamento[]>([]);
   const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -135,11 +137,11 @@ export default function Equipamentos() {
   }
 
   function podeCancelar(e: Emprestimo) {
-    return ehGestor || e.responsavelId === usuario?.uid;
+    return podeGerenciar || e.responsavelId === usuario?.uid;
   }
 
   const meusEProximos = emprestimos
-    .filter(e => ehGestor || e.responsavelId === usuario?.uid)
+    .filter(e => podeGerenciar || e.responsavelId === usuario?.uid)
     .sort((a, b) => a.dataInicio.localeCompare(b.dataInicio));
 
   return (
@@ -159,7 +161,7 @@ export default function Equipamentos() {
             <div style={s.card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>Catálogo ({equipamentos.length})</div>
-                {ehGestor && <button onClick={() => setModalEquip(true)} style={s.btnMini}>+ Novo equipamento</button>}
+                {podeGerenciar && <button onClick={() => setModalEquip(true)} style={s.btnMini}>+ Novo equipamento</button>}
               </div>
               {carregando ? (
                 <SkeletonLista itens={3} />
@@ -200,7 +202,7 @@ export default function Equipamentos() {
           </div>
 
           <div style={s.card}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 10 }}>{ehGestor ? "Todos os empréstimos ativos" : "Meus empréstimos"}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 10 }}>{podeGerenciar ? "Todos os empréstimos ativos" : "Meus empréstimos"}</div>
             {carregando ? (
               <SkeletonLista itens={3} />
             ) : meusEProximos.length === 0 ? (

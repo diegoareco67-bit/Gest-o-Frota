@@ -23,7 +23,8 @@ export type AcaoAuditoria =
   | "enviar_indenizacao"
   | "anonimizar_usuario"
   | "alterar_configuracao"
-  | "recusar_solicitacao_acesso";
+  | "recusar_solicitacao_acesso"
+  | "alterar_perfil_usuario";
 
 /**
  * Grava um registro imutável na coleção `auditoria`.

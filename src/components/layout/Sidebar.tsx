@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { collection, query, where, onSnapshot, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { IcoMenu, IcoX } from "../../components/Icone";
+import type { Perfil } from "../../types";
 
 const IcoMap = {
   dashboard: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
@@ -28,10 +29,19 @@ const IcoMap = {
 
 type IcoKey = keyof typeof IcoMap;
 
+/** Nome de cada perfil como o usuário o vê. Fonte única — não repetir em tela. */
+export const PERFIL_ROTULO: Record<Perfil, string> = {
+  gestor:         "Gestor",
+  administrativo: "Administrativo",
+  usuario:        "Usuário",
+  consulta:       "Consulta",
+  auditor:        "Auditor",
+};
+
 interface NavItem { icon:IcoKey; label:string; path:string; badge?:number; }
 interface Section { label:string; items:NavItem[]; }
 
-function getSections(perfil:"gestor"|"usuario"|"consulta"|"auditor", pendentes=0): Section[] {
+function getSections(perfil:Perfil, pendentes=0): Section[] {
   if(perfil==="gestor") return [
     { label:"PRINCIPAL", items:[
       {icon:"dashboard",label:"Dashboard",  path:"/gestor"},
@@ -52,6 +62,25 @@ function getSections(perfil:"gestor"|"usuario"|"consulta"|"auditor", pendentes=0
     { label:"ANÁLISE", items:[
       {icon:"chart",  label:"Relatórios", path:"/gestor/relatorios"},
       {icon:"shield", label:"Auditoria",  path:"/gestor/auditoria"},
+    ]},
+  ];
+  // Administrativo (SUAD): mantém os recursos do órgão e decide os Termos de Opção.
+  // Não tem Usuários nem Configurações — esses seguem exclusivos do gestor, para
+  // impedir escalonamento de privilégio e proteger o valor pago por km.
+  if(perfil==="administrativo") return [
+    { label:"PRINCIPAL", items:[
+      {icon:"dashboard", label:"Início",     path:"/administrativo"},
+      {icon:"cash",      label:"Indenizações", path:"/gestor/indenizacoes"},
+    ]},
+    { label:"GESTÃO", items:[
+      {icon:"truck",    label:"Veículos",     path:"/gestor/veiculos"},
+      {icon:"door",     label:"Salas",        path:"/salas"},
+      {icon:"laptop",   label:"Equipamentos", path:"/equipamentos"},
+      {icon:"wrench",   label:"Manutenção",   path:"/gestor/manutencao"},
+      {icon:"building", label:"Setores",      path:"/gestor/setores"},
+    ]},
+    { label:"ANÁLISE", items:[
+      {icon:"chart", label:"Relatórios", path:"/gestor/relatorios"},
     ]},
   ];
   if(perfil==="consulta") return [
@@ -109,7 +138,7 @@ const ICO_COLORS: Record<IcoKey, string> = {
   gear: ICO_COR_PADRAO,
 };
 
-interface SidebarProps { perfil:"gestor"|"usuario"|"consulta"|"auditor"; }
+interface SidebarProps { perfil:Perfil; }
 
 export function Sidebar({perfil}: SidebarProps) {
   const {usuario, logout} = useAuth();
@@ -120,7 +149,7 @@ export function Sidebar({perfil}: SidebarProps) {
   const [hovered, setHovered] = useState<string|null>(null);
   const [logoutHovered, setLogoutHovered] = useState(false);
   // Tela inicial de cada perfil — destino do clique na marca
-  const rotaInicial = perfil === "gestor" ? "/gestor" : perfil === "consulta" ? "/consulta" : perfil === "auditor" ? "/auditor" : "/usuario";
+  const rotaInicial = perfil === "gestor" ? "/gestor" : perfil === "administrativo" ? "/administrativo" : perfil === "consulta" ? "/consulta" : perfil === "auditor" ? "/auditor" : "/usuario";
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [aberta, setAberta] = useState(false);
 
@@ -273,7 +302,7 @@ export function Sidebar({perfil}: SidebarProps) {
           <div style={s.avatar}>{initials}</div>
           <div style={{flex:1,minWidth:0}}>
             <div style={s.userName}>{usuario?.nome?.split(" ")[0]??"Usuário"}</div>
-            <div style={s.userRole}>{perfil==="gestor"?"Gestor":perfil==="consulta"?"Consulta":perfil==="auditor"?"Auditor":"Usuário"} · CGE-MS</div>
+            <div style={s.userRole}>{PERFIL_ROTULO[perfil] ?? "Usuário"} · CGE-MS</div>
           </div>
           <button
             onClick={logout}

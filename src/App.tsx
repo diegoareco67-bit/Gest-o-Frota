@@ -22,6 +22,7 @@ const Auditoria = lazyComRetry(() => import("./pages/gestor/Auditoria"));
 const Seguranca = lazyComRetry(() => import("./pages/gestor/Seguranca"));
 const Setores = lazyComRetry(() => import("./pages/gestor/Setores"));
 const Configuracoes = lazyComRetry(() => import("./pages/gestor/Configuracoes"));
+const DashboardAdministrativo = lazyComRetry(() => import("./pages/administrativo/Dashboard"));
 const DashboardUsuario = lazyComRetry(() => import("./pages/usuario/Dashboard"));
 const Solicitar = lazyComRetry(() => import("./pages/usuario/Solicitar"));
 const MinhasSolicitacoes = lazyComRetry(() => import("./pages/usuario/MinhasSolicitacoes"));
@@ -58,14 +59,15 @@ export default function App() {
           <Route path="/gestor/aprovacoes" element={<RotaProtegida perfil="gestor"><Aprovacoes /></RotaProtegida>} />
           <Route path="/gestor/manual" element={<RotaProtegida perfil="gestor"><ManualUso /></RotaProtegida>} />
           <Route path="/gestor/seguranca" element={<RotaProtegida perfil="gestor"><Seguranca /></RotaProtegida>} />
-          <Route path="/gestor/veiculos" element={<RotaProtegida perfil="gestor"><Veiculos /></RotaProtegida>} />
-          <Route path="/gestor/manutencao" element={<RotaProtegida perfil="gestor"><Manutencao /></RotaProtegida>} />
+          <Route path="/gestor/veiculos" element={<RotaProtegida perfil={["gestor","administrativo"]}><Veiculos /></RotaProtegida>} />
+          <Route path="/gestor/manutencao" element={<RotaProtegida perfil={["gestor","administrativo"]}><Manutencao /></RotaProtegida>} />
           <Route path="/gestor/usuarios" element={<RotaProtegida perfil="gestor"><Usuarios /></RotaProtegida>} />
-          <Route path="/gestor/relatorios" element={<RotaProtegida perfil={["gestor","auditor"]}><Relatorios /></RotaProtegida>} />
+          <Route path="/gestor/relatorios" element={<RotaProtegida perfil={["gestor","administrativo","auditor"]}><Relatorios /></RotaProtegida>} />
           <Route path="/gestor/auditoria" element={<RotaProtegida perfil={["gestor","auditor"]}><Auditoria /></RotaProtegida>} />
           <Route path="/auditor" element={<RotaProtegida perfil="auditor"><Auditoria /></RotaProtegida>} />
-          <Route path="/gestor/setores" element={<RotaProtegida perfil="gestor"><Setores /></RotaProtegida>} />
+          <Route path="/gestor/setores" element={<RotaProtegida perfil={["gestor","administrativo"]}><Setores /></RotaProtegida>} />
           <Route path="/gestor/configuracoes" element={<RotaProtegida perfil="gestor"><Configuracoes /></RotaProtegida>} />
+          <Route path="/administrativo" element={<RotaProtegida perfil="administrativo"><DashboardAdministrativo /></RotaProtegida>} />
           <Route path="/usuario" element={<RotaProtegida perfil="usuario"><DashboardUsuario /></RotaProtegida>} />
           <Route path="/usuario/solicitar" element={<RotaProtegida perfil="usuario"><Solicitar /></RotaProtegida>} />
           <Route path="/usuario/solicitacoes" element={<RotaProtegida perfil="usuario"><MinhasSolicitacoes /></RotaProtegida>} />
@@ -73,7 +75,7 @@ export default function App() {
           <Route path="/usuario/checkin/:id" element={<RotaProtegida perfil="usuario"><Checkin /></RotaProtegida>} />
           <Route path="/usuario/veiculo-proprio" element={<RotaProtegida perfil="usuario"><VeiculoProprio /></RotaProtegida>} />
           <Route path="/usuario/indenizacoes" element={<RotaProtegida perfil="usuario"><Indenizacoes /></RotaProtegida>} />
-          <Route path="/gestor/indenizacoes" element={<RotaProtegida perfil="gestor"><GestorIndenizacoes /></RotaProtegida>} />
+          <Route path="/gestor/indenizacoes" element={<RotaProtegida perfil={["gestor","administrativo"]}><GestorIndenizacoes /></RotaProtegida>} />
           <Route path="/consulta" element={<RotaProtegida perfil="consulta"><DashboardConsulta /></RotaProtegida>} />
           <Route path="/salas" element={<RotaProtegida><Salas /></RotaProtegida>} />
           <Route path="/equipamentos" element={<RotaProtegida><Equipamentos /></RotaProtegida>} />

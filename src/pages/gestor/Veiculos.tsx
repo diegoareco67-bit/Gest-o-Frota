@@ -70,7 +70,7 @@ export default function Veiculos() {
 
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"#F1F5F9",fontFamily:"'Sora',system-ui,sans-serif"}}>
-      <Sidebar perfil="gestor"/>
+      <Sidebar perfil={usuario?.perfil ?? "gestor"}/>
 
       <main style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
         {/* Topbar */}

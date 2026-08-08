@@ -1,4 +1,4 @@
-export type Perfil = "gestor" | "usuario" | "consulta" | "auditor";
+export type Perfil = "gestor" | "administrativo" | "usuario" | "consulta" | "auditor";
 export type StatusVeiculo = "disponivel" | "em_uso" | "manutencao" | "indisponivel";
 
 export interface Usuario {

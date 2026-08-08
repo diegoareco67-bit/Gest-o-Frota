@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { useAuth } from "../../contexts/AuthContext";
 import { Sidebar } from "../../components/layout/Sidebar";
 
 interface SolicitacaoRel { id?:string; protocolo?:string; condutorNome?:string; condutorSetor?:string; veiculoPlaca?:string; destino?:string; motivo?:string; dataSaida?:string; dataRetorno?:string; status?:string; }
@@ -32,6 +33,7 @@ const REPORT_CARDS = [
 ];
 
 export default function Relatorios() {
+  const { usuario } = useAuth();
   const [resumo,setResumo] = useState<Resumo|null>(null);
   const [load,setLoad]     = useState(true);
   const [periodo,setPeriodo] = useState(new Date().toISOString().slice(0,7));
@@ -133,7 +135,7 @@ export default function Relatorios() {
 
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"#F1F5F9",fontFamily:"'Sora',system-ui,sans-serif"}}>
-      <Sidebar perfil="gestor"/>
+      <Sidebar perfil={usuario?.perfil ?? "gestor"}/>
 
       <main style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
         {/* Topbar */}

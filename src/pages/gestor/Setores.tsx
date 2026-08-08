@@ -2,11 +2,13 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { useAuth } from "../../contexts/AuthContext";
 import { SkeletonLista } from "../../components/Skeleton";
 
 interface Setor { id: string; nome: string; ativo: boolean; }
 
 export default function Setores() {
+  const { usuario } = useAuth();
   const [setores, setSetores] = useState<Setor[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [nomeNovo, setNomeNovo] = useState("");
@@ -44,7 +46,7 @@ export default function Setores() {
 
   return (
     <div style={s.page}>
-      <Sidebar perfil="gestor" />
+      <Sidebar perfil={usuario?.perfil ?? "gestor"} />
       <main style={s.main}>
         <div style={s.topbar}>
           <div>

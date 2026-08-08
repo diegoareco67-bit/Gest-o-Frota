@@ -50,7 +50,9 @@ export default function Login() {
     const {db:_db}    =await import("../firebase/config");
     const snap=await getDoc(doc(_db,"usuarios",auth.currentUser!.uid));
     const perfil=snap.data()?.perfil;
-    const destino=perfil==="gestor"||perfil==="usuario"||perfil==="consulta"||perfil==="auditor" ? `/${perfil}` : "/consulta";
+    // Perfil desconhecido cai em "/consulta" — privilégio mínimo, mesma decisão do AuthContext
+    const perfisValidos=["gestor","administrativo","usuario","consulta","auditor"];
+    const destino=perfisValidos.includes(perfil) ? `/${perfil}` : "/consulta";
     navigate(destino,{replace:true});
   }
 

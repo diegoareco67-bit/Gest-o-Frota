@@ -46,6 +46,7 @@ const ACAO_LABEL: Record<string, { texto: string; estado: keyof typeof badgeEsta
   registrar_manutencao:            { texto: "Registrou manutenção",      estado: "alerta" },
   alterar_configuracao:            { texto: "Alterou configuração",      estado: "alerta" },
   recusar_solicitacao_acesso:      { texto: "Recusou pedido de acesso",  estado: "perigo" },
+  alterar_perfil_usuario:          { texto: "Alterou nível de acesso",   estado: "alerta" },
   // Devoluções (fecha o ciclo, sem carga)
   checkin:                         { texto: "Devolveu veículo",          estado: "neutro" },
   devolver_equipamento:            { texto: "Devolveu equipamento",      estado: "neutro" },

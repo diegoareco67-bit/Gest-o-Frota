@@ -43,6 +43,7 @@ export function signInWithEmailAndPassword(_auth: unknown, email: string, passwo
     return Promise.reject(erro);
   }
   const uid = email.includes("gestor") ? "uid-gestor-teste"
+    : email.includes("administrativo") ? "uid-admin-teste"
     : email.includes("consulta") ? "uid-consulta-teste"
     : email.includes("auditor") ? "uid-auditor-teste"
     : email.includes("outro") ? "uid-outro-servidor"

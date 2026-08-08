@@ -99,6 +99,30 @@ Nome **Hub**, subtítulo "Central de Recursos Compartilhados". Visual minimalist
 
 Lei Federal nº 13.709/2018 (LGPD) · Lei nº 12.527/2011 (Lei de Acesso à Informação) · Decreto Estadual nº 10.154/2000 (Indenização de Transporte) · Decreto Estadual nº 15.572/2020 (LGPD no Poder Executivo de MS) · Política Estadual de Segurança da Informação · Decreto Estadual nº 15.721/2021 (Plano de Classificação e Tabela de Temporalidade de Documentos das Atividades-Meio do Executivo — base dos prazos de retenção/anonimização usados no Hub) · Resolução CGE/MS nº 133, de 4/9/2025 (Política de Privacidade e Proteção de Dados Pessoais da própria CGE/MS — existência e texto integral confirmados em 2026-08-06 via PDF oficial do Anexo Único; aplica-se diretamente ao Hub por ser um sistema da própria CGE/MS, mas seu Art. 6º — mapeamento de tratamento por área — ainda não lista a gestão de frota/salas/equipamentos/indenização entre as 8 aplicabilidades previstas, e seu Art. 12 aponta genericamente para a Tabela de Temporalidade de atividades-fim, não a de atividades-meio de fato usada pelo Hub — ver lacuna documentada em PLANO.md).
 
+## Perfis de acesso
+
+Cinco perfis em `src/types.ts`. Quem concede é o **gestor**, na tela de Usuários — o badge de
+perfil no card é clicável e vira seletor; toda troca vai para a trilha de auditoria.
+
+| Perfil | O que faz |
+|---|---|
+| `gestor` | Tudo. **Exclusivo:** gerenciar usuários/níveis de acesso e alterar configurações |
+| `administrativo` | Cadastra e edita veículos, salas, equipamentos, manutenção e setores; decide Termos de Opção; consulta indenizações e relatórios. Criado para a **SUAD** |
+| `usuario` | Reserva veículos, salas e equipamentos; solicita indenização |
+| `consulta` | Só leitura dos calendários |
+| `auditor` | Só leitura da trilha de auditoria e dos relatórios |
+
+**Duas exclusões do `administrativo` são deliberadas — não "libere" sem pensar:**
+- **Usuários**: quem cria/edita conta pode se promover a gestor. Essa brecha exata já foi
+  fechada na auditoria de 2026-07-19; reabri-la anula aquela correção.
+- **Configurações**: o valor do km define quanto dinheiro público é pago por indenização.
+
+O `gestor` não aparece entre os perfis concedíveis na tela: promover alguém a gestor dá a ele o
+poder de gerenciar acessos, e isso não deve ser um clique na rotina do dia a dia.
+
+Há testes e2e (`e2e/administrativo.spec.ts`) que travam esses dois limites — se alguém liberar
+por engano, a suíte quebra.
+
 ## Período de reserva — regras de negócio
 
 Toda entrada de início/fim passa por `src/utils/periodo.ts` (`validarPeriodo`). Não escreva

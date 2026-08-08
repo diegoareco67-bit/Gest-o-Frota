@@ -239,6 +239,46 @@ preciso saber se o E-MS expõe API de assinatura ou só interface web.
 
 ---
 
+## ✅ Perfil administrativo (SUAD) e gerência de níveis de acesso — 2026-08-08
+
+Fecha o bloqueio deixado pela pendência 14: o boletim ficava registrado no sistema, mas ninguém
+da SUAD conseguia vê-lo.
+
+**Nome:** `administrativo`, não `suad`. Perfil descreve *nível de acesso*, não *setor* — se
+amanhã outro setor precisar do mesmo acesso, o nome continua válido. É também o nome que já
+constava no plano original de perfis do `CLAUDE.md`.
+
+**O que o perfil faz:** cadastra e edita veículos, salas, equipamentos, manutenção e setores;
+aprova/recusa Termos de Opção; consulta indenizações e relatórios.
+
+**O que NÃO faz, de propósito:**
+- **Usuários** — quem cria/edita conta pode se promover a gestor. É a mesma brecha de
+  escalonamento de privilégio fechada na auditoria de 2026-07-19.
+- **Configurações** — o valor do km define quanto dinheiro público é pago.
+
+O pedido original era "todos os itens de gestão". Essas duas exclusões são um desvio deliberado
+do literal, pelos motivos acima; se a intenção for mesmo liberar, é mudar uma linha nas regras —
+mas convém decidir isso conscientemente.
+
+**Gerência de acesso pelo gestor:** o badge de perfil no card do usuário virou botão — clica e
+vira seletor, no mesmo lugar onde a informação já aparecia, sem procurar a ação em outra tela.
+Toda troca grava `alterar_perfil_usuario` na auditoria: mudança de permissão precisa ter dono e
+data quando alguém perguntar depois. O `gestor` **não** está entre os perfis concedíveis.
+
+**Alcance da mudança:**
+- `types.ts`, `AuthContext` (`ehAdministrativo`), `firestore.rules` (`isAdministrativo()` e
+  `isGestaoRecursos()`), Sidebar (menu próprio), `App.tsx` (rotas), `login.tsx` (redirecionamento)
+- Nova tela `pages/administrativo/Dashboard.tsx`
+- As telas de recurso deixaram de fixar `<Sidebar perfil="gestor">` e passaram a refletir o
+  perfil real — sem isso o administrativo veria o menu do gestor, com Usuários e Configurações
+- `PERFIL_ROTULO` centraliza o nome de cada perfil (antes repetido em cadeia de ternários)
+
+**Cobertura:** `e2e/administrativo.spec.ts` — 10 testes, sendo 3 que travam os limites
+(não acessa Usuários, não acessa Configurações, a barra lateral não oferece nenhum dos dois).
+
+**Pendente:** criar a conta real da SUAD e combinar com o setor quem será o usuário. É mudança
+de rotina de trabalho — eles deixam de esperar e-mail e passam a entrar no sistema.
+
 ## ⏳ PENDÊNCIAS ABERTAS
 
 ### ✅ 14. E-mails não chegavam — CAUSA IDENTIFICADA e contornada (2026-08-07)

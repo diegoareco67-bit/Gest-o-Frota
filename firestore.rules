@@ -29,6 +29,25 @@ service cloud.firestore {
       return isAuth() && perfil() == "auditor";
     }
 
+    /**
+     * Perfil administrativo (usado pela SUAD): cadastra e edita os RECURSOS do órgão —
+     * veículos, salas, equipamentos, manutenção, setores — e decide os Termos de Opção.
+     *
+     * NÃO gerencia usuários nem configurações, de propósito:
+     *  - usuários: quem cria/edita conta pode se promover a gestor. Essa brecha já foi
+     *    fechada uma vez na auditoria de 2026-07-19 e não deve ser reaberta.
+     *  - configurações: o valor do km define quanto dinheiro público é pago.
+     * Ambos seguem exclusivos do gestor.
+     */
+    function isAdministrativo() {
+      return isAuth() && perfil() == "administrativo";
+    }
+
+    /** Quem pode manter o cadastro dos recursos compartilhados. */
+    function isGestaoRecursos() {
+      return isGestor() || isAdministrativo();
+    }
+
     // ─── período de reserva ────────────────────────────────────────────────
     // Guarda contra período absurdo. Em teste de uso real um usuário conseguiu
     // reservar um veículo por ~100 anos — os dois campos de data eram independentes
@@ -85,7 +104,7 @@ service cloud.firestore {
     // de acesso, antes do login, também precisa listar); só gestor escreve.
     match /setores/{id} {
       allow read: if true;
-      allow write: if isGestor();
+      allow write: if isGestaoRecursos();
     }
 
     // ─── veiculos ─────────────────────────────────────────────────────────
@@ -96,9 +115,9 @@ service cloud.firestore {
     // permitia ao usuario reescrever o documento inteiro (placa, marca, modelo...),
     // brecha fechada na auditoria de 2026-07-19. Ninguém deleta veículo.
     match /veiculos/{id} {
-      allow read: if isGestor() || isUsuario() || isAuditor();
-      allow create: if isGestor();
-      allow update: if isGestor()
+      allow read: if isGestor() || isAdministrativo() || isUsuario() || isAuditor();
+      allow create: if isGestaoRecursos();
+      allow update: if isGestaoRecursos()
         || (isUsuario()
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","kmAtual"]));
       allow delete: if false;
@@ -181,8 +200,8 @@ service cloud.firestore {
 
     // ─── manutencoes ──────────────────────────────────────────────────────
     match /manutencoes/{id} {
-      allow read: if isGestor() || isUsuario() || isAuditor();
-      allow write: if isGestor();
+      allow read: if isGestor() || isAdministrativo() || isUsuario() || isAuditor();
+      allow write: if isGestaoRecursos();
     }
 
     // ─── usos (checkout / checkin) ────────────────────────────────────────
@@ -213,8 +232,8 @@ service cloud.firestore {
     // Cadastro de salas de reunião. Todo perfil autenticado lê (inclusive consulta,
     // que só enxerga calendários); só gestor cadastra/edita.
     match /salas/{id} {
-      allow read: if isGestor() || isUsuario() || isConsulta();
-      allow write: if isGestor();
+      allow read: if isGestor() || isAdministrativo() || isUsuario() || isConsulta();
+      allow write: if isGestaoRecursos();
     }
 
     // ─── reservasSalas ──────────────────────────────────────────────────────
@@ -239,9 +258,9 @@ service cloud.firestore {
     // Anexo I do Decreto 10.154/2000 — Termo de Opção e Cadastramento de Veículo.
     // Cadastro único por servidor; dado sensível (dados do veículo particular), gestor e o próprio dono leem.
     match /veiculosProprios/{id} {
-      allow read: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow read: if isGestor() || isAdministrativo() || (isUsuario() && resource.data.servidorId == request.auth.uid);
       allow create: if isUsuario() && request.resource.data.servidorId == request.auth.uid;
-      allow update: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow update: if isGestor() || isAdministrativo() || (isUsuario() && resource.data.servidorId == request.auth.uid);
       allow delete: if false;
     }
 
@@ -249,9 +268,9 @@ service cloud.firestore {
     // Anexo II do Decreto 10.154/2000 — Boletim Demonstrativo de Viagem e Homologação.
     // Uma por deslocamento; mesma visibilidade de veiculosProprios (dado financeiro/pessoal sensível).
     match /indenizacoes/{id} {
-      allow read: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow read: if isGestor() || isAdministrativo() || (isUsuario() && resource.data.servidorId == request.auth.uid);
       allow create: if isUsuario() && request.resource.data.servidorId == request.auth.uid;
-      allow update: if isGestor() || (isUsuario() && resource.data.servidorId == request.auth.uid);
+      allow update: if isGestor() || isAdministrativo() || (isUsuario() && resource.data.servidorId == request.auth.uid);
       allow delete: if false;
     }
 
@@ -261,7 +280,7 @@ service cloud.firestore {
     // por decreto de tempos em tempos). Leitura: gestor e usuário (o usuário precisa do
     // valor pra calcular o Anexo II ao preencher o formulário). Escrita: só gestor.
     match /configuracoes/{id} {
-      allow read: if isGestor() || isUsuario();
+      allow read: if isGestor() || isAdministrativo() || isUsuario();
       allow write: if isGestor();
     }
 
@@ -271,8 +290,8 @@ service cloud.firestore {
     // status (ao reservar/retirar/devolver/cancelar) — mesma brecha de 'veiculos'
     // fechada na auditoria de 2026-07-19.
     match /equipamentos/{id} {
-      allow read: if isGestor() || isUsuario() || isConsulta();
-      allow create: if isGestor();
+      allow read: if isGestor() || isAdministrativo() || isUsuario() || isConsulta();
+      allow create: if isGestaoRecursos();
       allow update: if isGestor()
         || (isUsuario()
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"]));
