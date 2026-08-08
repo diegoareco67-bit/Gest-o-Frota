@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Calendario from "../../components/Calendario";
 import { CalendarioGrade } from "../../components/CalendarioGrade";
 import { Sidebar } from "../../components/layout/Sidebar";
+import { PainelAvisos } from "../../components/PainelAvisos";
 import { IcoCarro, IcoPessoa, IcoSirene } from "../../components/Icone";
 
 const STATUS_SALAS = {
@@ -99,6 +100,10 @@ export default function DashboardGestor() {
             <Spinner />
           ) : (
             <>
+              {/* Pedidos de acesso e termos aguardando — substitui o aviso por e-mail,
+                  que o servidor da CGE barra (ver PLANO.md, pendência 14). */}
+              <PainelAvisos uid={usuario?.uid} perfil="gestor" />
+
               {/* Alertas de atraso */}
               {atrasadas.length > 0 && (
                 <div style={s.alertBox}>

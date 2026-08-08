@@ -241,7 +241,65 @@ preciso saber se o E-MS expõe API de assinatura ou só interface web.
 
 ## ⏳ PENDÊNCIAS ABERTAS
 
-### 14. E-mails não estão chegando — investigação parada, falta identificar QUAL
+### ✅ 14. E-mails não chegavam — CAUSA IDENTIFICADA e contornada (2026-08-07)
+
+**Causa raiz, confirmada por teste controlado:** o servidor de e-mail da CGE barra as
+mensagens do Apps Script. Não é bug do código nem configuração errada.
+
+Provas coletadas (mesma chamada, mesmo script, só o destinatário muda):
+
+| Destino | Resultado |
+|---|---|
+| `diegoareco67@gmail.com` | ✅ chegou |
+| `dareco@cge.ms.gov.br` | ❌ não chegou |
+
+**DNS do domínio explica:**
+```
+MX  cge.ms.gov.br → snwl.ms.gov.br            (appliance SonicWall do Estado)
+SPF v=spf1 ip4:187.86.226.x ... -all          (hard fail: rejeita fora desses IPs)
+```
+
+**Distinção importante, medida e não suposta:** o bloqueio **não é a "e-mail externo"**. Os
+e-mails do **Firebase** (definição de senha) **chegam normalmente** no `@cge.ms.gov.br` — prova:
+`mreis@cge.ms.gov.br` foi criado às 10:49 de 06/08 e fez login às **10:55**, 6 minutos depois,
+o que só é possível tendo recebido o link. O que é barrado é especificamente o remetente
+**Gmail pessoal sem autenticação de domínio** usado pelo `MailApp`.
+
+**Por que NÃO foi corrigido publicando o script por uma conta `@cge.ms.gov.br`:** a CGE não usa
+Google Workspace (o MX aponta para servidor próprio). Uma conta Google com endereço
+`@cge.ms.gov.br` enviaria pelos servidores do Google com remetente do domínio — e o SPF `-all`
+mandaria **rejeitar**. Ficaria pior: hoje é filtrado, ali seria recusado e ainda pareceria
+falsificação de remetente.
+
+**Decisão (com o usuário):** abandonar o e-mail como canal e **avisar dentro do sistema**. Além
+de viável, é mais defensável sob a LGPD — o PDF do Anexo II carrega nome, matrícula, trajetos e
+valor a receber; mandá-lo por e-mail a partir de uma conta Gmail pessoal significa dado pessoal
+saindo para uma caixa que o órgão não administra, não audita e não consegue eliminar no fim do
+prazo de retenção (conflita com os arts. 9º, 10 e 12 da Resolução CGE/MS nº 133/2025).
+
+**Implementado:**
+- **`src/hooks/useAvisos.ts`** — detecta novidades por perfil comparando o estado atual com o
+  último visto, guardado em `localStorage`. Sem campo novo no Firestore, sem migração, funciona
+  para documentos anteriores à funcionalidade. Verifica a cada 60s (mesmo padrão do
+  `CalendarioGrade`). Na primeira carga não notifica, para não estourar avisos antigos.
+- **`src/components/PainelAvisos.tsx`** — faixa de avisos no topo dos dashboards.
+  - **Condutor:** solicitação aprovada/recusada (com o motivo).
+  - **Gestor:** novo pedido de acesso, Termo de Opção aguardando.
+- **Notificação do navegador** — pop-up nativo mesmo com a aba em segundo plano. A permissão só
+  é pedida **quando já existe um aviso** — pedir numa tela vazia faz o usuário negar por reflexo.
+- **PWA instalável** (`public/manifest.webmanifest`, `public/sw.js`, ícones 192/512 gerados) —
+  habilita instalar na tela inicial do celular. Deixa pronto o caminho para push com o app
+  fechado; **a Cloud Function que dispara o push ainda não existe**, o `sw.js` já tem o handler.
+  O service worker **não faz cache de nada**, de propósito: cache aqui reintroduziria o problema
+  de chunk desatualizado da correção 13.
+- **Textos corrigidos:** a tela do Anexo II não promete mais "vai por e-mail para a SUAD" —
+  agora diz que fica registrado no sistema e que a SUAD acessa pelo Hub.
+
+**Pendente desta decisão:** criar o acesso da SUAD ao sistema (perfil a definir — novo perfil
+`suad` restrito a indenizações, ou reaproveitar `consulta`). Sem isso, o boletim fica registrado
+mas ninguém do setor o vê. **É o próximo passo e depende de combinar com o setor.**
+
+### 14b. (histórico) Investigação — o que já havia sido descartado
 
 Relatado em 2026-08-07: "os e-mails não estão chegando". A investigação **descartou as causas
 mais prováveis** — anotado aqui para não refazer o mesmo trabalho depois.

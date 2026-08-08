@@ -340,14 +340,16 @@ export default function Indenizacoes() {
                 <div style={s.passo}><strong>3.</strong> Envie o PDF assinado abaixo:</div>
                 <input type="file" accept="application/pdf" onChange={e => setArquivoAssinado(e.target.files?.[0] || null)} style={s.input} />
 
-                {/* Aqui o destino é diferente do Anexo I: o boletim SAI do sistema por e-mail.
-                    O usuário precisa saber disso antes de clicar em enviar. */}
+                {/* Texto ajustado à realidade: o e-mail automático para a SUAD não é
+                    entregue — o servidor da CGE barra mensagens do Apps Script (remetente
+                    Gmail sem autenticação de domínio). Ver PLANO.md, pendência 14.
+                    Prometer "vai por e-mail" seria enganar o usuário. */}
                 <div style={s.destino}>
                   <div style={{ fontWeight: 700, color: "#334155", marginBottom: 6 }}>O que acontece ao enviar</div>
                   <ul style={s.destinoLista}>
-                    <li>O boletim é <strong>enviado por e-mail, com o PDF anexado, para a SUAD/CGE-MS</strong> (<span style={{ fontWeight: 600 }}>suad@cge.ms.gov.br</span>) — o setor responsável pelo pagamento da indenização.</li>
-                    <li>Uma cópia fica <strong>guardada no sistema</strong>, com data, hora e código de verificação (SHA-256).</li>
-                    <li>O status passa para <strong>“Enviada ao RH”</strong> nesta tela assim que o envio é confirmado.</li>
+                    <li>O boletim fica <strong>registrado no sistema</strong>, com data, hora e código de verificação (SHA-256) que comprova que o arquivo não foi alterado depois do envio.</li>
+                    <li>A <strong>SUAD/CGE-MS</strong> — setor responsável pelo pagamento — acessa os boletins <strong>pelo próprio Hub</strong>, onde pode conferir e baixar o PDF assinado.</li>
+                    <li>O status passa para <strong>“Enviada ao RH”</strong> nesta tela.</li>
                     <li>O andamento do pagamento segue pelos canais do setor — o Hub não acompanha essa etapa.</li>
                   </ul>
                 </div>

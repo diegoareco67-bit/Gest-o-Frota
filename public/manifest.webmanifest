@@ -1,0 +1,19 @@
+{
+  "name": "Hub — Central de Recursos Compartilhados (CGE-MS)",
+  "short_name": "Hub CGE",
+  "description": "Gestão de frota, salas, equipamentos e indenização de transporte da Controladoria-Geral do Estado de Mato Grosso do Sul.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0F1E3D",
+  "theme_color": "#1E3A8A",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "government"],
+  "icons": [
+    { "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
